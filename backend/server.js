@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mysql = require('mysql2/promise');
+const roles = require('./roles');
 
 const PORT = process.env.PORT || 5000;
 
@@ -40,7 +41,7 @@ app.listen(PORT, () => {
 
 //register user
 app.post('/api/register', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, role } = req.body;
 
     //find if user exists
     const user = await db.query('SELECT * FROM users WHERE username = ? OR email = ?', [username, email]);
@@ -48,8 +49,12 @@ app.post('/api/register', async (req, res) => {
         return res.status(400).json({ message: 'User already exists' });
     }
 
+    if(role < 0 || role > 4){
+        return res.status(400).json({ message: 'Invalid role' });
+    }
+
     //add user to database
-    await db.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, password]);
+    await db.query('INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)', [username, email, password, role]);
     res.status(201).json({ message: 'User registered successfully' });
 });
 
@@ -83,3 +88,44 @@ const authMiddleware = require('./middleware/authMiddleware.js');
 app.get('/api/protected', authMiddleware, (req, res) => {
     res.status(200).json({ message: 'This is a protected route', user: req.user });
 });
+
+// displays all users
+app.get('/api/users', async (req, res) => {
+    const user = await db.query('SELECT * FROM users');
+    res.status(200).json(user[0]);
+});
+
+
+// displays user profile
+app.get('/api/users/:id', async (req, res) => {
+    const { id } = req.params;
+    const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+    if (user[0].length === 0) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user[0][0]);
+});
+
+//displays products
+app.get('/api/products', async (req, res) => {
+    const products = await db.query('SELECT * FROM products');
+    res.status(200).json(products[0]);
+});
+
+//displays product by id
+app.get('/api/products/:id', async (req, res) => {
+    const { id } = req.params;
+    const product = await db.query('SELECT * FROM products WHERE id = ?', [id]);
+    if (product[0].length === 0) {
+        return res.status(404).json({ message: 'Product not found' });
+    }
+    res.status(200).json(product[0][0]);
+});
+
+//display categories
+app.get('/api/categories', async (req, res) => {
+    const categories = await db.query('SELECT * FROM categories');
+    res.status(200).json(categories[0]);
+});
+
+
