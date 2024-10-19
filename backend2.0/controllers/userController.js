@@ -1,46 +1,57 @@
-import { dbGetAllUsers, dbGetUserById, dbCreateUser, dbUpdateUser, dbDeleteUser } from "../models/user.js"
+import { dbGetAllUsers, dbGetUserById, dbCreateUser, dbUpdateUser, dbDeleteUser } from "../models/user.js";
 
-export const getAllUsers = (req, res) => {
-    dbGetAllUsers((err, users) => {
-        if (err) throw err
-        res.json(users)
-    })
-}
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await dbGetAllUsers();
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
 
-export const getUserById = (req, res) => {
-    dbGetUserById(req.params.id, (err, user) => {
-        if (err) throw err
-        res.json(user)
-    })
-}
+export const getUserById = async (req, res) => {
+    try {
+        const user = await dbGetUserById(req.params.id);
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
 
-export const createUser = (req, res) => {
+export const createUser = async (req, res) => {
     const newUser = {
-        title: req.body.title,
-        completed: req.body.completed,
+        username: req.body.username,
+        password: req.body.password,
+        email: req.body.email,
+        role: req.body.role,
+    };
+
+    try {
+        await dbCreateUser(newUser);
+        res.json({ message: "User created successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
+};
 
-    dbCreateUser(newUser, (err, result) => {
-        if (err) throw err
-        res.json({ message: "User created successfully" })
-    })
-}
-
-export const updateUser = (req, res) => {
+export const updateUser = async (req, res) => {
     const updatedUser = {
-        title: req.body.title,
-        completed: req.body.completed,
+        placeholder: req.body.placeholder,
+    };
+
+    try {
+        await dbUpdateUser(req.params.id, updatedUser);
+        res.json({ message: "User updated successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
+};
 
-    dbUpdateUser(req.params.id, updatedUser, (err, result) => {
-        if (err) throw err
-        res.json({ message: "User updated successfully" })
-    })
-}
-
-export const deleteUser = (req, res) => {
-    dbDeleteUser(req.params.id, (err, result) => {
-        if (err) throw err
-        res.json({ message: "User deleted successfully" })
-    })
-}
+export const deleteUser = async (req, res) => {
+    try {
+        await dbDeleteUser(req.params.id);
+        res.json({ message: "User deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
