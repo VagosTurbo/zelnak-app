@@ -20,3 +20,8 @@ export const dbUpdateUser = async (id, updatedUser) => {
 export const dbDeleteUser = async (id) => {
     return db.query('DELETE FROM users WHERE id = ?', [id]);
 };
+
+export const dbVerifyUserCredentials = async (username, password) => {
+    const [rows] = await db.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password]);
+    return rows[0];
+}
