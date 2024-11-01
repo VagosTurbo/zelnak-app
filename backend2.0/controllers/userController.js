@@ -38,12 +38,30 @@ export const createUser = async (req, res) => {
 }
 
 export const updateUser = async (req, res) => {
-    const updatedUser = {
-        placeholder: req.body.placeholder,
+    const userId = req.params.id
+    const updatedUser = {}
+
+    if (req.body.username) updatedUser.username = req.body.username
+
+    if (req.body.password) updatedUser.password = req.body.password
+
+    if (req.body.email) updatedUser.email = req.body.email
+
+    if (req.body.role) updatedUser.role = req.body.role
+
+    // there must be at least one field to update
+    if (Object.keys(updatedUser).length === 0) {
+        return res.status(400).json({ error: "At least one field is required to update." })
     }
 
     try {
-        await dbUpdateUser(req.params.id, updatedUser)
+        // does user exist?
+        const existingUser = await dbGetUserById(userId)
+        if (!existingUser) {
+            return res.status(404).json({ error: "User not found." })
+        }
+
+        await dbUpdateUser(userId, updatedUser)
         res.json({ message: "User updated successfully" })
     } catch (err) {
         res.status(500).json({ error: err.message })
