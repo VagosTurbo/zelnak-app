@@ -69,8 +69,22 @@ export const updateUser = async (req, res) => {
 }
 
 export const deleteUser = async (req, res) => {
+    const userId = req.params.id
+
     try {
-        await dbDeleteUser(req.params.id)
+        // test existence
+        const existingUser = await dbGetUserById(userId)
+        if (!existingUser) {
+            return res.status(404).json({ error: "User not found." })
+        }
+
+        const result = await dbDeleteUser(userId)
+
+        // was the user deleted?
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "User not found." })
+        }
+
         res.json({ message: "User deleted successfully" })
     } catch (err) {
         res.status(500).json({ error: err.message })
