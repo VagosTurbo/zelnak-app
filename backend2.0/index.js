@@ -5,6 +5,7 @@ import eventRoutes from "./routes/eventRoutes.js"
 import orderRoutes from "./routes/orderRoutes.js"
 import errorHandler from "./errorHandler/errorHandler.js"
 import loginRoutes from "./routes/loginRoutes.js"
+import registerRoutes from "./routes/registerRoutes.js"
 import dotenv from "dotenv"
 
 dotenv.config()
@@ -18,6 +19,7 @@ app.use("/products", productRoutes)
 app.use("/events", eventRoutes)
 app.use("/orders", orderRoutes)
 app.use("/login", loginRoutes)
+app.use("/register", registerRoutes)
 app.use(errorHandler)
 app.listen(PORT, () => {
     console.log(`\n***** SERVER RUNNING ON http://localhost:${PORT} *****`)

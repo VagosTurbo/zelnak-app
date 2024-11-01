@@ -1,7 +1,8 @@
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { dbVerifyUserCredentials } from "../models/user.js";
+import { dbVerifyUserCredentials, dbCreateUser } from "../models/user.js";
 
-const secretKey = 'your_secret_key'; // Use a strong secret key in production
+const secretKey = process.env.JWT_SECRET; // Use a strong secret key in production
 
 export const login = async (req, res) => {
     const { username, password } = req.body;
@@ -17,6 +18,33 @@ export const login = async (req, res) => {
 
         res.json({ token });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const register = async (req, res) => {
+    const { username, email, password, role } = req.body;
+
+    try {
+        if(!username || !password || !password){
+            return res.status(400).json({ message: "Username, password and email are required" });
+        } 
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = {
+            username,
+            email,
+            password: hashedPassword,
+            role: role || "user",
+        };
+
+        await dbCreateUser(newUser);
+        res.status(201).json({ message: "User registered successfully" });
+    }
+
+    catch (error) {
+        console.error(error);
     }
 };

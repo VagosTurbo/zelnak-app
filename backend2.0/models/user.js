@@ -1,4 +1,6 @@
 import db from "../config/database.js"
+import bcrypt from "bcrypt" 
+
 
 export const dbGetAllUsers = async () => {
     const [rows] = await db.query("SELECT * FROM users")
@@ -26,6 +28,17 @@ export const dbDeleteUser = async (id) => {
 }
 
 export const dbVerifyUserCredentials = async (username, password) => {
-    const [rows] = await db.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password]);
-    return rows[0];
+    const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+    const user = rows.length > 0 ? rows[0] : null;
+
+    if(!user) {
+        return null;
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if(!isPasswordValid) {
+        return null;
+    }
+
+    return user;
 }
