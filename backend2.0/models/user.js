@@ -1,25 +1,29 @@
-// backend/models/user.js
-import db from '../config/database.js';
+import db from "../config/database.js"
 
 export const dbGetAllUsers = async () => {
-    return db.query('SELECT * FROM users');
-};
+    const [rows] = await db.query("SELECT * FROM users")
+    return rows
+}
 
 export const dbGetUserById = async (id) => {
-    return db.query('SELECT * FROM users WHERE id = ?', [id]);
-};
+    const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [id])
+    return rows.length > 0 ? rows[0] : null
+}
 
 export const dbCreateUser = async (newUser) => {
-    return db.query('INSERT INTO users SET ?', newUser);
-};
+    const [result] = await db.query("INSERT INTO users SET ?", newUser)
+    return { id: result.insertId, ...newUser }
+}
 
 export const dbUpdateUser = async (id, updatedUser) => {
-    return db.query('UPDATE users SET ? WHERE id = ?', [updatedUser, id]);
-};
+    const [result] = await db.query("UPDATE users SET ? WHERE id = ?", [updatedUser, id])
+    return result.affectedRows > 0
+}
 
 export const dbDeleteUser = async (id) => {
-    return db.query('DELETE FROM users WHERE id = ?', [id]);
-};
+    const [result] = await db.query("DELETE FROM users WHERE id = ?", [id])
+    return result.affectedRows > 0
+}
 
 export const dbVerifyUserCredentials = async (username, password) => {
     const [rows] = await db.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password]);
