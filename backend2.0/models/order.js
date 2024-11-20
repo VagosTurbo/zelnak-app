@@ -1,26 +1,63 @@
-import db from '../config/database.js';
+import { poolPromise } from '../config/database.js';
 
 export const dbGetAllOrders = async () => {
-    return db.query('SELECT * FROM orders');
-}
+    const pool = await poolPromise;
+    const result = await pool.request().query('SELECT * FROM orders');
+    return result.recordset;
+};
 
 export const dbGetOrderById = async (id) => {
-    return db.query('SELECT * FROM orders WHERE id = ?', [id]);
-}
+    const pool = await poolPromise;
+    const result = await pool
+        .request()
+        .input('id', sql.Int, id)
+        .query('SELECT * FROM orders WHERE id = @id');
+    return result.recordset.length > 0 ? result.recordset[0] : null;
+};
 
 export const dbCreateOrder = async (newOrder) => {
-    return db.query('INSERT INTO orders SET ?', newOrder);
-}
+    const pool = await poolPromise;
+    const result = await pool
+        .request()
+        .input('seller_id', sql.Int, newOrder.seller_id)
+        .input('buyer_id', sql.Int, newOrder.buyer_id)
+        .input('product_id', sql.Int, newOrder.product_id)
+        .input('quantity', sql.Int, newOrder.quantity)
+        .query(
+            'INSERT INTO orders (seller_id, buyer_id, product_id, quantity) OUTPUT Inserted.id VALUES (@seller_id, @buyer_id, @product_id, @quantity)'
+        );
+    return { id: result.recordset[0].id, ...newOrder };
+};
 
 export const dbUpdateOrder = async (id, updatedOrder) => {
-    return db.query('UPDATE orders SET ? WHERE id = ?', [updatedOrder, id]);
-}
+    const pool = await poolPromise;
+    const result = await pool
+        .request()
+        .input('id', sql.Int, id)
+        .input('seller_id', sql.Int, updatedOrder.seller_id)
+        .input('buyer_id', sql.Int, updatedOrder.buyer_id)
+        .input('product_id', sql.Int, updatedOrder.product_id)
+        .input('quantity', sql.Int, updatedOrder.quantity)
+        .query(
+            'UPDATE orders SET seller_id = @seller_id, buyer_id = @buyer_id, product_id = @product_id, quantity = @quantity WHERE id = @id'
+        );
+    return result.rowsAffected[0] > 0;
+};
 
 export const dbDeleteOrder = async (id) => {
-    return db.query('DELETE FROM orders WHERE id = ?', [id]);
-}
+    const pool = await poolPromise;
+    const result = await pool
+        .request()
+        .input('id', sql.Int, id)
+        .query('DELETE FROM orders WHERE id = @id');
+    return result.rowsAffected[0] > 0;
+};
 
 export const dbGetOrdersByUserId = async (userId) => {
-    return db.query('SELECT * FROM orders WHERE userId = ?', [userId]);
-}
-
+    const pool = await poolPromise;
+    const result = await pool
+        .request()
+        .input('userId', sql.Int, userId)
+        .query('SELECT * FROM orders WHERE user_id = @userId');
+    return result.recordset;
+};

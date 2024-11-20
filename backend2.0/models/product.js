@@ -1,22 +1,46 @@
-// backend/models/user.js
-import db from '../config/database.js';
+import { poolPromise } from '../config/database.js';
 
 export const dbGetAllProducts = async () => {
-    return db.query('SELECT * FROM products');
+    const pool = await poolPromise;
+    const result = await pool.request().query('SELECT * FROM products');
+    return result.recordset; // Returning the rows from the query
 };
 
 export const dbGetProductById = async (id) => {
-    return db.query('SELECT * FROM products WHERE id = ?', [id]);
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('id', sql.Int, id) // Binding the id parameter
+        .query('SELECT * FROM products WHERE id = @id');
+    return result.recordset.length > 0 ? result.recordset[0] : null;
 };
 
 export const dbCreateProduct = async (newProduct) => {
-    return db.query('INSERT INTO products SET ?', newProduct);
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('name', sql.NVarChar, newProduct.name)
+        .input('price', sql.Decimal, newProduct.price)
+        .input('description', sql.NVarChar, newProduct.description)
+        .input('user_id', sql.Int, newProduct.user_id)
+        .query('INSERT INTO products (name, price, description, user_id) VALUES (@name, @price, @description, @user_id)');
+    return { id: result.rowsAffected, ...newProduct }; // Returning the insertId and newProduct
 };
 
 export const dbUpdateProduct = async (id, updatedProduct) => {
-    return db.query('UPDATE products SET ? WHERE id = ?', [updatedProduct, id]);
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('id', sql.Int, id)
+        .input('name', sql.NVarChar, updatedProduct.name)
+        .input('price', sql.Decimal, updatedProduct.price)
+        .input('description', sql.NVarChar, updatedProduct.description)
+        .input('user_id', sql.Int, updatedProduct.user_id)
+        .query('UPDATE products SET name = @name, price = @price, description = @description, user_id = @user_id WHERE id = @id');
+    return result.rowsAffected > 0; // Returns true if rows were affected
 };
 
 export const dbDeleteProduct = async (id) => {
-    return db.query('DELETE FROM products WHERE id = ?', [id]);
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('id', sql.Int, id)
+        .query('DELETE FROM products WHERE id = @id');
+    return result.rowsAffected > 0; // Returns true if rows were affected
 };

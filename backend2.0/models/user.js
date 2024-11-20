@@ -1,44 +1,70 @@
-import db from "../config/database.js"
-import bcrypt from "bcrypt" 
-
+import { poolPromise, sql } from '../config/database.js';
+import bcrypt from "bcrypt";
 
 export const dbGetAllUsers = async () => {
-    const [rows] = await db.query("SELECT * FROM users")
-    return rows
-}
+    const pool = await poolPromise;
+    const result = await pool.request().query("SELECT * FROM users");
+    return result.recordset;
+};
 
 export const dbGetUserById = async (id) => {
-    const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [id])
-    return rows.length > 0 ? rows[0] : null
-}
+    const pool = await poolPromise;
+    const result = await pool
+        .request()
+        .input("id", sql.Int, id)
+        .query("SELECT * FROM users WHERE id = @id");
+    return result.recordset.length > 0 ? result.recordset[0] : null;
+};
 
 export const dbCreateUser = async (newUser) => {
-    const [result] = await db.query("INSERT INTO users SET ?", newUser)
-    return { id: result.insertId, ...newUser }
-}
+    const pool = await poolPromise;
+    const result = await pool
+        .request()
+        .input("username", sql.NVarChar, newUser.username)
+        .input("password", sql.NVarChar, newUser.password)
+        .input("email", sql.NVarChar, newUser.email)
+        .query(
+            "INSERT INTO users (username, password, email) OUTPUT Inserted.id VALUES (@username, @password, @email)"
+        );
+    return { id: result.recordset[0].id, ...newUser };
+};
 
 export const dbUpdateUser = async (id, updatedUser) => {
-    const [result] = await db.query("UPDATE users SET ? WHERE id = ?", [updatedUser, id])
-    return result.affectedRows > 0
-}
+    const pool = await poolPromise;
+    const result = await pool
+        .request()
+        .input("id", sql.Int, id)
+        .input("username", sql.NVarChar, updatedUser.username)
+        .input("password", sql.NVarChar, updatedUser.password)
+        .input("email", sql.NVarChar, updatedUser.email)
+        .query(
+            "UPDATE users SET username = @username, password = @password, email = @email WHERE id = @id"
+        );
+    return result.rowsAffected[0] > 0;
+};
 
 export const dbDeleteUser = async (id) => {
-    const [result] = await db.query("DELETE FROM users WHERE id = ?", [id])
-    return result.affectedRows > 0
-}
+    const pool = await poolPromise;
+    const result = await pool
+        .request()
+        .input("id", sql.Int, id)
+        .query("DELETE FROM users WHERE id = @id");
+    return result.rowsAffected[0] > 0;
+};
 
 export const dbVerifyUserCredentials = async (username, password) => {
-    const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
-    const user = rows.length > 0 ? rows[0] : null;
+    const pool = await poolPromise;
+    const result = await pool
+        .request()
+        .input("username", sql.NVarChar, username)
+        .query("SELECT * FROM users WHERE username = @username");
 
-    if(!user) {
+    const user = result.recordset.length > 0 ? result.recordset[0] : null;
+
+    if (!user) {
         return null;
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if(!isPasswordValid) {
-        return null;
-    }
-
-    return user;
-}
+    return isPasswordValid ? user : null;
+};
