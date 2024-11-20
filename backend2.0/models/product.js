@@ -1,4 +1,4 @@
-import { poolPromise } from '../config/database.js';
+import { poolPromise, sql } from '../config/database.js';
 
 export const dbGetAllProducts = async () => {
     const pool = await poolPromise;
@@ -21,7 +21,8 @@ export const dbCreateProduct = async (newProduct) => {
         .input('price', sql.Decimal, newProduct.price)
         .input('description', sql.NVarChar, newProduct.description)
         .input('user_id', sql.Int, newProduct.user_id)
-        .query('INSERT INTO products (name, price, description, user_id) VALUES (@name, @price, @description, @user_id)');
+        .input('image', sql.NVarChar, newProduct.image)
+        .query('INSERT INTO products (name, price, description, user_id, image) VALUES (@name, @price, @description, @user_id, @image)');
     return { id: result.rowsAffected, ...newProduct }; // Returning the insertId and newProduct
 };
 
