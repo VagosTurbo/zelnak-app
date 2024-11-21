@@ -43,7 +43,6 @@ export const updateUser = async (req, res) => {
 
     if (req.body.username) updatedUser.username = req.body.username
 
-    if (req.body.password) updatedUser.password = req.body.password
 
     if (req.body.email) updatedUser.email = req.body.email
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Typography, Card, CardContent, CardMedia } from '@mui/material'
-import api from '../api/api'
+import { apiGet } from '../api/apiGet'
+import { LocalStorage } from '../enums'
 
 interface Product {
     id: number
@@ -19,8 +20,13 @@ const ProductsPage: React.FC = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await api.get('/products')
-                setProducts(response.data)
+                const token = localStorage.getItem(LocalStorage.token)
+                if (token != null) {
+                    const response = await apiGet('/products', token)
+                    setProducts(response)
+                } else {
+                    console.log('Youre not logged in!')
+                }
             } catch (err: any) {
                 setError(err.response?.data?.message || 'Failed to fetch products')
             }

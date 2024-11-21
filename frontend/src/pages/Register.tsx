@@ -1,12 +1,16 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react'
+import React, { useState, FormEvent } from 'react'
+import { Box, Button, Typography } from '@mui/material'
 import api from '../api/api'
+import { ZelnakInput } from '../components/ZelnakInput'
+import Navbar from '../components/Navbar'
 
 const Register: React.FC = () => {
     const [formData, setFormData] = useState({ username: '', email: '', password: '' })
     const [message, setMessage] = useState('')
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value })
+    // Updates form data when any field changes
+    const handleSetValue = (key: keyof typeof formData, value: string) => {
+        setFormData({ ...formData, [key]: value })
     }
 
     const handleSubmit = async (e: FormEvent) => {
@@ -20,37 +24,68 @@ const Register: React.FC = () => {
     }
 
     return (
-        <div>
-            <h2>Register</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    name="username"
-                    placeholder="Username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                />
-                <button type="submit">Register</button>
-            </form>
-            {message && <p>{message}</p>}
-        </div>
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                backgroundColor: '#f5f5f5',
+            }}>
+            <Box
+                sx={{
+                    width: 400,
+                    padding: 4,
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    backgroundColor: '#fff',
+                    textAlign: 'center',
+                }}>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Register
+                </Typography>
+                <form onSubmit={handleSubmit}>
+                    <ZelnakInput
+                        title="Username"
+                        type="text"
+                        inputKey="username"
+                        value={formData.username}
+                        setValue={handleSetValue}
+                        placeholder="Enter your username"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                    />
+                    <ZelnakInput
+                        title="Email"
+                        type="email"
+                        inputKey="email"
+                        value={formData.email}
+                        setValue={handleSetValue}
+                        placeholder="Enter your email"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                    />
+                    <ZelnakInput
+                        title="Password"
+                        type="password"
+                        inputKey="password"
+                        value={formData.password}
+                        setValue={handleSetValue}
+                        placeholder="Enter your password"
+                        fullWidth
+                        sx={{ mb: 3 }}
+                    />
+                    <Button variant="contained" color="primary" type="submit" fullWidth>
+                        Register
+                    </Button>
+                </form>
+                {message && (
+                    <Typography color="error" sx={{ mt: 2 }}>
+                        {message}
+                    </Typography>
+                )}
+            </Box>
+        </Box>
     )
 }
 
