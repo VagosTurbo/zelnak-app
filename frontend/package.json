@@ -4,6 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
+        "start": "react-scripts start",
         "dev": "vite --mode development",
         "dev.mode-production": "vite --mode production",
         "build": "tsc && vite build",
@@ -26,8 +27,8 @@
         "i": "^0.3.7",
         "lodash": "^4.17.21",
         "npm": "^10.8.2",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
         "react-router-dom": "^6.23.1",
         "react-slick": "^0.30.2",
         "slick-carousel": "^1.8.1"
@@ -44,7 +45,7 @@
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-react-refresh": "^0.4.6",
         "sass": "^1.77.2",
-        "typescript": "^5.2.2",
+        "typescript": "^5.6.3",
         "vite": "^5.2.0"
     }
 }

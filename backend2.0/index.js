@@ -7,13 +7,14 @@ import errorHandler from "./errorHandler/errorHandler.js"
 import loginRoutes from "./routes/loginRoutes.js"
 import registerRoutes from "./routes/registerRoutes.js"
 import dotenv from "dotenv"
+import cors from 'cors';
 
 dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 3001
 
-
+app.use(cors());
 app.use(express.json())
 app.use("/users", userRoutes)
 app.use("/products", productRoutes)

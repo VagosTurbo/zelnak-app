@@ -1,8 +1,8 @@
 import { Box, Typography } from '@mui/material'
+import { Link } from 'react-router-dom'
+import { Routes } from '../enums/Routes'
 
-interface HomepageProps {}
-
-const Homepage = (_props: HomepageProps) => {
+const Homepage: React.FC = () => {
     return (
         <div>
             <Typography variant="h1">H1</Typography>
@@ -17,14 +17,25 @@ const Homepage = (_props: HomepageProps) => {
             </Box>
 
             <Box
-                color="white.main"
-                sx={{ height: '64px', width: '96px', backgroundColor: 'secondary.main' }}>
+                sx={{
+                    height: '64px',
+                    width: '96px',
+                    backgroundColor: 'secondary.main',
+                    color: '#fff',
+                }}>
                 Secondary color
             </Box>
 
-            <Box sx={{ height: '64px', width: '96px', backgroundColor: 'white.main' }}>
+            <Box sx={{ height: '64px', width: '96px', backgroundColor: '#fff', color: 'black' }}>
                 White color
             </Box>
+
+            <Typography variant="h1">Welcome to the Homepage</Typography>
+            <nav>
+                <Link to={Routes.Register}>Register</Link>
+                <Link to={Routes.Login}>Login</Link>
+                <Link to={Routes.Products}>All Products</Link>
+            </nav>
         </div>
     )
 }
