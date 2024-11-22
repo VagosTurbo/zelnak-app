@@ -3,5 +3,5 @@ export const Roles = {
     Moderator: 1,
     Customer: 2,
     Farmer: 3,
-    Registered: 4,
-}
+    Registered: 4, 
+};

@@ -26,7 +26,7 @@ export const createUser = async (req, res) => {
         username,
         password,
         email,
-        role: role || Roles.Registered,
+        role: Roles.Registered
     }
 
     try {
