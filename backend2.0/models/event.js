@@ -1,3 +1,6 @@
+/**
+ * Events DONE
+ */
 import { poolPromise, sql } from "../config/database.js"
 
 export const dbGetAllEvents = async () => {

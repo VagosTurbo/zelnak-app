@@ -1,3 +1,6 @@
+/**
+ * Events DONE
+ */
 import { dbGetAllEvents, dbGetEventById, dbCreateEvent, dbDeleteEvent, dbUpdateEvent } from "../models/event.js"
 
 export const getAllEvents = async (req, res) => {

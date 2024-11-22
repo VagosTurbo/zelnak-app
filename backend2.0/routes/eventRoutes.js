@@ -1,3 +1,7 @@
+/**
+ * TODO: handle authentication for all routes
+ */
+
 import { Router } from "express"
 import { getAllEvents, getEventById, createEvent, updateEvent, deleteEvent } from "../controllers/eventController.js"
 import { authenticateToken } from "../middleware/auth.js"
