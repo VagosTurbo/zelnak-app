@@ -17,6 +17,15 @@ CREATE TABLE users (
 );
 GO
 
+-- Create the categories table
+CREATE TABLE categories (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    name NVARCHAR(255) NOT NULL,
+    parent_id INT NULL,
+    FOREIGN KEY (parent_id) REFERENCES categories(id)
+);
+GO
+
 -- Create the products table
 CREATE TABLE products (
     id INT PRIMARY KEY IDENTITY(1,1),
@@ -26,7 +35,9 @@ CREATE TABLE products (
     image NVARCHAR(255) NOT NULL,
     user_id INT NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+	category_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+	FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 GO
 
@@ -68,18 +79,4 @@ CREATE TABLE events (
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
-GO
-
--- Create the categories table
-CREATE TABLE categories (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    name NVARCHAR(255) NOT NULL,
-    parent_id INT NULL,
-    FOREIGN KEY (parent_id) REFERENCES categories(id)
-);
-GO
-
--- Insert a default admin user
-INSERT INTO users (username, password, email) 
-VALUES ('admin', 'admin123', 'admin@admin.com');
 GO
