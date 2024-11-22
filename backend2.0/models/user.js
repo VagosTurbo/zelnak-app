@@ -25,7 +25,7 @@ export const dbCreateUser = async (newUser) => {
         .input("email", sql.NVarChar, newUser.email)
         .input("role", sql.Int, newUser.role)
         .query(
-            "INSERT INTO users (username, password, email) OUTPUT Inserted.id VALUES (@username, @password, @email)"
+            "INSERT INTO users (username, password, email, role) OUTPUT Inserted.id VALUES (@username, @password, @email, @role)"
         );
     return { id: result.recordset[0].id, ...newUser };
 };
