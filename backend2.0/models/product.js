@@ -27,17 +27,57 @@ export const dbCreateProduct = async (newProduct) => {
 };
 
 export const dbUpdateProduct = async (id, updatedProduct) => {
+    if (!id || Object.keys(updatedProduct).length === 0) {
+        throw new Error("Invalid input: ID and at least one field to update are required.");
+    }
+
     const pool = await poolPromise;
-    const result = await pool.request()
-        .input('id', sql.Int, id)
-        .input('name', sql.NVarChar, updatedProduct.name)
-        .input('price', sql.Decimal, updatedProduct.price)
-        .input('description', sql.NVarChar, updatedProduct.description)
-        .input('user_id', sql.Int, updatedProduct.user_id)
-        .input('image', sql.NVarChar, updatedProduct.image)
-        .query('UPDATE products SET name = @name, price = @price, description = @description, user_id = @user_id, image = @image WHERE id = @id');
-    return result.rowsAffected > 0; // Returns true if rows were affected
+    const request = pool.request();
+
+    // Fields to skip
+    const skipFields = ["user_id", "created_at"];
+
+    // Dynamically build the SET clause and add inputs to the request
+    const setClauses = [];
+    for (const [key, value] of Object.entries(updatedProduct)) {
+        if (skipFields.includes(key)) continue; // Skip the specified fields
+
+        const paramName = `@${key}`;
+        setClauses.push(`${key} = ${paramName}`);
+
+        // Adjust SQL data type based on expected schema
+        let sqlType;
+        switch (key) {
+            case "price":
+                sqlType = sql.Decimal;
+                break;
+            case "id":
+                sqlType = sql.Int;
+                break;
+            default:
+                sqlType = sql.NVarChar;
+        }
+
+        request.input(key, sqlType, value);
+    }
+
+    // Ensure there are fields to update
+    if (setClauses.length === 0) {
+        throw new Error("No valid fields provided to update.");
+    }
+
+    // Add the ID input
+    request.input("id", sql.Int, id);
+
+    const query = `UPDATE products SET ${setClauses.join(", ")} WHERE id = @id`;
+
+    // Execute the query
+    const result = await request.query(query);
+
+    return result.rowsAffected[0] > 0; // Returns true if any rows were updated
 };
+
+
 
 export const dbDeleteProduct = async (id) => {
     const pool = await poolPromise;
