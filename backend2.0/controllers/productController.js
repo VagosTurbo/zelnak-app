@@ -40,6 +40,7 @@ export const updateProduct = async (req, res) => {
         price: req.body.price,
         description: req.body.description,
         user_id: req.body.user_id,
+        image: req.body.image,
     };
     try {
         await dbUpdateProduct(req.params.id, updatedProduct);

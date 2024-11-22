@@ -5,6 +5,7 @@ import Register from './pages/Register.tsx'
 import Login from './pages/Login.tsx'
 import ProductsPage from './pages/ProductsPage.tsx'
 import Profile from './pages/Profilepage.tsx'
+import AddProduct from './pages/AddProduct.tsx'
 
 const applicationRouter = createHashRouter([
     {
@@ -27,6 +28,10 @@ const applicationRouter = createHashRouter([
         path: Routes.Profile,
         element: <Profile />,
     },
+    {
+        path: Routes.AddProduct, 
+        element: <AddProduct />,
+    }
 ])
 
 const getRouter = () => {
