@@ -1,270 +1,303 @@
 {
-  "info": {
-    "_postman_id": "df834e30-4bc5-431f-aa4f-db719e50f9ce",
-    "name": "Zelnak App",
-    "description": "zdar kundy",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "34090157"
-  },
-  "item": [
-    {
-      "name": "users",
-      "item": [
-        {
-          "name": "all users",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{api-url}}/users",
-              "host": ["{{api-url}}"],
-              "path": ["users"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "get user by id",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{api-url}}/users/1",
-              "host": ["{{api-url}}"],
-              "path": ["users", "1"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "create user",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"username\": \"test\",\r\n    \"password\": \"password\",\r\n    \"email\": \"email\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{api-url}}/users",
-              "host": ["{{api-url}}"],
-              "path": ["users"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "update user role",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"role\": \"Moderator\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{api-url}}/users/2",
-              "host": ["{{api-url}}"],
-              "path": ["users", "2"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "update user",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"username\": \"updateduser\", \r\n    \"role\": \"Farmer\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{api-url}}/users/2",
-              "host": ["{{api-url}}"],
-              "path": ["users", "2"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "delete user",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{api-url}}/users/6",
-              "host": ["{{api-url}}"],
-              "path": ["users", "6"]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "events",
-      "item": [
-        {
-          "name": "all events",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{api-url}}/users",
-              "host": ["{{api-url}}"],
-              "path": ["users"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "get event by id",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{api-url}}/events/1",
-              "host": ["{{api-url}}"],
-              "path": ["events", "1"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "create event",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"name\": \"nnn\",\r\n    \"description\": \"desccc\",\r\n    \"date\": \"2024-11-01\",\r\n    \"location\": \"brno\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{api-url}}/events",
-              "host": ["{{api-url}}"],
-              "path": ["events"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "update event",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"username\": \"updateduser\", \r\n    \"role\": \"Farmer\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{api-url}}/users/2",
-              "host": ["{{api-url}}"],
-              "path": ["users", "2"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "delete event",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{api-url}}/users/6",
-              "host": ["{{api-url}}"],
-              "path": ["users", "6"]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "login",
-      "item": [
-        {
-          "name": "login user",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"username\": \"asd\",\r\n    \"password\": \"dsa\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{api-url}}/login",
-              "host": ["{{api-url}}"],
-              "path": ["login"]
-            }
-          },
-          "response": []
-        }
-      ]
-    }
-  ],
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJhc2QiLCJpYXQiOjE3MzIyODg5MDksImV4cCI6MTczMjI5MjUwOX0.ZoYwDrSm347_9lSEsHoGqIzlu5rfpeqiS0JFViqwWm4",
-        "type": "string"
-      }
-    ]
-  },
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "exec": [""]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "exec": [""]
-      }
-    }
-  ],
-  "variable": [
-    {
-      "key": "api-url",
-      "value": "localhost:3000"
-    }
-  ]
+	"info": {
+		"_postman_id": "585639c0-dab7-4bc2-874d-c12b0b2dc9d2",
+		"name": "Zelnak App",
+		"description": "zdar kundy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38972291"
+	},
+	"item": [
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "all users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api-url}}/users",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api-url}}/users/2",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"users",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user role",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"role\": \"Moderator\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api-url}}/users/2",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"users",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"updateduser\", \r\n    \"role\": \"Farmer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api-url}}/users/2",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"users",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete user",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api-url}}/users/6",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"users",
+								"6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "events",
+			"item": [
+				{
+					"name": "all events",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api-url}}/users",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get event by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api-url}}/events/1",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"events",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create event",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"nnn\",\r\n    \"description\": \"desccc\",\r\n    \"date\": \"2024-11-01\",\r\n    \"location\": \"brno\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api-url}}/events",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update event",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"updateduser\", \r\n    \"role\": \"Farmer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api-url}}/users/2",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"users",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete event",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api-url}}/users/6",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"users",
+								"6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "login",
+			"item": [
+				{
+					"name": "login user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"asd\",\r\n    \"password\": \"dsa\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api-url}}/login",
+							"host": [
+								"{{api-url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJhc2QiLCJpYXQiOjE3MzIyODg5MDksImV4cCI6MTczMjI5MjUwOX0.ZoYwDrSm347_9lSEsHoGqIzlu5rfpeqiS0JFViqwWm4",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "api-url",
+			"value": "localhost:3000"
+		}
+	]
 }
