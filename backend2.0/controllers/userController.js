@@ -20,13 +20,13 @@ export const getUserById = async (req, res) => {
 }
 
 export const createUser = async (req, res) => {
-    const { username, password, email } = req.body
+    const { username, password, email, role } = req.body
 
     const newUser = {
         username,
         password,
         email,
-        role: Roles.Registered,
+        role: role || Roles.Registered,
     }
 
     try {

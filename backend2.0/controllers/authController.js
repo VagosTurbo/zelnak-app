@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { dbVerifyUserCredentials, dbCreateUser } from "../models/user.js";
+import { Roles } from "../enums/roles.js";
 
 const secretKey = process.env.JWT_SECRET; // Use a strong secret key in production
 
@@ -38,7 +39,7 @@ export const register = async (req, res) => {
             username,
             email,
             password: hashedPassword,
-            role: role || "user",
+            role: role || Roles.Registered,
         };
 
         await dbCreateUser(newUser);
