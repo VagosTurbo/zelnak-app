@@ -104,9 +104,9 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{api-url}}/users",
+                            "raw": "{{api-url}}/events",
                             "host": ["{{api-url}}"],
-                            "path": ["users"]
+                            "path": ["events"]
                         }
                     },
                     "response": []
@@ -131,7 +131,7 @@
                         "header": [],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\r\n    \"name\": \"nnn\",\r\n    \"description\": \"desccc\",\r\n    \"date\": \"2024-11-01\",\r\n    \"location\": \"brno\"\r\n}",
+                            "raw": "{\r\n    \"name\": \"nnn\",\r\n    \"description\": \"desccc\",\r\n    \"date\": \"2024-11-01\",\r\n    \"location\": \"brno\", \r\n    \"user_id\": 2\r\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -153,7 +153,7 @@
                         "header": [],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\r\n    \"username\": \"updateduser\", \r\n    \"role\": \"Farmer\"\r\n}",
+                            "raw": "{\r\n    \"name\": \"nnn\",\r\n    \"description\": \"desccc\",\r\n    \"date\": \"2024-11-01\",\r\n    \"location\": \"brno2\"\r\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -161,9 +161,9 @@
                             }
                         },
                         "url": {
-                            "raw": "{{api-url}}/users/2",
+                            "raw": "{{api-url}}/events/1",
                             "host": ["{{api-url}}"],
-                            "path": ["users", "2"]
+                            "path": ["events", "1"]
                         }
                     },
                     "response": []
@@ -174,9 +174,9 @@
                         "method": "DELETE",
                         "header": [],
                         "url": {
-                            "raw": "{{api-url}}/users/6",
+                            "raw": "{{api-url}}/events/2",
                             "host": ["{{api-url}}"],
-                            "path": ["users", "6"]
+                            "path": ["events", "2"]
                         }
                     },
                     "response": []
@@ -192,9 +192,9 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{api-url}}/users",
+                            "raw": "{{api-url}}/orders",
                             "host": ["{{api-url}}"],
-                            "path": ["users"]
+                            "path": ["orders"]
                         }
                     },
                     "response": []
@@ -205,9 +205,9 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{api-url}}/events/1",
+                            "raw": "{{api-url}}/orders/1",
                             "host": ["{{api-url}}"],
-                            "path": ["events", "1"]
+                            "path": ["orders", "1"]
                         }
                     },
                     "response": []
