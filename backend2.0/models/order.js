@@ -1,4 +1,4 @@
-import { poolPromise } from '../config/database.js';
+import { poolPromise, sql } from '../config/database.js';
 
 export const dbGetAllOrders = async () => {
     const pool = await poolPromise;
