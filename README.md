@@ -27,3 +27,9 @@ DB_DATABASE=zelnak
 spust v složce backend2.0 npm run dev
 
 a mělo by to běžet
+
+
+/////////
+spusteni BE lokalne:
+1. cd backend2.0
+2. npm run dev
