@@ -45,3 +45,29 @@ export const dbDeleteEvent = async (id) => {
         .query('DELETE FROM events WHERE id = @id');
     return result.rowsAffected[0] > 0; // Return true if rows were affected
 };
+// import db from "../config/database.js"
+
+// export const dbGetAllEvents = async () => {
+//     const [rows] = await db.query("SELECT id, name, date, location FROM events")
+//     return rows
+// }
+
+// export const dbGetEventById = async (id) => {
+//     const [rows] = await db.query("SELECT id, name, date, location FROM events WHERE id = ?", [id])
+//     return rows.length > 0 ? rows[0] : null
+// }
+
+// export const dbCreateEvent = async (newEvent) => {
+//     const [result] = await db.query("INSERT INTO events SET ?", newEvent)
+//     return { id: result.insertId, ...newEvent }
+// }
+
+// export const dbUpdateEvent = async (id, updatedEvent) => {
+//     const [result] = await db.query("UPDATE events SET ? WHERE id = ?", [updatedEvent, id])
+//     return result.affectedRows > 0
+// }
+
+// export const dbDeleteEvent = async (id) => {
+//     const [result] = await db.query("DELETE FROM events WHERE id = ?", [id])
+//     return result.affectedRows > 0
+// }
