@@ -1,5 +1,6 @@
 import { dbGetAllProducts, dbGetProductById, dbCreateProduct, dbUpdateProduct, dbDeleteProduct } from "../models/product.js";
 import { dbGetUserById } from "../models/user.js";
+import { dbGetCategoryById } from "../models/category.js";
 
 // Get all products
 export const getAllProducts = async (req, res) => {
@@ -35,10 +36,12 @@ export const getProductById = async (req, res) => {
 // Create a new product
 export const createProduct = async (req, res) => {
     try {
-        const { name, price, description, user_id, image } = req.body;
+        
 
-        if (!user_id || !price || !name) {
-            return res.status(400).json({ error: "Name, price and user_id is required" });
+        const { name, price, description, user_id, image, category_id } = req.body;
+
+        if (!user_id || !price || !name || !category_id) {
+            return res.status(400).json({ error: "Name, price, category and user_id is required" });
         }
         
         const user = await dbGetUserById(user_id);
@@ -46,7 +49,12 @@ export const createProduct = async (req, res) => {
             return res.status(400).json({ error: "User id doesnt exist" });
         }
 
-        const productCreated = await dbCreateProduct({ name, price, description, user_id, image });
+        const category = await dbGetCategoryById(category_id);
+        if(!category){
+            return res.status(400).json({ error: "Category doesnt exist" });
+        }
+
+        const productCreated = await dbCreateProduct({ name, price, description, user_id, image, category_id });
 
         if (productCreated) {
             res.status(201).json({ message: "Product created successfully" });
@@ -112,15 +120,6 @@ export const deleteProduct = async (req, res) => {
 
         if (!existingProduct) {
             return res.status(404).json({ error: "Product not found" });
-        }
-
-        // // Check if the user is authorized to delete the product
-        const userId = req.user.id // The logged-in user's ID from the token
-        const userRole = req.user.role // The role from the token
-
-        // Only allow the deletion if the user is an admin or the user who created the product
-        if (userRole !== Roles.Admin && existingEvent.user_id !== userId) {
-            return res.status(403).json({ error: "Forbidden: You are not authorized to delete this product" })
         }
 
         // Proceed with deleting the product

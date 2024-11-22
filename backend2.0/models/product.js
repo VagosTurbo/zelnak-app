@@ -14,6 +14,14 @@ export const dbGetProductById = async (id) => {
     return result.recordset.length > 0 ? result.recordset[0] : null;
 };
 
+export const dbGetProductsByCategory = async (categoryId) => {
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('categoryId', sql.Int, categoryId) 
+        .query('SELECT * FROM products WHERE category_id = @categoryId');
+    return result.recordset; // Returning the rows from the query
+};
+
 export const dbCreateProduct = async (newProduct) => {
     const pool = await poolPromise;
     const result = await pool.request()
@@ -21,8 +29,9 @@ export const dbCreateProduct = async (newProduct) => {
         .input('price', sql.Decimal, newProduct.price)
         .input('description', sql.NVarChar, newProduct.description)
         .input('user_id', sql.Int, newProduct.user_id)
+        .input('category_id', sql.Int, newProduct.category_id)
         .input('image', sql.NVarChar, newProduct.image)
-        .query('INSERT INTO products (name, price, description, user_id, image) VALUES (@name, @price, @description, @user_id, @image)');
+        .query('INSERT INTO products (name, price, description, user_id, image, category_id) VALUES (@name, @price, @description, @user_id, @image, @category_id)');
     return { id: result.rowsAffected, ...newProduct }; // Returning the insertId and newProduct
 };
 
