@@ -12,7 +12,8 @@ CREATE TABLE users (
     username NVARCHAR(255) NOT NULL,
     password NVARCHAR(255) NOT NULL,
     email NVARCHAR(255) NOT NULL UNIQUE,
-    created_at DATETIME DEFAULT GETDATE()
+    created_at DATETIME DEFAULT GETDATE(),
+    role INT NOT NULL
 );
 GO
 
