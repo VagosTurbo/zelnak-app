@@ -14,16 +14,43 @@ export const dbGetEventById = async (id) => {
     return result.recordset.length > 0 ? result.recordset[0] : null; // Return the first row or null
 };
 
-export const dbCreateEvent = async (newEvent) => {
+export const dbCreateEvent = async (event) => {
+    const { name, description, date, location, user_id } = event;
+
     const pool = await poolPromise;
-    const result = await pool.request()
-        .input('name', sql.NVarChar, newEvent.name)
-        .input('description', sql.NVarChar, newEvent.description)
-        .input('date', sql.DateTime, newEvent.date)
-        .input('location', sql.NVarChar, newEvent.location)
-        .input('user_id', sql.Int, newEvent.user_id)
-        .query('INSERT INTO events (name, description, date, location, user_id) OUTPUT inserted.id VALUES (@name, @description, @date, @location, @user_id)');
-    return { id: result.recordset[0].id, ...newEvent }; // Return inserted id with the event data
+    const transaction = pool.transaction();
+    await transaction.begin();
+
+    try {
+        // Check if the user_id exists
+        const userCheck = await transaction
+            .request()
+            .input("user_id", sql.Int, user_id)
+            .query("SELECT COUNT(*) as count FROM users WHERE id = @user_id");
+
+        if (userCheck.recordset[0].count === 0) {
+            throw new Error(`User with id ${user_id} does not exist.`);
+        }
+
+        // Insert the event
+        const result = await transaction
+            .request()
+            .input("name", sql.NVarChar, name)
+            .input("description", sql.NVarChar, description)
+            .input("date", sql.Date, date)
+            .input("location", sql.NVarChar, location)
+            .input("user_id", sql.Int, user_id)
+            .query(
+                "INSERT INTO events (name, description, date, location, user_id) VALUES (@name, @description, @date, @location, @user_id)"
+            );
+
+        await transaction.commit();
+        return result.rowsAffected[0] > 0;
+    } catch (error) {
+        await transaction.rollback();
+        console.error("Error creating event:", error);
+        throw error;
+    }
 };
 
 export const dbUpdateEvent = async (id, updatedEvent) => {
@@ -45,29 +72,3 @@ export const dbDeleteEvent = async (id) => {
         .query('DELETE FROM events WHERE id = @id');
     return result.rowsAffected[0] > 0; // Return true if rows were affected
 };
-// import db from "../config/database.js"
-
-// export const dbGetAllEvents = async () => {
-//     const [rows] = await db.query("SELECT id, name, date, location FROM events")
-//     return rows
-// }
-
-// export const dbGetEventById = async (id) => {
-//     const [rows] = await db.query("SELECT id, name, date, location FROM events WHERE id = ?", [id])
-//     return rows.length > 0 ? rows[0] : null
-// }
-
-// export const dbCreateEvent = async (newEvent) => {
-//     const [result] = await db.query("INSERT INTO events SET ?", newEvent)
-//     return { id: result.insertId, ...newEvent }
-// }
-
-// export const dbUpdateEvent = async (id, updatedEvent) => {
-//     const [result] = await db.query("UPDATE events SET ? WHERE id = ?", [updatedEvent, id])
-//     return result.affectedRows > 0
-// }
-
-// export const dbDeleteEvent = async (id) => {
-//     const [result] = await db.query("DELETE FROM events WHERE id = ?", [id])
-//     return result.affectedRows > 0
-// }

@@ -24,20 +24,22 @@ export const getEventById = async (req, res) => {
 }
 
 export const createEvent = async (req, res) => {
-    const userId = req.user.id
-    const newEvent = {
-        name: req.body.name,
-        description: req.body.description,
-        date: req.body.date,
-        location: req.body.location,
-        user_id: userId,
-    }
-
     try {
-        await dbCreateEvent(newEvent)
-        res.json({ message: "Event created successfully" })
+        const { name, description, date, location, user_id } = req.body
+
+        if (!user_id) {
+            return res.status(400).json({ error: "user_id is required" })
+        }
+
+        const eventCreated = await dbCreateEvent({ name, description, date, location, user_id })
+
+        if (eventCreated) {
+            res.status(201).json({ message: "Event created successfully" })
+        } else {
+            res.status(500).json({ error: "Failed to create event" })
+        }
     } catch (err) {
-        res.status(500).json({ error: err.message })
+        res.status(400).json({ error: err.message })
     }
 }
 
