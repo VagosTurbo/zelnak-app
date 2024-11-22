@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Box, Typography, Paper, TextField, Button } from '@mui/material'
 import { LocalStorage } from '../enums'
 import { apiGet } from '../api/apiGet'
+import { ZelnakButton } from '../components/ZelnakButton'
 
 interface User {
     id: number
@@ -142,9 +143,9 @@ const Profile: React.FC = () => {
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             sx={{ mb: 2 }}
                         />
-                        <Button variant="contained" color="primary" type="submit" fullWidth>
+                        <ZelnakButton color="primary" type="submit" fullWidth>
                             Update Profile
-                        </Button>
+                        </ZelnakButton>
                     </form>
 
                     {success && (

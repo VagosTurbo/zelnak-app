@@ -3,6 +3,7 @@ import { Box, Button, Typography } from '@mui/material'
 import api from '../api/api'
 import { ZelnakInput } from '../components/ZelnakInput'
 import Navbar from '../components/Navbar'
+import { ZelnakButton } from '../components/ZelnakButton'
 
 const Register: React.FC = () => {
     const [formData, setFormData] = useState({ username: '', email: '', password: '' })
@@ -75,12 +76,15 @@ const Register: React.FC = () => {
                         fullWidth
                         sx={{ mb: 3 }}
                     />
-                    <Button variant="contained" color="primary" type="submit" fullWidth>
+                    {/* <Button variant="contained" color="primary" type="submit" fullWidth>
                         Register
-                    </Button>
+                    </Button> */}
+                    <ZelnakButton color="primary" type="submit" fullWidth>
+                        Register
+                    </ZelnakButton>
                 </form>
                 {message && (
-                    <Typography color="error" sx={{ mt: 2 }}>
+                    <Typography color="success.main" sx={{ mt: 2 }}>
                         {message}
                     </Typography>
                 )}
