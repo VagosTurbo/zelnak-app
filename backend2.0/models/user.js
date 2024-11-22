@@ -30,27 +30,65 @@ export const dbCreateUser = async (newUser) => {
 };
 
 export const dbUpdateUser = async (id, updatedUser) => {
+    if (!id || Object.keys(updatedUser).length === 0) {
+        throw new Error("Invalid input: ID and at least one field to update are required.");
+    }
+
     const pool = await poolPromise;
-    const result = await pool
-        .request()
-        .input("id", sql.Int, id)
-        .input("username", sql.NVarChar, updatedUser.username)
-        .input("password", sql.NVarChar, updatedUser.password)
-        .input("email", sql.NVarChar, updatedUser.email)
-        .query(
-            "UPDATE users SET username = @username, password = @password, email = @email WHERE id = @id"
-        );
+    const request = pool.request();
+
+    // TODO heslo aby neslo upravovat
+
+    // Dynamically build the SET clause and add inputs to the request
+    const setClauses = [];
+    for (const [key, value] of Object.entries(updatedUser)) {
+        const paramName = `@${key}`;
+        setClauses.push(`${key} = ${paramName}`);
+        request.input(key, sql.NVarChar, value); // Adjust sql type based on your schema
+    }
+
+    // Add the ID input
+    request.input("id", sql.Int, id);
+
+    const query = `UPDATE users SET ${setClauses.join(", ")} WHERE id = @id`;
+
+    // Execute the query
+    const result = await request.query(query);
+
     return result.rowsAffected[0] > 0;
 };
 
+
 export const dbDeleteUser = async (id) => {
     const pool = await poolPromise;
-    const result = await pool
-        .request()
-        .input("id", sql.Int, id)
-        .query("DELETE FROM users WHERE id = @id");
-    return result.rowsAffected[0] > 0;
+
+    // Begin a transaction
+    const transaction = pool.transaction();
+    await transaction.begin();
+
+    try {
+        // Delete related events
+        await transaction
+            .request()
+            .input("id", sql.Int, id)
+            .query("DELETE FROM events WHERE user_id = @id");
+
+        // Delete the user
+        const result = await transaction
+            .request()
+            .input("id", sql.Int, id)
+            .query("DELETE FROM users WHERE id = @id");
+
+        await transaction.commit();
+
+        return result.rowsAffected[0] > 0;
+    } catch (error) {
+        await transaction.rollback();
+        console.error("Error deleting user:", error);
+        throw error;
+    }
 };
+
 
 export const dbVerifyUserCredentials = async (username, password) => {
     const pool = await poolPromise;
