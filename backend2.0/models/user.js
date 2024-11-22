@@ -23,6 +23,7 @@ export const dbCreateUser = async (newUser) => {
         .input("username", sql.NVarChar, newUser.username)
         .input("password", sql.NVarChar, newUser.password)
         .input("email", sql.NVarChar, newUser.email)
+        .input("role", sql.Int, newUser.role)
         .query(
             "INSERT INTO users (username, password, email) OUTPUT Inserted.id VALUES (@username, @password, @email)"
         );
