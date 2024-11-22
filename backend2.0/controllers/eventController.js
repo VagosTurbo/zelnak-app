@@ -5,13 +5,19 @@ export const getAllEvents = async (req, res) => {
         const events = await dbGetAllEvents()
         res.json(events)
     } catch (err) {
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ error: "Failed to retrieve events: " + err.message })
     }
 }
 
 export const getEventById = async (req, res) => {
     try {
-        const event = await dbGetEventById(req.params.id)
+        const eventId = req.params.id
+
+        if (!eventId) {
+            return res.status(400).json({ error: "Event ID is required" })
+        }
+
+        const event = await dbGetEventById(eventId)
 
         if (!event) {
             return res.status(404).json({ error: "Event not found" })
@@ -19,7 +25,7 @@ export const getEventById = async (req, res) => {
 
         res.json(event)
     } catch (err) {
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ error: "Failed to retrieve event: " + err.message })
     }
 }
 
@@ -39,43 +45,59 @@ export const createEvent = async (req, res) => {
             res.status(500).json({ error: "Failed to create event" })
         }
     } catch (err) {
-        res.status(400).json({ error: err.message })
+        res.status(400).json({ error: "Failed to create event: " + err.message })
     }
 }
 
 export const updateEvent = async (req, res) => {
-    const eventId = req.params.id
-    const updatedEvent = {}
-
-    if (req.body.name) updatedEvent.name = req.body.name
-    if (req.body.description) updatedEvent.description = req.body.description
-    if (req.body.date) updatedEvent.date = req.body.date
-    if (req.body.location) updatedEvent.location = req.body.location
-
-    // at least one field is required to update
-    if (Object.keys(updatedEvent).length === 0) {
-        return res.status(400).json({ error: "At least one field is required to update." })
-    }
-
     try {
-        // does event exist?
-        const existingEvent = await dbGetEventById(eventId)
-        if (!existingEvent) {
-            return res.status(404).json({ error: "Event not found." })
+        const eventId = req.params.id
+        const updatedEvent = {}
+
+        if (req.body.name) updatedEvent.name = req.body.name
+        if (req.body.description) updatedEvent.description = req.body.description
+        if (req.body.date) updatedEvent.date = req.body.date
+        if (req.body.location) updatedEvent.location = req.body.location
+
+        if (Object.keys(updatedEvent).length === 0) {
+            return res.status(400).json({ error: "At least one field is required to update" })
         }
 
-        await dbUpdateEvent(eventId, updatedEvent)
-        res.json({ message: "Event updated successfully" })
+        const existingEvent = await dbGetEventById(eventId)
+
+        if (!existingEvent) {
+            return res.status(404).json({ error: "Event not found" })
+        }
+
+        const eventUpdated = await dbUpdateEvent(eventId, updatedEvent)
+
+        if (eventUpdated) {
+            res.json({ message: "Event updated successfully" })
+        } else {
+            res.status(500).json({ error: "Failed to update event" })
+        }
     } catch (err) {
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ error: "Failed to update event: " + err.message })
     }
 }
 
 export const deleteEvent = async (req, res) => {
     try {
-        await dbDeleteEvent(req.params.id)
+        const eventId = req.params.id
+
+        if (!eventId) {
+            return res.status(400).json({ error: "Event ID is required" })
+        }
+
+        const existingEvent = await dbGetEventById(eventId)
+
+        if (!existingEvent) {
+            return res.status(404).json({ error: "Event not found" })
+        }
+
+        await dbDeleteEvent(eventId)
         res.json({ message: "Event deleted successfully" })
     } catch (err) {
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ error: "Failed to delete event: " + err.message })
     }
 }
