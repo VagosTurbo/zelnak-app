@@ -16,6 +16,26 @@ export const dbGetUserById = async (id) => {
     return result.recordset.length > 0 ? result.recordset[0] : null;
 };
 
+export const dbFindUserByUsernameOrEmail = async (username, email) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool
+            .request()
+            .input("username", sql.NVarChar, username)
+            .input("email", sql.NVarChar, email)
+            .query(
+                "SELECT id FROM users WHERE username = @username OR email = @email"
+            );
+
+        // If a user is found, return it, otherwise return null
+        return result.recordset.length > 0 ? result.recordset[0] : null;
+    } catch (error) {
+        console.error("Database error:", error.message);
+        throw new Error("Failed to query the database");
+    }
+};
+
+
 export const dbCreateUser = async (newUser) => {
     const pool = await poolPromise;
     const result = await pool
