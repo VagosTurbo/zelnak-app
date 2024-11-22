@@ -1,6 +1,7 @@
 /**
  * Events DONE
  */
+import { Roles } from "../enums/roles.js"
 import { dbGetAllEvents, dbGetEventById, dbCreateEvent, dbDeleteEvent, dbUpdateEvent } from "../models/event.js"
 
 export const getAllEvents = async (req, res) => {
@@ -72,6 +73,16 @@ export const updateEvent = async (req, res) => {
             return res.status(404).json({ error: "Event not found" })
         }
 
+        // Check if the user is authorized to update the event
+        const userId = req.user.id // The logged-in user's ID from the token
+        const userRole = req.user.role // The role from the token
+
+        // Only allow the update if the user is an admin or the user who created the event
+        if (userRole !== Roles.Admin && existingEvent.user_id !== userId) {
+            return res.status(403).json({ error: "Forbidden: You are not authorized to update this event" })
+        }
+
+        // Proceed with updating the event
         const eventUpdated = await dbUpdateEvent(eventId, updatedEvent)
 
         if (eventUpdated) {
@@ -98,7 +109,18 @@ export const deleteEvent = async (req, res) => {
             return res.status(404).json({ error: "Event not found" })
         }
 
+        // Check if the user is authorized to delete the event
+        const userId = req.user.id // The logged-in user's ID from the token
+        const userRole = req.user.role // The role from the token
+
+        // Only allow the deletion if the user is an admin or the user who created the event
+        if (userRole !== Roles.Admin && existingEvent.user_id !== userId) {
+            return res.status(403).json({ error: "Forbidden: You are not authorized to delete this event" })
+        }
+
+        // Proceed with deleting the event
         await dbDeleteEvent(eventId)
+
         res.json({ message: "Event deleted successfully" })
     } catch (err) {
         res.status(500).json({ error: "Failed to delete event: " + err.message })
