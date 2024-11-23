@@ -31,8 +31,9 @@ export const dbCreateProduct = async (newProduct) => {
         .input('user_id', sql.Int, newProduct.user_id)
         .input('category_id', sql.Int, newProduct.category_id)
         .input('image', sql.NVarChar, newProduct.image)
-        .query('INSERT INTO products (name, price, description, user_id, image, category_id) VALUES (@name, @price, @description, @user_id, @image, @category_id)');
-    return { id: result.rowsAffected, ...newProduct }; // Returning the insertId and newProduct
+        .input('category_id', sql.Int, newProduct.category_id)
+        .query('INSERT INTO products (name, price, description, user_id, image, category_id) VALUES (@name, @price, @description, @user_id, @image, @category_id); SELECT SCOPE_IDENTITY() AS id');
+        return { id: result.rowsAffected, ...newProduct }; // Returning the insertId and newProduct
 };
 
 export const dbUpdateProduct = async (id, updatedProduct) => {
@@ -41,49 +42,16 @@ export const dbUpdateProduct = async (id, updatedProduct) => {
     }
 
     const pool = await poolPromise;
-    const request = pool.request();
-
-    // Fields to skip
-    const skipFields = ["user_id", "created_at"];
-
-    // Dynamically build the SET clause and add inputs to the request
-    const setClauses = [];
-    for (const [key, value] of Object.entries(updatedProduct)) {
-        if (skipFields.includes(key)) continue; // Skip the specified fields
-
-        const paramName = `@${key}`;
-        setClauses.push(`${key} = ${paramName}`);
-
-        // Adjust SQL data type based on expected schema
-        let sqlType;
-        switch (key) {
-            case "price":
-                sqlType = sql.Decimal;
-                break;
-            case "id":
-                sqlType = sql.Int;
-                break;
-            default:
-                sqlType = sql.NVarChar;
-        }
-
-        request.input(key, sqlType, value);
-    }
-
-    // Ensure there are fields to update
-    if (setClauses.length === 0) {
-        throw new Error("No valid fields provided to update.");
-    }
-
-    // Add the ID input
-    request.input("id", sql.Int, id);
-
-    const query = `UPDATE products SET ${setClauses.join(", ")} WHERE id = @id`;
-
-    // Execute the query
-    const result = await request.query(query);
-
-    return result.rowsAffected[0] > 0; // Returns true if any rows were updated
+    const result = await pool.request()
+        .input('id', sql.Int, id)
+        .input('name', sql.NVarChar, updatedProduct.name)
+        .input('price', sql.Decimal, updatedProduct.price)
+        .input('description', sql.NVarChar, updatedProduct.description)
+        .input('user_id', sql.Int, updatedProduct.user_id)
+        .input('image', sql.NVarChar, updatedProduct.image)
+        .input('category_id', sql.Int, updatedProduct.category_id)
+        .query('UPDATE products SET name = @name, price = @price, description = @description, user_id = @user_id, image = @image, category_id = @category_id WHERE id = @id');
+    return result.rowsAffected > 0; // Returns true if rows were affected
 };
 
 
