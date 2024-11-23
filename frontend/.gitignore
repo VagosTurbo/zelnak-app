@@ -8,14 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+node_modules/
 dist
 dist_development
 dist_production
 dist_homepage
 dist-ssr
 *.local
-api-example.json
-api-example-ihriska.json
 
 # Editor directories and files
 .vscode/*
