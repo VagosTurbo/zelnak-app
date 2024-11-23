@@ -12,11 +12,14 @@ import App from './App'
 import { theme } from './styles/theme'
 
 import 'dayjs/locale/cs'
+import { AuthProvider } from './context/AuthContext'
 
 const Main = () => {
     return (
         <React.StrictMode>
-            <AppProviders />
+            <AuthProvider>
+                <AppProviders />
+            </AuthProvider>
         </React.StrictMode>
     )
 }
