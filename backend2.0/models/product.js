@@ -42,7 +42,6 @@ export const dbUpdateProduct = async (id, updatedProduct) => {
 
     const pool = await poolPromise;
     const result = await pool.request()
-        .input('id', sql.Int, id)
         .input('name', sql.NVarChar, updatedProduct.name)
         .input('price', sql.Decimal, updatedProduct.price)
         .input('description', sql.NVarChar, updatedProduct.description)

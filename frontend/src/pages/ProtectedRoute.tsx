@@ -1,20 +1,38 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { Routes } from '../enums';
+import {jwtDecode} from 'jwt-decode';
+import { Routes, LocalStorage } from '../enums';
 
 interface ProtectedRouteProps {
     element: JSX.Element;
-    allowedRoles: string[];
+    allowedRoles: number[];
+}
+
+interface DecodedToken {
+    role: number;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element, allowedRoles }) => {
-    const userRole = localStorage.getItem('userRole'); // Assuming userRole is stored in localStorage
+    const token = localStorage.getItem(LocalStorage.token);
 
-    if (!userRole || !allowedRoles.includes(userRole)) {
-        return <Navigate to={Routes.Login} />; // Redirect to login if not authorized
+    if (!token) {
+        return <Navigate to={Routes.Login} />; // Redirect to login if no token
     }
 
-    return element;
+    try {
+        const decodedToken: DecodedToken = jwtDecode(token);
+        const userRole = decodedToken.role;
+
+        if (!allowedRoles.includes(userRole)) {
+            console.log('User not authorized');
+            return <Navigate to={Routes.Login} />; // Redirect to login if not authorized
+        }
+
+        return element;
+    } catch (error) {
+        console.error('Invalid token:', error);
+        return <Navigate to={Routes.Login} />; // Redirect to login if token is invalid
+    }
 };
 
 export default ProtectedRoute;
