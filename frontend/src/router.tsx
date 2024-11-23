@@ -11,6 +11,8 @@ import CategoriesPage from './pages/CategoryPage.tsx'
 import AddCategory from './pages/AddCategory.tsx'
 import FarmerProfile from './pages/FarmerProfile.tsx'
 import AdminPage from './pages/AdminPage.tsx'
+import ProtectedRoute from './pages/ProtectedRoute.tsx'
+import { UserRole } from './enums/UserRole.ts'
 
 const applicationRouter = createHashRouter([
     {
@@ -35,7 +37,7 @@ const applicationRouter = createHashRouter([
     },
     {
         path: Routes.AddProduct, 
-        element: <AddProduct />,
+        element: <ProtectedRoute element={<AddProduct />} allowedRoles={[UserRole.Farmer, UserRole.Registered]} />,
     },
     {
         path: Routes.Events,
@@ -55,7 +57,7 @@ const applicationRouter = createHashRouter([
     },
     {
         path: '/admin',
-        element: <AdminPage />, // Add this route
+        element: <ProtectedRoute element={<AdminPage />} allowedRoles={[UserRole.Admin]} />,
     },
 ])
 
