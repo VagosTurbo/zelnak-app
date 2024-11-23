@@ -1,22 +1,30 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material'
-import { Link } from 'react-router-dom'
+import {
+    Box,
+    Button,
+    Card,
+    CardActionArea,
+    CardContent,
+    CardMedia,
+    Typography,
+} from '@mui/material'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Routes } from '../../enums/Routes'
-import { LocalStorage } from '../../enums'
 import Layout from '../layouts/Layout'
 import { Category } from '../../types/Category'
-import { Attribute } from '../../types/Attribute'
 import { apiGet } from '../../api/apiGet'
 import { Product } from '../../types/Product'
 import colors from '../../styles/colors'
+import { UrlParams } from '../../enums/UrlParams'
+import { useCart } from '../../context/CartContext'
 
 const Homepage: React.FC = () => {
-    const userId = localStorage.getItem(LocalStorage.UserId)
-
     const [categories, setCategories] = useState<Category[]>([])
+    const [allProducts, setAllProducts] = useState<Product[]>([])
     const [products, setProducts] = useState<Product[]>([])
-    const [attributes, setAttributes] = useState<Attribute[]>([])
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
+
+    const [searchParams] = useSearchParams()
+    const { addProduct } = useCart()
 
     const fetchCategories = async () => {
         try {
@@ -30,17 +38,32 @@ const Homepage: React.FC = () => {
     const fetchAllProducts = async () => {
         try {
             const response = await apiGet<Product[]>('/products')
+            setAllProducts(response)
             setProducts(response)
         } catch (err: any) {
             console.error('Failed to fetch products', err)
         }
     }
-    const { addProduct } = useCart()
+
+    const handleUrlParams = () => {
+        const category = searchParams.get('category')
+        if (category) {
+            setProducts(
+                allProducts.filter((product) => product.category_id === parseInt(category, 10))
+            )
+        } else {
+            setProducts(allProducts)
+        }
+    }
 
     useEffect(() => {
         fetchCategories()
         fetchAllProducts()
     }, [])
+
+    useEffect(() => {
+        handleUrlParams()
+    }, [searchParams, allProducts])
 
     return (
         <Layout>
@@ -105,7 +128,7 @@ const Homepage: React.FC = () => {
                         <CardContent>
                             <CardActionArea>
                                 <Link
-                                    to={'?category=' + category.id}
+                                    to={`?${UrlParams.Category}=${category.id}`}
                                     style={{ textDecoration: 'none' }}>
                                     <Typography gutterBottom variant="h5" component="div">
                                         {category.name}
@@ -131,7 +154,7 @@ const Homepage: React.FC = () => {
                 {products.map((product, index) => (
                     <Card sx={{}} key={index}>
                         <CardMedia component="img" height="140" image={product.image} />
-                        <CardContent>
+                        <CardContent sx={{ height: '100%' }}>
                             <CardActionArea>
                                 <Link
                                     to={Routes.Product + '/' + product.id}
