@@ -1,16 +1,15 @@
-import React from 'react'
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material'
-import { LocalStorage } from '../enums'
+import React from 'react';
+import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
+import { LocalStorage } from '../enums';
 
 const Navbar: React.FC = () => {
-    const handleLogout = () => {
-        // Remove the token from localStorage and redirect to login (if needed)
-        localStorage.removeItem(LocalStorage.token)
-        localStorage.removeItem(LocalStorage.UserId)
-        window.location.href = '/login'
-    }
+    const isLoggedIn = !!localStorage.getItem(LocalStorage.token); // Check if token exists
 
-    const isLoggedIn = !!localStorage.getItem(LocalStorage.token) // Check if token exists
+    const handleLogout = () => {
+        localStorage.removeItem(LocalStorage.token);
+        localStorage.removeItem(LocalStorage.UserId);
+        window.location.reload();
+    };
 
     return (
         <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
@@ -30,27 +29,30 @@ const Navbar: React.FC = () => {
                     </Button>
                 </Box>
                 {isLoggedIn ? (
-                    <Button color="inherit" href="#/profile">
-                        Profile
-                    </Button>
+                    <>
+                        <Button color="inherit" href="#/profile">
+                            Profile
+                        </Button>
+                        <Button color="inherit" onClick={handleLogout}>
+                            Logout
+                        </Button>
+                        <Button color="inherit" href="#/cart">
+                            Cart
+                        </Button>
+                    </>
                 ) : (
-                    <Button color="inherit" href="#/register">
-                        Register
-                    </Button>
-                )}
-                {/* Login/Logout Button */}
-                {isLoggedIn ? (
-                    <Button color="inherit" onClick={handleLogout}>
-                        Logout
-                    </Button>
-                ) : (
-                    <Button color="inherit" href="#/login">
-                        Login
-                    </Button>
+                    <>
+                        <Button color="inherit" href="#/register">
+                            Register
+                        </Button>
+                        <Button color="inherit" href="#/login">
+                            Login
+                        </Button>
+                    </>
                 )}
             </Toolbar>
         </AppBar>
-    )
-}
+    );
+};
 
-export default Navbar
+export default Navbar;

@@ -10,4 +10,5 @@ export enum Routes {
     Events = '/events',
     Categories = '/categories',
     AddCategory = '/add-category',
+    Cart = '/cart',
 }
