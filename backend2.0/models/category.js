@@ -15,14 +15,21 @@ export const dbGetCategoryById = async (id) => {
     return result.recordset.length > 0 ? result.recordset[0] : null;
 };
 
-export const dbCreateCategory = async (newCategory) => {
-    const pool = await poolPromise;
-    const result = await pool.request()
+export const dbCreateCategory = async (newCategory, transaction) => {
+    const result = await transaction.request()
         .input('name', sql.NVarChar, newCategory.name)
         .input('parent_id', sql.Int, newCategory.parent_id)
-        .query('INSERT INTO categories (name, parent_id) VALUES (@name, @parent_id)');
-    return { id: result.recordset[0].id, ...newCategory };
+        .input('is_approved', sql.Bit, newCategory.is_approved)
+        .query(`
+            INSERT INTO categories (name, parent_id, is_approved)
+            OUTPUT INSERTED.id
+            VALUES (@name, @parent_id, @is_approved)
+        `);
+
+    return result.recordset[0].id;  // return category id
 };
+
+
 
 export const dbGetCategoryHierarchy = async (categoryId) => {
     const pool = await poolPromise;
