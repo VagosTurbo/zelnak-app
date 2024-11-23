@@ -9,7 +9,7 @@ const router = Router();
 const permissions = {
     getAllCategories: [],
     getCategoryById: [],
-    createCategory: [Roles.Admin, Roles.Moderator],
+    createCategory: [],
     updateCategory: [Roles.Admin, Roles.Moderator],
     deleteCategory: [Roles.Admin, Roles.Moderator],
 }
@@ -17,7 +17,7 @@ const permissions = {
 router.get("/", getAllCategories);
 router.get("/:id", getCategoryById);
 router.put("/:id", authenticateToken(permissions.updateCategory),updateCategory);
-router.post("/", authenticateToken(permissions.createCategory),createCategory);
+router.post("/",createCategory);
 router.delete("/:id",authenticateToken(permissions.deleteCategory), deleteCategory);
 router.get("/:categoryId/hierarchy", getCategoryHierarchy);
 

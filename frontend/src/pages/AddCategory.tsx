@@ -1,69 +1,79 @@
 // frontend/src/pages/AddCategory.tsx
-import React, { useState, useEffect, FormEvent } from 'react';
-import { Box, Button, TextField, Typography, IconButton, MenuItem } from '@mui/material';
-import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
-import api from '../api/api';
-import { useNavigate } from 'react-router-dom';
-import { Routes } from '../enums/Routes';
+import React, { useState, useEffect, FormEvent } from 'react'
+import { Box, Button, TextField, Typography, IconButton, MenuItem } from '@mui/material'
+import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material'
+import api from '../api/api'
+import { useNavigate } from 'react-router-dom'
+import { Routes } from '../enums/Routes'
+import { apiPost } from '../api/apiPost'
+import { useAuth } from '../context/AuthContext'
 
 interface Category {
-    id: number;
-    name: string;
+    id: number
+    name: string
 }
 
 const AddCategory: React.FC = () => {
-    const [categoryName, setCategoryName] = useState('');
-    const [parentCategoryId, setParentCategoryId] = useState<number | null>(null);
-    const [attributes, setAttributes] = useState([{ name: '', isRequired: false }]);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [message, setMessage] = useState('');
-    const navigate = useNavigate();
+    const [categoryName, setCategoryName] = useState('')
+    const [parentCategoryId, setParentCategoryId] = useState<number | null>(null)
+    const [attributes, setAttributes] = useState([{ name: '', isRequired: false }])
+    const [categories, setCategories] = useState<Category[]>([])
+    const [message, setMessage] = useState('')
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await api.get('/categories');
-                setCategories(response.data);
+                const response = await api.get('/categories')
+                setCategories(response.data)
             } catch (err: any) {
-                console.error('Failed to fetch categories', err);
+                console.error('Failed to fetch categories', err)
             }
-        };
+        }
 
-        fetchCategories();
-    }, []);
+        fetchCategories()
+    }, [])
 
     const handleAttributeChange = (index: number, key: string, value: string | boolean) => {
-        const newAttributes = [...attributes];
-        newAttributes[index] = { ...newAttributes[index], [key]: value };
-        setAttributes(newAttributes);
-    };
+        const newAttributes = [...attributes]
+        newAttributes[index] = { ...newAttributes[index], [key]: value }
+        setAttributes(newAttributes)
+    }
 
     const handleAddAttribute = () => {
-        setAttributes([...attributes, { name: '', isRequired: false }]);
-    };
+        setAttributes([...attributes, { name: '', isRequired: false }])
+    }
 
     const handleRemoveAttribute = (index: number) => {
-        const newAttributes = attributes.filter((_, i) => i !== index);
-        setAttributes(newAttributes);
-    };
+        const newAttributes = attributes.filter((_, i) => i !== index)
+        setAttributes(newAttributes)
+    }
 
     const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        try {
-            const response = await api.post('/categories', {
-                name: categoryName,
-                parent_id: parentCategoryId,
-                attributes: attributes.map(attr => ({
-                    name: attr.name,
-                    is_required: attr.isRequired,
-                })),
-            });
-            setMessage(response.data.message || 'Category created successfully!');
-            navigate(Routes.Categories);
-        } catch (error: any) {
-            setMessage(error.response?.data?.message || 'Error occurred');
+        e.preventDefault()
+
+        // Creating the data in the desired format
+        const categoryData = {
+            name: categoryName,
+            parent_id: parentCategoryId,
+            attributes: attributes.map((attr) => ({
+                name: attr.name,
+                is_required: attr.isRequired,
+            })),
         }
-    };
+
+        try {
+            // Posting the data to the API
+            const response = await api.post('/categories', categoryData)
+
+            // Displaying a success message
+            setMessage(response.message || 'Category created successfully!')
+            navigate(Routes.Categories)
+        } catch (error: any) {
+            // Handling error
+            setMessage(error.response?.data?.message || 'Error occurred')
+        }
+    }
 
     return (
         <Box
@@ -101,9 +111,10 @@ const AddCategory: React.FC = () => {
                         fullWidth
                         select
                         value={parentCategoryId || ''}
-                        onChange={(e) => setParentCategoryId(e.target.value ? parseInt(e.target.value) : null)}
-                        sx={{ mb: 2 }}
-                    >
+                        onChange={(e) =>
+                            setParentCategoryId(e.target.value ? parseInt(e.target.value) : null)
+                        }
+                        sx={{ mb: 2 }}>
                         <MenuItem value="">
                             <em>None</em>
                         </MenuItem>
@@ -123,7 +134,9 @@ const AddCategory: React.FC = () => {
                                 variant="outlined"
                                 fullWidth
                                 value={attribute.name}
-                                onChange={(e) => handleAttributeChange(index, 'name', e.target.value)}
+                                onChange={(e) =>
+                                    handleAttributeChange(index, 'name', e.target.value)
+                                }
                                 sx={{ mr: 2 }}
                             />
                             <TextField
@@ -133,9 +146,14 @@ const AddCategory: React.FC = () => {
                                 select
                                 SelectProps={{ native: true }}
                                 value={attribute.isRequired ? 'true' : 'false'}
-                                onChange={(e) => handleAttributeChange(index, 'isRequired', e.target.value === 'true')}
-                                sx={{ mr: 2 }}
-                            >
+                                onChange={(e) =>
+                                    handleAttributeChange(
+                                        index,
+                                        'isRequired',
+                                        e.target.value === 'true'
+                                    )
+                                }
+                                sx={{ mr: 2 }}>
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                             </TextField>
@@ -144,7 +162,11 @@ const AddCategory: React.FC = () => {
                             </IconButton>
                         </Box>
                     ))}
-                    <Button variant="outlined" onClick={handleAddAttribute} startIcon={<AddCircleOutline />} sx={{ mb: 2 }}>
+                    <Button
+                        variant="outlined"
+                        onClick={handleAddAttribute}
+                        startIcon={<AddCircleOutline />}
+                        sx={{ mb: 2 }}>
                         Add Attribute
                     </Button>
                     <Button variant="contained" color="primary" type="submit" fullWidth>
@@ -158,7 +180,7 @@ const AddCategory: React.FC = () => {
                 )}
             </Box>
         </Box>
-    );
-};
+    )
+}
 
-export default AddCategory;
+export default AddCategory
