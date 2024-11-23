@@ -26,6 +26,16 @@ CREATE TABLE categories (
 );
 GO
 
+-- Create the attributes table
+CREATE TABLE attributes (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    name NVARCHAR(255) NOT NULL,
+    is_required BIT NOT NULL,
+    category_id INT NOT NULL,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+GO
+
 -- Create the products table
 CREATE TABLE products (
     id INT PRIMARY KEY IDENTITY(1,1),

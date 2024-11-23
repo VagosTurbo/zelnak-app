@@ -16,8 +16,8 @@ const permissions = {
     deleteEvent: [Roles.Admin, Roles.Farmer],
 }
 
-router.get("/", authenticateToken(permissions.getAllEvents), getAllEvents)
-router.get("/:id", authenticateToken(permissions.getEventById), getEventById)
+router.get("/", getAllEvents)
+router.get("/:id", getEventById)
 router.post("/", authenticateToken(permissions.createEvent), createEvent)
 router.put("/:id", authenticateToken(permissions.updateEvent), updateEvent)
 router.delete("/:id", authenticateToken(permissions.deleteEvent), deleteEvent)

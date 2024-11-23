@@ -6,6 +6,10 @@ import Login from './pages/Login.tsx'
 import ProductsPage from './pages/ProductsPage.tsx'
 import Profile from './pages/Profilepage.tsx'
 import AddProduct from './pages/AddProduct.tsx'
+import Events from './pages/Events.tsx'
+import CategoriesPage from './pages/CategoryPage.tsx'
+import AddCategory from './pages/AddCategory.tsx'
+import FarmerProfile from './pages/FarmerProfile.tsx'
 
 const applicationRouter = createHashRouter([
     {
@@ -31,6 +35,22 @@ const applicationRouter = createHashRouter([
     {
         path: Routes.AddProduct, 
         element: <AddProduct />,
+    },
+    {
+        path: Routes.Events,
+        element: <Events />,
+    },
+    {
+        path: Routes.Categories,
+        element: <CategoriesPage />,
+    },
+    {
+        path: Routes.AddCategory,
+        element: <AddCategory />,
+    },
+    {
+        path: '/farmers/:id',
+        element: <FarmerProfile />,
     }
 ])
 

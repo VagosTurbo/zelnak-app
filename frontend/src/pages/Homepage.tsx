@@ -62,6 +62,16 @@ const Homepage: React.FC = () => {
                     <Link to={Routes.AddProduct} style={{ marginRight: '16px' }}>
                         Add Product
                     </Link>
+                    <Link to={Routes.Events} style={{ marginRight: '16px' }}>
+                        Events
+                    </Link>
+                    <Link to={Routes.Categories} style={{ marginRight: '16px' }}>
+                        Categories
+                    </Link>
+                    <Link to={Routes.AddCategory} style={{ marginRight: '16px' }}>
+                        Add Category
+                    </Link>
+
     
                 </nav>
             </Box>

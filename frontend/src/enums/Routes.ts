@@ -5,4 +5,7 @@ export enum Routes {
     Products = '/products',
     Profile='/profile',
     AddProduct = '/add-product',
+    Events = '/events',
+    Categories = '/categories',
+    AddCategory = '/add-category',
 };

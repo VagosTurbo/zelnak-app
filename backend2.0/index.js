@@ -6,6 +6,8 @@ import orderRoutes from "./routes/orderRoutes.js"
 import errorHandler from "./errorHandler/errorHandler.js"
 import loginRoutes from "./routes/loginRoutes.js"
 import registerRoutes from "./routes/registerRoutes.js"
+import categoryRoutes from "./routes/categoryRoutes.js"
+import attributeRoutes from "./routes/attributeRoutes.js"
 import dotenv from "dotenv"
 import cors from 'cors';
 
@@ -22,6 +24,8 @@ app.use("/events", eventRoutes)
 app.use("/orders", orderRoutes)
 app.use("/login", loginRoutes)
 app.use("/register", registerRoutes)
+app.use("/categories", categoryRoutes)
+app.use("/attributes", attributeRoutes)
 app.use(errorHandler)
 app.listen(PORT, () => {
     console.log(`\n***** SERVER RUNNING ON http://localhost:${PORT} *****`)
