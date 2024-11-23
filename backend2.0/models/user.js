@@ -58,14 +58,24 @@ export const dbUpdateUser = async (id, updatedUser) => {
     const pool = await poolPromise;
     const request = pool.request();
 
-    // TODO heslo aby neslo upravovat
+    // Prevent password updates
+    if (updatedUser.password) {
+        throw new Error("Password updates are not allowed via this method.");
+    }
 
     // Dynamically build the SET clause and add inputs to the request
     const setClauses = [];
     for (const [key, value] of Object.entries(updatedUser)) {
+        if (key === "created_at") {
+            throw new Error("Cannot update 'created_at' field.");
+        }
         const paramName = `@${key}`;
         setClauses.push(`${key} = ${paramName}`);
-        request.input(key, sql.NVarChar, value); // Adjust sql type based on your schema
+        if (key === "role") {
+            request.input(key, sql.Int, value); // Role is an INT
+        } else {
+            request.input(key, sql.NVarChar, value); // Use NVarChar for username and email
+        }
     }
 
     // Add the ID input

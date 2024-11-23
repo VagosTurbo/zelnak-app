@@ -19,34 +19,55 @@ export const getUserById = async (req, res) => {
     }
 }
 
-export const updateUser = async (req, res) => {
-    const userId = req.params.id
-    const updatedUser = {}
+export const createUser = async (req, res) => {
+    const { username, password, email, role } = req.body
 
-    if (req.body.username) updatedUser.username = req.body.username
-
-    if (req.body.email) updatedUser.email = req.body.email
-
-    if (req.body.role) updatedUser.role = req.body.role
-
-    // there must be at least one field to update
-    if (Object.keys(updatedUser).length === 0) {
-        return res.status(400).json({ error: "At least one field is required to update." })
+    const newUser = {
+        username,
+        password,
+        email,
+        role: Roles.Registered
     }
 
     try {
-        // does user exist?
-        const existingUser = await dbGetUserById(userId)
-        if (!existingUser) {
-            return res.status(404).json({ error: "User not found." })
-        }
-
-        await dbUpdateUser(userId, updatedUser)
-        res.json({ message: "User updated successfully" })
+        await dbCreateUser(newUser)
+        res.json({ message: "User created successfully" })
     } catch (err) {
         res.status(500).json({ error: err.message })
     }
 }
+
+export const updateUser = async (req, res) => {
+    const userId = req.params.id;
+    const updatedUser = {};
+
+    // Only include fields that are allowed to be updated
+    if (req.body.username) updatedUser.username = req.body.username;
+    if (req.body.email) updatedUser.email = req.body.email;
+    if (req.body.role) updatedUser.role = req.body.role;
+
+    // there must be at least one field to update
+    if (Object.keys(updatedUser).length === 0) {
+        return res.status(400).json({ error: "At least one field is required to update." });
+    }
+
+    try {
+        // Does the user exist?
+        const existingUser = await dbGetUserById(userId);
+        if (!existingUser) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        // Exclude 'created_at' and 'user_id' fields from the update
+        const { created_at, user_id, ...userToUpdate } = updatedUser;
+
+        // Pass only the allowed fields to dbUpdateUser
+        await dbUpdateUser(userId, userToUpdate);
+        res.json({ message: "User updated successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
 
 export const deleteUser = async (req, res) => {
     const userId = req.params.id
