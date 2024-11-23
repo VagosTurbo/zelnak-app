@@ -13,6 +13,7 @@ import { theme } from './styles/theme'
 
 import 'dayjs/locale/cs'
 import { AuthProvider } from './context/AuthContext'
+import { CartProvider } from './context/CartContext'
 
 const Main = () => {
     return (
@@ -28,7 +29,9 @@ const AppProviders = () => {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="cs">
             <ThemeProvider theme={theme}>
-                <App />
+                <CartProvider>
+                    <App />
+                </CartProvider>
             </ThemeProvider>
         </LocalizationProvider>
     )
