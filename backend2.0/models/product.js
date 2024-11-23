@@ -22,8 +22,9 @@ export const dbCreateProduct = async (newProduct) => {
         .input('description', sql.NVarChar, newProduct.description)
         .input('user_id', sql.Int, newProduct.user_id)
         .input('image', sql.NVarChar, newProduct.image)
-        .query('INSERT INTO products (name, price, description, user_id, image) VALUES (@name, @price, @description, @user_id, @image)');
-    return { id: result.rowsAffected, ...newProduct }; // Returning the insertId and newProduct
+        .input('category_id', sql.Int, newProduct.category_id)
+        .query('INSERT INTO products (name, price, description, user_id, image, category_id) VALUES (@name, @price, @description, @user_id, @image, @category_id); SELECT SCOPE_IDENTITY() AS id');
+        return { id: result.rowsAffected, ...newProduct }; // Returning the insertId and newProduct
 };
 
 export const dbUpdateProduct = async (id, updatedProduct) => {
@@ -35,7 +36,8 @@ export const dbUpdateProduct = async (id, updatedProduct) => {
         .input('description', sql.NVarChar, updatedProduct.description)
         .input('user_id', sql.Int, updatedProduct.user_id)
         .input('image', sql.NVarChar, updatedProduct.image)
-        .query('UPDATE products SET name = @name, price = @price, description = @description, user_id = @user_id, image = @image WHERE id = @id');
+        .input('category_id', sql.Int, updatedProduct.category_id)
+        .query('UPDATE products SET name = @name, price = @price, description = @description, user_id = @user_id, image = @image, category_id = @category_id WHERE id = @id');
     return result.rowsAffected > 0; // Returns true if rows were affected
 };
 

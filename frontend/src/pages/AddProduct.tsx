@@ -1,9 +1,13 @@
-// frontend/src/pages/AddProduct.tsx
-import React, { useState, FormEvent } from 'react';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import React, { useState, useEffect, FormEvent } from 'react';
+import { Box, Button, TextField, Typography, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 import api from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import { LocalStorage } from '../enums';
+
+interface Category {
+    id: number;
+    name: string;
+}
 
 const AddProduct: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -11,9 +15,24 @@ const AddProduct: React.FC = () => {
         price: '',
         description: '',
         image: '',
+        category_id: '',
     });
+    const [categories, setCategories] = useState<Category[]>([]);
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await api.get('/categories');
+                setCategories(response.data);
+            } catch (err: any) {
+                setMessage(err.response?.data?.message || 'Failed to fetch categories');
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     const handleSetValue = (key: keyof typeof formData, value: string) => {
         setFormData({ ...formData, [key]: value });
@@ -96,6 +115,21 @@ const AddProduct: React.FC = () => {
                         onChange={(e) => handleSetValue('image', e.target.value)}
                         sx={{ mb: 2 }}
                     />
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel id="category-label">Category</InputLabel>
+                        <Select
+                            labelId="category-label"
+                            value={formData.category_id}
+                            onChange={(e) => handleSetValue('category_id', e.target.value)}
+                            label="Category"
+                        >
+                            {categories.map((category) => (
+                                <MenuItem key={category.id} value={category.id}>
+                                    {category.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     <Button variant="contained" color="primary" type="submit" fullWidth>
                         Add Product
                     </Button>

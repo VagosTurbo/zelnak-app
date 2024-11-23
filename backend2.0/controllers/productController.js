@@ -19,34 +19,55 @@ export const getProductById = async (req, res) => {
 }
 
 export const createProduct = async (req, res) => {
-    const newProduct = {
-        name: req.body.name,
-        price: req.body.price,
-        description: req.body.description,
-        user_id: req.body.user_id,
-        image: req.body.image,
-    };
     try {
-        await dbCreateProduct(newProduct);
-        res.json({ message: "Product created successfully" });
+        const { name, price, description, image, user_id, category_id } = req.body;
+
+        if (!name || !price || !description || !user_id || !category_id) {
+            return res.status(400).json({ error: "All fields are required" });
+        }
+
+        const productCreated = await dbCreateProduct({ name, price, description, image, user_id, category_id });
+
+        if (productCreated) {
+            res.status(201).json({ message: "Product created successfully" });
+        } else {
+            res.status(500).json({ error: "Failed to create product" });
+        }
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to create product: " + err.message });
     }
 }
 
 export const updateProduct = async (req, res) => {
-    const updatedProduct = {
-        name: req.body.name,
-        price: req.body.price,
-        description: req.body.description,
-        user_id: req.body.user_id,
-        image: req.body.image,
-    };
     try {
-        await dbUpdateProduct(req.params.id, updatedProduct);
-        res.json({ message: "Product updated successfully" });
+        const productId = req.params.id;
+        const updatedProduct = {};
+
+        if (req.body.name) updatedProduct.name = req.body.name;
+        if (req.body.price) updatedProduct.price = req.body.price;
+        if (req.body.description) updatedProduct.description = req.body.description;
+        if (req.body.image) updatedProduct.image = req.body.image;
+        if (req.body.category_id) updatedProduct.category_id = req.body.category_id;
+
+        if (Object.keys(updatedProduct).length === 0) {
+            return res.status(400).json({ error: "At least one field is required to update" });
+        }
+
+        const existingProduct = await dbGetProductById(productId);
+
+        if (!existingProduct) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        const productUpdated = await dbUpdateProduct(productId, updatedProduct);
+
+        if (productUpdated) {
+            res.json({ message: "Product updated successfully" });
+        } else {
+            res.status(500).json({ error: "Failed to update product" });
+        }
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Failed to update product: " + err.message });
     }
 }
 
