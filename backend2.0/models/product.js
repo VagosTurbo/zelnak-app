@@ -31,7 +31,6 @@ export const dbCreateProduct = async (newProduct) => {
         .input('user_id', sql.Int, newProduct.user_id)
         .input('category_id', sql.Int, newProduct.category_id)
         .input('image', sql.NVarChar, newProduct.image)
-        .input('category_id', sql.Int, newProduct.category_id)
         .query('INSERT INTO products (name, price, description, user_id, image, category_id) VALUES (@name, @price, @description, @user_id, @image, @category_id); SELECT SCOPE_IDENTITY() AS id');
         return { id: result.rowsAffected, ...newProduct }; // Returning the insertId and newProduct
 };
