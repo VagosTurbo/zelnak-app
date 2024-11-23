@@ -71,7 +71,9 @@ const Homepage: React.FC = () => {
                     <Link to={Routes.AddCategory} style={{ marginRight: '16px' }}>
                         Add Category
                     </Link>
-
+                    <Link to="/admin" style={{ marginRight: '16px' }}>
+                        Admin Page
+                    </Link>
     
                 </nav>
             </Box>

@@ -10,6 +10,7 @@ import Events from './pages/Events.tsx'
 import CategoriesPage from './pages/CategoryPage.tsx'
 import AddCategory from './pages/AddCategory.tsx'
 import FarmerProfile from './pages/FarmerProfile.tsx'
+import AdminPage from './pages/AdminPage.tsx'
 
 const applicationRouter = createHashRouter([
     {
@@ -51,7 +52,11 @@ const applicationRouter = createHashRouter([
     {
         path: '/farmers/:id',
         element: <FarmerProfile />,
-    }
+    },
+    {
+        path: '/admin',
+        element: <AdminPage />, // Add this route
+    },
 ])
 
 const getRouter = () => {

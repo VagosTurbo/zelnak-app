@@ -127,3 +127,29 @@ export const dbVerifyUserCredentials = async (username, password) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     return isPasswordValid ? user : null;
 };
+
+export const dbAddUserEvent = async (userId, eventId) => {
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('user_id', sql.Int, userId)
+        .input('event_id', sql.Int, eventId)
+        .query('INSERT INTO user_events (user_id, event_id) VALUES (@user_id, @event_id)');
+    return result.rowsAffected[0] > 0;
+};
+
+export const dbRemoveUserEvent = async (userId, eventId) => {
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('user_id', sql.Int, userId)
+        .input('event_id', sql.Int, eventId)
+        .query('DELETE FROM user_events WHERE user_id = @user_id AND event_id = @event_id');
+    return result.rowsAffected[0] > 0;
+};
+
+export const dbGetUserEvents = async (userId) => {
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('user_id', sql.Int, userId)
+        .query('SELECT event_id FROM user_events WHERE user_id = @user_id');
+    return result.recordset.map(row => row.event_id);
+};

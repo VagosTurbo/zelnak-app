@@ -1,5 +1,5 @@
 import { Roles } from "../enums/roles.js"
-import { dbGetAllUsers, dbGetUserById, dbCreateUser, dbUpdateUser, dbDeleteUser } from "../models/user.js"
+import { dbGetAllUsers, dbGetUserById, dbCreateUser, dbUpdateUser, dbDeleteUser, dbAddUserEvent, dbRemoveUserEvent, dbGetUserEvents } from "../models/user.js";
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -70,3 +70,46 @@ export const deleteUser = async (req, res) => {
         res.status(500).json({ error: err.message })
     }
 }
+
+export const addUserEvent = async (req, res) => {
+    const userId = req.params.userId;
+    const eventId = req.body.eventId;
+
+    try {
+        const success = await dbAddUserEvent(userId, eventId);
+        if (success) {
+            res.json({ message: 'Event added successfully' });
+        } else {
+            res.status(500).json({ error: 'Failed to add event' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const removeUserEvent = async (req, res) => {
+    const userId = req.params.userId;
+    const eventId = req.body.eventId;
+
+    try {
+        const success = await dbRemoveUserEvent(userId, eventId);
+        if (success) {
+            res.json({ message: 'Event removed successfully' });
+        } else {
+            res.status(500).json({ error: 'Failed to remove event' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getUserEvents = async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const events = await dbGetUserEvents(userId);
+        res.json(events);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

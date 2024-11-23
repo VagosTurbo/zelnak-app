@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Typography, Card, CardContent, CardMedia, Link } from '@mui/material'
+import { Box, Typography, Card, CardContent, CardMedia, Link, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { apiGet } from '../api/apiGet'
 
@@ -31,6 +31,7 @@ const ProductsPage: React.FC = () => {
     const [users, setUsers] = useState<{ [key: number]: User }>({})
     const [categories, setCategories] = useState<{ [key: number]: Category[] }>({})
     const [error, setError] = useState<string | null>(null)
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -69,6 +70,14 @@ const ProductsPage: React.FC = () => {
         navigate(`/farmers/${farmerId}`)
     }
 
+    const handleCategoryChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        setSelectedCategory(event.target.value as number)
+    }
+
+    const filteredProducts = selectedCategory
+        ? products.filter(product => product.category_id === selectedCategory)
+        : products
+
     return (
         <Box sx={{ padding: 4 }}>
             <Typography variant="h4" gutterBottom>
@@ -77,8 +86,27 @@ const ProductsPage: React.FC = () => {
 
             {error && <Typography color="error">{error}</Typography>}
 
+            <FormControl fullWidth sx={{ mb: 4 }}>
+                <InputLabel id="category-filter-label">Filter by Category</InputLabel>
+                <Select
+                    labelId="category-filter-label"
+                    value={selectedCategory || ''}
+                    onChange={handleCategoryChange}
+                    label="Filter by Category"
+                >
+                    <MenuItem value="">
+                        <em>All Categories</em>
+                    </MenuItem>
+                    {Object.values(categories).flat().map((category) => (
+                        <MenuItem key={category.id} value={category.id}>
+                            {category.name}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                {products.map((product) => (
+                {filteredProducts.map((product) => (
                     <Card key={product.id} sx={{ maxWidth: 345 }}>
                         <CardMedia
                             component="img"
