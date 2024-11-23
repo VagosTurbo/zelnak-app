@@ -1,6 +1,7 @@
 import { dbGetAllProducts, dbGetProductById, dbCreateProduct, dbUpdateProduct, dbDeleteProduct } from "../models/product.js";
-import { dbGetUserById } from "../models/user.js";
+import { dbGetUserById, dbUpdateUser } from "../models/user.js";
 import { dbGetCategoryById } from "../models/category.js";
+import { Roles } from "../enums/roles.js";
 
 // Get all products
 export const getAllProducts = async (req, res) => {
@@ -36,27 +37,55 @@ export const getProductById = async (req, res) => {
 // Create a new product
 export const createProduct = async (req, res) => {
     try {
-        
-
         const { name, price, description, user_id, image, category_id } = req.body;
 
+        // Validate required fields
         if (!user_id || !price || !name || !category_id) {
-            return res.status(400).json({ error: "Name, price, category and user_id is required" });
+            return res.status(400).json({ error: "Name, price, category, and user_id are required" });
         }
         
+        // Check if user exists
         const user = await dbGetUserById(user_id);
-        if(!user){
-            return res.status(400).json({ error: "User id doesnt exist" });
+        if (!user) {
+            return res.status(400).json({ error: "User ID doesn't exist" });
         }
 
+        // Check if category exists
         const category = await dbGetCategoryById(category_id);
-        if(!category){
-            return res.status(400).json({ error: "Category doesnt exist" });
+        if (!category) {
+            return res.status(400).json({ error: "Category doesn't exist" });
         }
 
-        const productCreated = await dbCreateProduct({ name, price, description, user_id, image, category_id });
+        // Set default image if not provided
+        const imageUrl = image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+
+        // Create product
+        const productCreated = await dbCreateProduct({ 
+            name, 
+            price, 
+            description, 
+            user_id, 
+            image: imageUrl, 
+            category_id 
+        });
 
         if (productCreated) {
+
+             // Check if user's current role is Registered
+             if (user.role === Roles.Registered) {
+                // Update user role to Farmer
+                const roleUpdated = await dbUpdateUser(user_id, { role: Roles.Farmer });
+                if (roleUpdated) {
+                    return res.status(201).json({ 
+                        message: "Product created successfully, user role updated to Farmer" 
+                    });
+                } else {
+                    return res.status(500).json({ 
+                        error: "Product created, but failed to update user role to Farmer" 
+                    });
+                }
+            }
+
             res.status(201).json({ message: "Product created successfully" });
         } else {
             res.status(500).json({ error: "Failed to create product" });
@@ -65,6 +94,7 @@ export const createProduct = async (req, res) => {
         res.status(400).json({ error: "Failed to create product: " + err.message });
     }
 };
+
 
 // Update a product
 export const updateProduct = async (req, res) => {
