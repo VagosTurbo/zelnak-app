@@ -35,6 +35,7 @@ const Homepage: React.FC = () => {
             console.error('Failed to fetch products', err)
         }
     }
+    const { addProduct } = useCart()
 
     useEffect(() => {
         fetchCategories()
@@ -154,10 +155,20 @@ const Homepage: React.FC = () => {
                                 Cena: {product.price} Kč
                             </Typography>
                             <Link to={Routes.Seller + '/' + product.user_id}>
-                                <Typography variant="body2" sx={{ color: colors.colorText }}>
+                                <Typography variant="body2" sx={{ color: colors.colorText }} mb={2}>
                                     Prodejce: {product.price} Kč
                                 </Typography>
                             </Link>
+                            <Button
+                                onClick={() => addProduct(product.id, 1)}
+                                color="secondary"
+                                variant="contained"
+                                sx={{
+                                    mt: 'auto',
+                                }}
+                                fullWidth>
+                                Přidat do košíku
+                            </Button>
                         </CardContent>
                     </Card>
                 ))}
