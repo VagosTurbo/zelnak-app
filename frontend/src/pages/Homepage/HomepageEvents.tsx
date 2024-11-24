@@ -114,28 +114,36 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({ events, users })
                                     {getNameOfUserById(event.user_id)}
                                 </Link>
                             </Typography>
-                            <Button
-                                onClick={() => signUpForEvent(event.id)}
-                                color="secondary"
-                                variant="contained"
-                                sx={{
-                                    mt: 'auto',
-                                }}
-                                fullWidth>
-                                Zapsat se na událost
-                            </Button>
-
-                            {isUserRegisteredForEvent(event.id) && (
-                                <Button
-                                    color="primary"
-                                    variant="contained"
-                                    sx={{
-                                        mt: 'auto',
-                                    }}
-                                    onClick={() => signOffFromEvent(event.id)}
-                                    fullWidth>
-                                    Odhlásit se
-                                </Button>
+                            {authenticated ? (
+                                <>
+                                    {isUserRegisteredForEvent(event.id) ? (
+                                        <Button
+                                            color="primary"
+                                            variant="contained"
+                                            sx={{
+                                                mt: 'auto',
+                                            }}
+                                            onClick={() => signOffFromEvent(event.id)}
+                                            fullWidth>
+                                            Odhlásit se
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            onClick={() => signUpForEvent(event.id)}
+                                            color="secondary"
+                                            variant="contained"
+                                            sx={{
+                                                mt: 'auto',
+                                            }}
+                                            fullWidth>
+                                            Zapsat se na událost
+                                        </Button>
+                                    )}
+                                </>
+                            ) : (
+                                <Typography variant="body2" sx={{ color: colors.colorText }}>
+                                    Pro zápis na událost se musíte přihlásit
+                                </Typography>
                             )}
                         </CardContent>
                     </Card>
