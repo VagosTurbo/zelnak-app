@@ -2,8 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import './styles/main.scss'
-import 'slick-carousel/slick/slick-theme.css'
-import 'slick-carousel/slick/slick.css'
 
 import { ThemeProvider } from '@mui/material'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -12,8 +10,9 @@ import App from './App'
 import { theme } from './styles/theme'
 
 import 'dayjs/locale/cs'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
+import { CurrentUserProvider } from './context/CurrentUserContext'
 
 const Main = () => {
     return (
@@ -26,12 +25,16 @@ const Main = () => {
 }
 
 const AppProviders = () => {
+    const { userId, accessToken } = useAuth()
+
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="cs">
             <ThemeProvider theme={theme}>
-                <CartProvider>
-                    <App />
-                </CartProvider>
+                <CurrentUserProvider userId={userId} accessToken={accessToken}>
+                    <CartProvider>
+                        <App />
+                    </CartProvider>
+                </CurrentUserProvider>
             </ThemeProvider>
         </LocalizationProvider>
     )
