@@ -1,5 +1,6 @@
 {
     "name": "zelnak-app",
+    "homepage": "https://vagosturbo.github.io/zelnak-app/",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
