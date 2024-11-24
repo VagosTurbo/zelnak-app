@@ -23,29 +23,17 @@ const Navbar: React.FC = () => {
                     </Typography>
                 )}
 
-                {/* Navigation Links */}
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Button color="inherit" href="/">
-                        Home
-                    </Button>
-                    <Button color="inherit" href="/about">
-                        About
-                    </Button>
+                    <MyLink to={Routes.Homepage} text="Home" />
                 </Box>
                 {authenticated ? (
                     <>
-                        <Button color="inherit" href="#/profile">
-                            Profile
-                        </Button>
+                        <MyLink to={Routes.Profile} text="Profile and orders" />
                         <Button color="inherit" onClick={signOut}>
                             Logout
                         </Button>
                         {isRegisteredUser ||
-                            (isCustomer && (
-                                <Button color="inherit" href="#/cart">
-                                    Cart
-                                </Button>
-                            ))}
+                            (isCustomer && <MyLink to={Routes.Cart} text="Cart" />)}
                     </>
                 ) : (
                     <>
@@ -74,5 +62,11 @@ const Navbar: React.FC = () => {
         </AppBar>
     )
 }
+
+const MyLink = ({ to, text }: { to: string; text: string }) => (
+    <Link to={to} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Button color="inherit">{text}</Button>
+    </Link>
+)
 
 export default Navbar
