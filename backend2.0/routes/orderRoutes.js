@@ -16,4 +16,8 @@ router.put("/items/:id", updateOrderItem);
 router.delete("/items/:id", deleteOrderItem);
 
 
+// approve order item
+router.put("/items/:id/approve", approveOrderItem);
+
+
 export default router;
