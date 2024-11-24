@@ -1,5 +1,5 @@
 import { Roles } from "../enums/roles.js"
-import { dbGetAllUsers, dbGetUserById, dbCreateUser, dbUpdateUser, dbDeleteUser, dbAddUserEvent, dbRemoveUserEvent, dbGetUserEvents} from "../models/user.js";
+import { dbGetAllUsers, dbGetUserById, dbCreateUser, dbUpdateUser, dbDeleteUser, dbAddUserEvent, dbRemoveUserEvent, dbGetUserEvents, dbFindUserByUsername, dbFindUserByEmail} from "../models/user.js";
 import { dbCheckUserEvent } from "../models/event.js";
 
 export const getAllUsers = async (req, res) => {
@@ -53,27 +53,28 @@ export const updateUser = async (req, res) => {
         return res.status(400).json({ success: false, message: "At least one field is required to update." });
     }
 
+    
     try {
         // Check if the user exists
         const existingUser = await dbGetUserById(userId);
         if (!existingUser) {
             return res.status(404).json({ success: false, message: "User not found." });
         }
-
-        // // Check if username or email is unique
-        // if (updatedUser.username) {
-        //     const usernameExists = await dbFindUserByUsername(updatedUser.username);
-        //     if (usernameExists ) {
-        //         return res.status(400).json({ success: false, message: "Username is already taken." });
-        //     }
-        // }
         
-        // if (updatedUser.email) {
-        //     const emailExists = await dbFindUserByEmail(updatedUser.email);
-        //     if (emailExists && emailExists.id !== userId) {
-        //         return res.status(400).json({ success: false, message: "Email is already taken." });
-        //     }
-        // }
+        // Check if username or email is unique
+        if (updatedUser.username) {
+            const usernameExists = await dbFindUserByUsername(updatedUser.username);
+            if (usernameExists) {
+                return res.status(400).json({ success: false, message: "Username is already taken." });
+            }
+        }
+        
+        if (updatedUser.email) {
+            const emailExists = await dbFindUserByEmail(updatedUser.email);
+            if (emailExists) {
+                return res.status(400).json({ success: false, message: "Email is already taken." });
+            }
+        }
         
 
         // Perform the update
@@ -83,6 +84,7 @@ export const updateUser = async (req, res) => {
         } else {
             return res.status(500).json({ success: false, message: "Failed to update user. Please try again." });
         }
+
     } catch (err) {
         console.error("Error updating user:", err); // Log the error
         return res.status(500).json({ success: false, message: "An unexpected error occurred.", error: err.message });
