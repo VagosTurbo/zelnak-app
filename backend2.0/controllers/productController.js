@@ -52,10 +52,6 @@ export const getProductsByUserId = async (req, res) => {
         // Retrieve products by user_id
         const products = await dbGetProductsByUserId(userId);
 
-        if (products.length === 0) {
-            return res.status(404).json({ error: "No products found for this user" });
-        }
-
         res.json(products);
     } catch (err) {
         res.status(500).json({ error: "Failed to retrieve products: " + err.message });

@@ -14,9 +14,14 @@ import { User } from '../../types/User'
 interface HomepageEventsProps {
     events: Event[]
     users: User[]
+    showAddButton?: boolean // Add the parameter to show/hide the "Create New Event" button
 }
 
-export const HomepageEvents: React.FC<HomepageEventsProps> = ({ events, users }) => {
+export const HomepageEvents: React.FC<HomepageEventsProps> = ({
+    events,
+    users,
+    showAddButton = true,
+}) => {
     const { authenticated, userId, accessToken } = useAuth()
 
     const [userRegisteredEvents, setUserRegisteredEvents] = useState<Event[]>([])
@@ -25,7 +30,10 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({ events, users })
         if (!authenticated || !accessToken) return
 
         try {
-            const response = await apiGet<number[]>(`/users/${userId}/events`, accessToken)
+            const response = await apiGet<number[]>(
+                `/users/${userId}/registeredevents`,
+                accessToken
+            )
             const userEvents = events.filter((event) => response.includes(event.id))
             setUserRegisteredEvents(userEvents)
         } catch (err: any) {
@@ -73,7 +81,7 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({ events, users })
     return (
         <>
             <Typography variant="h1" component="h2" mb={3} textAlign="center">
-                Události
+                Self-harvest events
             </Typography>
             <Box
                 className="all-events"
@@ -103,13 +111,13 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({ events, users })
                                 {event.description}
                             </Typography>
                             <Typography variant="body2" sx={{ color: colors.colorText }}>
-                                Datum: {formatDate(event.date)}
+                                Date: {formatDate(event.date)}
                             </Typography>
                             <Typography variant="body2" sx={{ color: colors.colorText }}>
-                                Místo: {event.location}
+                                Location: {event.location}
                             </Typography>
                             <Typography variant="body2" sx={{ color: colors.colorText }} mb={2}>
-                                Akci vytvořil:&nbsp;
+                                Host:&nbsp;
                                 <Link to={`${Routes.Seller}/${event.user_id}`}>
                                     {getNameOfUserById(event.user_id)}
                                 </Link>
@@ -125,7 +133,7 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({ events, users })
                                             }}
                                             onClick={() => signOffFromEvent(event.id)}
                                             fullWidth>
-                                            Odhlásit se
+                                            Remove from my events
                                         </Button>
                                     ) : (
                                         <Button
@@ -136,7 +144,7 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({ events, users })
                                                 mt: 'auto',
                                             }}
                                             fullWidth>
-                                            Zapsat se na událost
+                                            Add to my events
                                         </Button>
                                     )}
                                 </>
@@ -150,7 +158,9 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({ events, users })
                 ))}
             </Box>
 
-            <Button>Vytvořit novou událost</Button>
+            {showAddButton && (
+                <Button>Vytvořit novou událost</Button> // Show button only if showAddButton is true
+            )}
         </>
     )
 }

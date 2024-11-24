@@ -2,7 +2,7 @@
  * Events DONE
  */
 import { Roles } from "../enums/roles.js"
-import { dbGetAllEvents, dbGetEventById, dbCreateEvent, dbDeleteEvent, dbUpdateEvent } from "../models/event.js"
+import { dbGetAllEvents, dbGetEventById, dbCreateEvent, dbDeleteEvent, dbUpdateEvent, dbGetEventsByUserId } from "../models/event.js"
 
 export const getAllEvents = async (req, res) => {
     try {
@@ -33,6 +33,24 @@ export const getEventById = async (req, res) => {
     }
 }
 
+
+export const getEventsByUserId = async (req, res) => {
+    try {
+        const userId = req.params.id
+
+        if (!userId) {
+            return res.status(400).json({ error: "User ID is required" })
+        }
+
+        const events = await dbGetEventsByUserId(userId)
+
+        res.json(events)
+    } catch (err) {
+        res.status(500).json({ error: "Failed to retrieve events: " + err.message })
+    }
+}
+
+
 export const createEvent = async (req, res) => {
     try {
         const { name, description, date, location, user_id } = req.body
@@ -52,6 +70,8 @@ export const createEvent = async (req, res) => {
         res.status(400).json({ error: "Failed to create event: " + err.message })
     }
 }
+
+
 
 export const updateEvent = async (req, res) => {
     try {

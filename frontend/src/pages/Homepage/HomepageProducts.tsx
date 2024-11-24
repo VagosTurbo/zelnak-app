@@ -26,7 +26,7 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
     return (
         <>
             <Typography variant="h1" component="h2" mb={3} textAlign="center">
-                Produkty
+                Products
             </Typography>
             <Box
                 className="all-products"
@@ -57,14 +57,14 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                                 {product.description}
                             </Typography>
                             <Typography variant="body2" sx={{ color: colors.colorText }}>
-                                Kategorie: {product.category_id}
+                                Category: {product.category_id}
                             </Typography>
                             <Typography variant="body2" sx={{ color: colors.colorText }}>
-                                Cena: {product.price} Kč
+                                Price: {product.price} Kč
                             </Typography>
                             <Link to={`${Routes.Seller}/${product.user_id}`}>
                                 <Typography variant="body2" sx={{ color: colors.colorText }} mb={2}>
-                                    Prodejce: {product.user_id}
+                                    Seller: {product.user_id}
                                 </Typography>
                             </Link>
                             {authenticated ? (
@@ -76,11 +76,11 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                                         mt: 'auto',
                                     }}
                                     fullWidth>
-                                    Přidat do košíku
+                                    Add to cart
                                 </Button>
                             ) : (
                                 <Typography variant="body2" sx={{ color: colors.colorText }} mb={2}>
-                                    Pro nákup se musíte přihlásit
+                                    You have have to login first.
                                 </Typography>
                             )}
                         </CardContent>
