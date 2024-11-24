@@ -4,11 +4,6 @@ import { poolPromise, sql } from '../config/database.js';
 
 export const approveOrderItem = async (req, res) => {
     const { id } = req.params; 
-    const { status } = req.body;
-
-    if (status !== 'Accepted') {
-        return res.status(400).json({ error: "Invalid status. Only 'Approved' status is allowed." });
-    }
 
     const pool = await poolPromise;
     const transaction = new sql.Transaction(pool);
