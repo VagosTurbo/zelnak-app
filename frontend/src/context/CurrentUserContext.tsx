@@ -1,11 +1,10 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
-import { UserData } from '../types/UserData'
 import { UserRole } from '../enums/UserRole'
 import { apiGet } from '../api/apiGet'
 import { User } from '../types/User'
 
 interface CurrentUserContextType {
-    currentUser: UserData | null
+    currentUser: User | null
     loading: boolean
     error: string | null
     refreshCurrentUser: () => void
@@ -26,7 +25,7 @@ interface CurrentUserProviderProps {
 
 export const CurrentUserProvider = (props: CurrentUserProviderProps) => {
     const { userId, accessToken, children } = props
-    const [currentUser, setCurrentUser] = useState<UserData | null>(null)
+    const [currentUser, setCurrentUser] = useState<User | null>(null)
     const [loading, setLoading] = useState<boolean>(true) // important true, refresh
     const [error, setError] = useState<string | null>(null)
 
