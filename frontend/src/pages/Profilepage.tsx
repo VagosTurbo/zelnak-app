@@ -10,7 +10,6 @@ const ProfilePage: React.FC = () => {
     const [initialUser, setInitialUser] = useState<User | null>(null)
     const [username, setUsername] = useState<string>('')
     const [email, setEmail] = useState<string>('')
-    const [currentPassword, setCurrentPassword] = useState<string>('')
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState<string | null>(null)
@@ -86,13 +85,29 @@ const ProfilePage: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 p: 3,
-            }}
-        >
+            }}>
             <Paper elevation={3} sx={{ p: 3, width: '100%', maxWidth: '500px' }}>
                 <Typography variant="h4" gutterBottom>
                     Profile
                 </Typography>
-                <Box component="form" onSubmit={handleUpdateProfile}>
+                {user && (
+                    <>
+                        <Typography variant="body1" sx={{ mt: 2 }}>
+                            <strong>ID:</strong> {user.id}
+                        </Typography>
+                        <Typography variant="body1" sx={{ mt: 2 }}>
+                            <strong>Username:</strong> {user.username}
+                        </Typography>
+                        <Typography variant="body1" sx={{ mt: 2 }}>
+                            <strong>Email:</strong> {user.email}
+                        </Typography>
+                        <Typography variant="body1" sx={{ mt: 2 }}>
+                            <strong>Account Created:</strong>{' '}
+                            {new Date(user.created_at).toLocaleString()}
+                        </Typography>
+                    </>
+                )}
+                <Box component="form" onSubmit={handleUpdateProfile} sx={{ mt: 3 }}>
                     <TextField
                         label="Username"
                         variant="outlined"
@@ -110,15 +125,7 @@ const ProfilePage: React.FC = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         sx={{ mb: 2 }}
                     />
-                    <TextField
-                        label="Current Password"
-                        variant="outlined"
-                        fullWidth
-                        type="password"
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        sx={{ mb: 2 }}
-                    />
+
                     <ZelnakButton color="primary" type="submit" fullWidth>
                         Update Profile
                     </ZelnakButton>
