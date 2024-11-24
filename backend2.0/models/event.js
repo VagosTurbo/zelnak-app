@@ -114,3 +114,13 @@ export const dbDeleteEvent = async (id) => {
         throw error
     }
 }
+
+
+export const dbCheckUserEvent = async (userId, eventId) => {
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('userId', sql.Int, userId)
+        .input('eventId', sql.Int, eventId)
+        .query('SELECT * FROM user_events WHERE user_id = @userId AND event_id = @eventId');
+    return result.recordset.length > 0;
+};

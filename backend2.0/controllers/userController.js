@@ -1,5 +1,6 @@
 import { Roles } from "../enums/roles.js"
-import { dbGetAllUsers, dbGetUserById, dbCreateUser, dbUpdateUser, dbDeleteUser, dbAddUserEvent, dbRemoveUserEvent, dbGetUserEvents } from "../models/user.js";
+import { dbGetAllUsers, dbGetUserById, dbCreateUser, dbUpdateUser, dbDeleteUser, dbAddUserEvent, dbRemoveUserEvent, dbGetUserEvents} from "../models/user.js";
+import { dbCheckUserEvent } from "../models/event.js";
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -97,6 +98,13 @@ export const addUserEvent = async (req, res) => {
     const eventId = req.body.eventId;
 
     try {
+        const exists = await dbCheckUserEvent(userId, eventId);
+
+        if (exists) {
+            return res.status(400).json({ error: "User already added to event" });
+        }
+
+
         const success = await dbAddUserEvent(userId, eventId);
         if (success) {
             res.json({ message: 'Event added successfully' });
