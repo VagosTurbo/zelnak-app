@@ -27,16 +27,16 @@ export default ({ mode }: { mode: string }) => {
             outDir: getOutputDir(mode),
             target: 'esnext',
         },
-        base: './',
+        base: '/zelnak-app', 
         server: {
-            proxy: {
-                '/api': {
-                    target: process.env.VITE_API_URL,
-                    changeOrigin: true,
-                    secure: false,
-                    ws: true,
-                },
-            },
+            // proxy: {
+            //     '/api': {
+            //         target: process.env.VITE_API_URL,
+            //         changeOrigin: true,
+            //         secure: false,
+            //         ws: true,
+            //     },
+            // },
         },
     })
 }
