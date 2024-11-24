@@ -14,6 +14,22 @@ export const dbGetProductById = async (id) => {
     return result.recordset.length > 0 ? result.recordset[0] : null;
 };
 
+// Get products by user_id
+export const dbGetProductsByUserId = async (user_id) => {
+    const pool = await poolPromise;
+
+    try {
+        const result = await pool.request()
+            .input('user_id', sql.Int, user_id)
+            .query('SELECT * FROM products WHERE user_id = @user_id');
+
+        // Return the result if any products are found, else return an empty array
+        return result.recordset.length > 0 ? result.recordset : [];
+    } catch (err) {
+        throw new Error("Failed to retrieve products by user ID: " + err.message);
+    }
+};
+
 export const dbGetProductsByCategory = async (categoryId) => {
     const pool = await poolPromise;
     const result = await pool.request()

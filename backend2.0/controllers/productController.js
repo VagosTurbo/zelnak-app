@@ -1,4 +1,4 @@
-import { dbGetAllProducts, dbGetProductById, dbCreateProduct, dbUpdateProduct, dbDeleteProduct } from "../models/product.js";
+import { dbGetAllProducts, dbGetProductById, dbCreateProduct, dbUpdateProduct, dbDeleteProduct, dbGetProductsByUserId } from "../models/product.js";
 import { dbGetUserById, dbUpdateUser } from "../models/user.js";
 import { dbGetCategoryById } from "../models/category.js";
 import { Roles } from "../enums/roles.js";
@@ -33,6 +33,35 @@ export const getProductById = async (req, res) => {
         res.status(500).json({ error: "Failed to retrieve product: " + err.message });
     }
 };
+
+// Get products by user ID
+export const getProductsByUserId = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        if (!userId) {
+            return res.status(400).json({ error: "User ID is required" });
+        }
+
+        // test existence
+        const existingUser = await dbGetUserById(userId)
+        if (!existingUser) {
+            return res.status(404).json({ error: "User not found." })
+        }
+
+        // Retrieve products by user_id
+        const products = await dbGetProductsByUserId(userId);
+
+        if (products.length === 0) {
+            return res.status(404).json({ error: "No products found for this user" });
+        }
+
+        res.json(products);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to retrieve products: " + err.message });
+    }
+};
+
 
 // Create a new product
 export const createProduct = async (req, res) => {
