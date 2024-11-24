@@ -1,13 +1,12 @@
 import { dbGetAllOrders, dbGetOrderById, dbCreateOrder, dbUpdateOrder, dbDeleteOrder, dbGetOrdersByUserId } from '../models/order.js';
 import { dbCreateOrderItem, dbGetOrderItemsByOrderId, dbUpdateOrderItem } from '../models/orderItem.js';
 import { poolPromise, sql } from '../config/database.js';
-im
 
 export const approveOrderItem = async (req, res) => {
     const { id } = req.params; 
     const { status } = req.body;
 
-    if (status !== 'Approved') {
+    if (status !== 'Accepted') {
         return res.status(400).json({ error: "Invalid status. Only 'Approved' status is allowed." });
     }
 
