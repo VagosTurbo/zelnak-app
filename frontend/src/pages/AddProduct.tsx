@@ -1,7 +1,6 @@
 import React, { useState, useEffect, FormEvent } from 'react';
 import { Box, Button, TextField, Typography, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 import api from '../api/api';
-import { useNavigate } from 'react-router-dom';
 import { LocalStorage } from '../enums';
 
 interface Category {
@@ -19,7 +18,6 @@ const AddProduct: React.FC = () => {
     });
     const [categories, setCategories] = useState<Category[]>([]);
     const [message, setMessage] = useState('');
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCategories = async () => {

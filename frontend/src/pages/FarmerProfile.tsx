@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import api from '../api/api';
-import { useAuth } from '../context/AuthContext';
 
 interface Farmer {
     id: number;

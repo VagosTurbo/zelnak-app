@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Typography, Paper, TextField, Button } from '@mui/material'
+import { Box, Typography, Paper, TextField } from '@mui/material'
 import { LocalStorage } from '../enums'
 import { ZelnakButton } from '../components/ZelnakButton'
 import { apiPut } from '../api/apiPut'
 import { apiGet } from '../api/apiGet'
+import { User } from '../types/User'
 
 const ProfilePage: React.FC = () => {
-    const [user, setUser] = useState<User | null>(null)
+    const [_user, setUser] = useState<User | null>(null)
     const [initialUser, setInitialUser] = useState<User | null>(null)
     const [username, setUsername] = useState<string>('')
     const [email, setEmail] = useState<string>('')
@@ -62,7 +63,7 @@ const ProfilePage: React.FC = () => {
 
             // Send the updated details to the backend
             const response = await apiPut(`/users/${userId}`, updatedDetails, token)
-            setUser(response)
+            setUser(response as any)
 
             setSuccess('Profile updated successfully!')
         } catch (err: any) {
