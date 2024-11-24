@@ -3,10 +3,42 @@ import { Box, Button, Typography, List, ListItem, ListItemText, IconButton } fro
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { apiPost } from '../api/apiPost';
+import { LocalStorage } from '../enums/LocalStorage';
 
 const Cart: React.FC = () => {
     const { cart, removeProduct, clearCart, addProduct } = useCart();
     const { authenticated, userId } = useAuth();
+    const [message, setMessage] = React.useState<string | null>(null);
+
+    const handleCreateOrder = async () => {
+        if (!userId) {
+            setMessage('User is not authenticated');
+            return;
+        }
+
+        const token = localStorage.getItem(LocalStorage.token);
+        if (!token) {
+            setMessage('User is not authenticated');
+            return;
+        }
+
+        try {
+            const orderData = {
+                buyer_id: userId,
+                products: cart.products.map((product) => ({
+                    product_id: product.id,
+                    quantity: product.quantity,
+                })),
+            };
+
+            const response = await apiPost('/orders', orderData, token);
+            setMessage(response.message || 'Order created successfully!');
+            clearCart(); // Clear the cart after creating the order
+        } catch (error: any) {
+            setMessage(error.response?.data?.message || 'Failed to create order');
+        }
+    };
 
     return (
         <Box sx={{ padding: 2 }}>
@@ -46,7 +78,15 @@ const Cart: React.FC = () => {
                             <Button variant="contained" color="secondary" onClick={clearCart} sx={{ mt: 2 }}>
                                 Clear Cart
                             </Button>
+                            <Button variant="contained" color="primary" onClick={handleCreateOrder} sx={{ mt: 2 }}>
+                                Create Order
+                            </Button>
                         </>
+                    )}
+                    {message && (
+                        <Typography color="error" sx={{ mt: 2 }}>
+                            {message}
+                        </Typography>
                     )}
                 </>
             ) : (
