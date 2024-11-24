@@ -2,17 +2,25 @@ import { poolPromise, sql } from '../config/database.js';
 import bcrypt from "bcrypt";
 
 export const dbGetAllUsers = async () => {
-    const pool = await poolPromise;
-    const result = await pool.request().query("SELECT * FROM users");
-    return result.recordset;
+    try {
+        const pool = await poolPromise;
+        const result = await pool
+            .request()
+            .query("SELECT id, username, email, created_at, role FROM users"); // List all columns except password
+        return result.recordset;
+    } catch (error) {
+        console.error("Error fetching all users:", error);
+        throw error;
+    }
 };
+
 
 export const dbGetUserById = async (id) => {
     const pool = await poolPromise;
     const result = await pool
         .request()
         .input("id", sql.Int, id)
-        .query("SELECT * FROM users WHERE id = @id");
+        .query("SELECT id, username, email, created_at, role FROM users");
     return result.recordset.length > 0 ? result.recordset[0] : null;
 };
 
