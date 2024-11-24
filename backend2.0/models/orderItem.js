@@ -27,13 +27,17 @@ export const dbGetOrderItemsByOrderId = async (orderId) => {
     const pool = await poolPromise;
     const result = await pool.request()
         .input('orderId', sql.Int, orderId)
-        .query('SELECT * FROM order_items WHERE order_id = @orderId');
+        .query(`
+            SELECT oi.*, p.name as productName
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
+            WHERE oi.order_id = @orderId
+        `);
     return result.recordset;
-}
+};
 
-export const dbUpdateOrderItem = async (id, updatedOrderItem) => {
-    const pool = await poolPromise;
-    const result = await pool.request()
+export const dbUpdateOrderItem = async (id, updatedOrderItem, transaction) => {
+    const result = await transaction.request()
         .input('id', sql.Int, id)
         .input('status', sql.NVarChar, updatedOrderItem.status)
         .query(`
@@ -50,4 +54,12 @@ export const dbDeleteOrderItem = async (id) => {
         .input('id', sql.Int, id)
         .query('DELETE FROM order_items WHERE id = @id');
     return result.rowsAffected[0] > 0;
+};
+
+export const dbGetOrderItemsBySellerId = async (sellerId) => {
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('sellerId', sql.Int, sellerId)
+        .query('SELECT * FROM order_items WHERE seller_id = @sellerId');
+    return result.recordset;
 };

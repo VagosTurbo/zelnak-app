@@ -77,3 +77,15 @@ export const dbDeleteProduct = async (id) => {
         .query('DELETE FROM products WHERE id = @id');
     return result.rowsAffected > 0; // Returns true if rows were affected
 };
+
+export const dbUpdateProductQuantity = async (id, quantity, transaction) => {
+    const result = await transaction.request()
+        .input('id', sql.Int, id)
+        .input('quantity', sql.Int, quantity)
+        .query(`
+            UPDATE products
+            SET quantity = @quantity
+            WHERE id = @id
+        `);
+    return result.rowsAffected[0] > 0;
+};

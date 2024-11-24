@@ -1,5 +1,5 @@
 import { dbGetAllOrders, dbGetOrderById, dbCreateOrder, dbUpdateOrder, dbDeleteOrder, dbGetOrdersByUserId } from '../models/order.js';
-import { dbCreateOrderItem, dbGetOrderItemsByOrderId, dbUpdateOrderItem } from '../models/orderItem.js';
+import { dbCreateOrderItem, dbGetOrderItemsByOrderId, dbUpdateOrderItem, dbGetOrderItemsBySellerId } from '../models/orderItem.js';
 import { poolPromise, sql } from '../config/database.js';
 
 export const approveOrderItem = async (req, res) => {
@@ -193,6 +193,16 @@ try {
     const orderItems = await dbGetOrderItemsByOrderId(req.params.orderId);
     res.json(orderItems);
 } catch (err) {
+    res.status(500).json({ error: err.message });
+}
+}
+
+export const getOrderItemsBySellerId = async (req, res) => {
+try {
+    const orderItems = await dbGetOrderItemsBySellerId(req.params.sellerId);
+    res.json(orderItems);
+}
+catch (err) {
     res.status(500).json({ error: err.message });
 }
 }
