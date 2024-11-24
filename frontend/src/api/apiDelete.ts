@@ -1,20 +1,20 @@
-import axios, { AxiosResponse } from 'axios';
-import { getAuthHeaders } from './getAuthHeaders';
+import axios from 'axios'
+import { getAuthHeaders } from './getAuthHeaders'
 
-export async function apiPut<T, R>(url: string, data: T, accessToken: string): Promise<R> {
-    const fullUrl = import.meta.env.VITE_API_URL + url;
+export async function apiDelete<T>(url: string, accessToken?: string): Promise<T> {
+    const fullUrl = import.meta.env.VITE_API_URL + url
     return axios
-        .put<R>(fullUrl, data, {
+        .delete<T>(fullUrl, {
             headers: getAuthHeaders(accessToken),
         })
-        .then((response: AxiosResponse<R>) => {
-            return response.data;
+        .then((response) => {
+            return response.data
         })
         .catch((error) => {
             if (axios.isAxiosError(error)) {
-                throw new Error(error.response?.data?.code || 'Internal error');
+                throw new Error(error.response?.data?.code || 'Internal error')
             } else {
-                throw new Error('Internal error');
+                throw new Error('Internal error')
             }
-        });
+        })
 }
