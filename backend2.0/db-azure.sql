@@ -1,6 +1,5 @@
 -- Create the database
-CREATE DATABASE zelnak;
-GO
+-- CREATE DATABASE zelnak;GO
 
 -- Use the database
 USE zelnak;
@@ -67,14 +66,25 @@ GO
 -- Create the orders table
 CREATE TABLE orders (
     id INT PRIMARY KEY IDENTITY(1,1),
-    seller_id INT NOT NULL,
     buyer_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (seller_id) REFERENCES users(id),
-    FOREIGN KEY (buyer_id) REFERENCES users(id),
-    FOREIGN KEY (product_id) REFERENCES products(id)
+    status NVARCHAR(50) DEFAULT 'Pending';
+    FOREIGN KEY (buyer_id) REFERENCES users(id)
+);
+GO
+
+
+-- Create the order_items table
+CREATE TABLE order_items (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    seller_id INT NOT NULL,
+    quantity INT NOT NULL,
+    status NVARCHAR(50) DEFAULT 'Pending',
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (seller_id) REFERENCES users(id)
 );
 GO
 
