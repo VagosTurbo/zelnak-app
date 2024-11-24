@@ -1,13 +1,13 @@
+import { Box, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { Box, Typography, Link } from '@mui/material'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { apiGet } from '../api/apiGet'
-import Layout from './layouts/Layout'
-import { HomepageProducts } from './Homepage/HomepageProducts'
-import { HomepageEvents } from './Homepage/HomepageEvents'
-import { Product } from '../types/Product'
 import { Event } from '../types/Event'
+import { Product } from '../types/Product'
 import { User } from '../types/User'
+import { HomepageEvents } from './Homepage/HomepageEvents'
+import { HomepageProducts } from './Homepage/HomepageProducts'
+import Layout from './layouts/Layout'
 
 const FarmerProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>()

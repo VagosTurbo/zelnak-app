@@ -1,26 +1,27 @@
-import React from 'react';
-import { Box, Button, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { apiPost } from '../api/apiPost';
-import { LocalStorage } from '../enums/LocalStorage';
+import React from 'react'
+import { Box, Button, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material'
+import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { apiPost } from '../api/apiPost'
+import { LocalStorage } from '../enums/LocalStorage'
+import { Order } from '../types/Order'
 
 const Cart: React.FC = () => {
-    const { cart, removeProduct, clearCart, addProduct } = useCart();
-    const { authenticated, userId } = useAuth();
-    const [message, setMessage] = React.useState<string | null>(null);
+    const { cart, removeProduct, clearCart } = useCart()
+    const { authenticated, userId } = useAuth()
+    const [message, setMessage] = React.useState<string | null>(null)
 
     const handleCreateOrder = async () => {
         if (!userId) {
-            setMessage('User is not authenticated');
-            return;
+            setMessage('User is not authenticated')
+            return
         }
 
-        const token = localStorage.getItem(LocalStorage.token);
+        const token = localStorage.getItem(LocalStorage.token)
         if (!token) {
-            setMessage('User is not authenticated');
-            return;
+            setMessage('User is not authenticated')
+            return
         }
 
         try {
@@ -31,15 +32,15 @@ const Cart: React.FC = () => {
                     seller_id: product.seller_id, // Ensure seller_id is included in the product data
                     quantity: product.quantity,
                 })),
-            };
+            }
 
-            const response = await apiPost('/orders', orderData, token);
-            setMessage(response.message || 'Order created successfully!');
-            clearCart(); // Clear the cart after creating the order
+            const response = await apiPost<Order[]>('/orders', orderData, token)
+            setMessage(response.toString() || 'Order created successfully!')
+            clearCart() // Clear the cart after creating the order
         } catch (error: any) {
-            setMessage(error.response?.data?.message || 'Failed to create order');
+            setMessage(error.response?.data?.message || 'Failed to create order')
         }
-    };
+    }
 
     return (
         <Box sx={{ padding: 2 }}>
@@ -63,16 +64,27 @@ const Cart: React.FC = () => {
                                             primary={`Product ID: ${product.id}`}
                                             secondary={`Quantity: ${product.quantity}`}
                                         />
-                                        <IconButton edge="end" aria-label="delete" onClick={() => removeProduct(product.id)}>
+                                        <IconButton
+                                            edge="end"
+                                            aria-label="delete"
+                                            onClick={() => removeProduct(product.id)}>
                                             <DeleteIcon />
                                         </IconButton>
                                     </ListItem>
                                 ))}
                             </List>
-                            <Button variant="contained" color="secondary" onClick={clearCart} sx={{ mt: 2 }}>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={clearCart}
+                                sx={{ mt: 2 }}>
                                 Clear Cart
                             </Button>
-                            <Button variant="contained" color="primary" onClick={handleCreateOrder} sx={{ mt: 2 }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleCreateOrder}
+                                sx={{ mt: 2 }}>
                                 Create Order
                             </Button>
                         </>
@@ -87,7 +99,7 @@ const Cart: React.FC = () => {
                 <Typography variant="body1">Please log in to view your cart.</Typography>
             )}
         </Box>
-    );
-};
+    )
+}
 
-export default Cart;
+export default Cart
