@@ -1,57 +1,100 @@
-// frontend/src/pages/FarmerProfile.tsx
-import React, { useEffect, useState } from 'react';
-import { Box, Typography } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import api from '../api/api';
-
-interface Farmer {
-    id: number;
-    username: string;
-    email: string;
-    // Add other fields as necessary
-}
+import { Box, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { useParams, useSearchParams } from 'react-router-dom'
+import { apiGet } from '../api/apiGet'
+import { Event } from '../types/Event'
+import { Product } from '../types/Product'
+import { User } from '../types/User'
+import { HomepageEvents } from './Homepage/HomepageEvents'
+import { HomepageProducts } from './Homepage/HomepageProducts'
+import Layout from './layouts/Layout'
 
 const FarmerProfile: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const [farmer, setFarmer] = useState<Farmer | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const { id } = useParams<{ id: string }>()
+    const [farmer, setFarmer] = useState<User | null>(null)
+    const [products, setProducts] = useState<Product[]>([])
+    const [events, setEvents] = useState<Event[]>([])
+    const [error, setError] = useState<string | null>(null)
 
+    const [searchParams] = useSearchParams()
+
+    const fetchFarmer = async () => {
+        try {
+            const response = await apiGet<User>(`/users/${id}`)
+            setFarmer(response)
+        } catch (err: any) {
+            setError('Failed to fetch farmer profile')
+        }
+    }
+
+    const fetchProducts = async () => {
+        try {
+            const response = await apiGet<Product[]>(`/users/${id}/products`)
+            setProducts(response)
+        } catch (err: any) {
+            setError('Failed to fetch products')
+        }
+    }
+
+    const fetchEvents = async () => {
+        try {
+            const response = await apiGet<Event[]>(`/users/${id}/events`)
+            setEvents(response)
+        } catch (err: any) {
+            setError('Failed to fetch events')
+        }
+    }
+
+    const handleUrlParams = () => {
+        const category = searchParams.get('category')
+        if (category) {
+            setProducts(
+                products.filter((product) => product.category_id === parseInt(category, 10))
+            )
+        }
+    }
 
     useEffect(() => {
-        const fetchFarmer = async () => {
-            try {
-                const response = await api.get(`/users/${id}`);
-                setFarmer(response.data);
-            } catch (err: any) {
-                setError(err.response?.data?.message || 'Failed to fetch farmer');
-            }
-        };
+        fetchFarmer()
+        fetchProducts()
+        fetchEvents()
+    }, [id])
 
-        fetchFarmer();
-    }, [id]);
+    useEffect(() => {
+        handleUrlParams()
+    }, [searchParams, products])
 
     if (error) {
-        return <Typography color="error">{error}</Typography>;
+        return <Typography color="error">{error}</Typography>
     }
 
     if (!farmer) {
-        return <Typography>Loading...</Typography>;
+        return <Typography>Loading...</Typography>
     }
 
     return (
-        <Box sx={{ padding: 4 }}>
-            <Typography variant="h4" gutterBottom>
-                Farmer Profile
+        <Layout>
+            <Box
+                sx={{
+                    background: 'primary',
+                    width: '100%',
+                    height: '50px',
+                }}></Box>
+
+            <Typography variant="h1" component="h1" mb={3}>
+                Farmer Profile: {farmer.username}
             </Typography>
             <Typography variant="h5" component="div">
-                {farmer.username}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
                 Email: {farmer.email}
             </Typography>
-            {/* Add other farmer details here */}
-        </Box>
-    );
-};
 
-export default FarmerProfile;
+            {/* Display Products */}
+            <HomepageProducts products={products} />
+
+            {/* Display Events */}
+            <HomepageEvents events={events} users={[farmer]} showAddButton={false} />
+        </Layout>
+    )
+}
+
+export default FarmerProfile

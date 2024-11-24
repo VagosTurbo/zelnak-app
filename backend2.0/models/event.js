@@ -26,6 +26,24 @@ export const dbGetEventById = async (id) => {
     }
 }
 
+
+export const dbGetEventsByUserId = async (userId) => {
+    try {
+        const pool = await poolPromise
+        const result = await pool
+            .request()
+            .input('userId', sql.Int, userId)
+            .query('SELECT * FROM dbo.events WHERE user_id = @userId') 
+
+        return result.recordset 
+    } catch (error) {
+        console.error(`Error fetching events for user with ID ${userId}:`, error)
+        throw error
+    }
+}
+
+
+
 export const dbCreateEvent = async (event) => {
     const { name, description, date, location, user_id } = event
 
