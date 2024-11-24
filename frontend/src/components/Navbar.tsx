@@ -2,10 +2,12 @@ import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
 import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useCurrentUser } from '../context/CurrentUserContext'
+import { Link } from 'react-router-dom'
+import { Routes } from '../enums'
 
 const Navbar: React.FC = () => {
     const { authenticated, signOut } = useAuth()
-    const { currentUser, isCustomer, isRegisteredUser } = useCurrentUser()
+    const { currentUser, isCustomer, isRegisteredUser, isAdmin } = useCurrentUser()
 
     return (
         <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
@@ -54,6 +56,19 @@ const Navbar: React.FC = () => {
                             Login
                         </Button>
                     </>
+                )}
+
+                {isAdmin && (
+                    <Link to={Routes.AdminPage} style={{ textDecoration: 'none' }}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            sx={{
+                                mx: 1,
+                            }}>
+                            Admin dashboard
+                        </Button>
+                    </Link>
                 )}
             </Toolbar>
         </AppBar>
