@@ -43,13 +43,14 @@ export const dbFindUserByUsernameOrEmail = async (username, email) => {
     }
 };
 
-export const dbFindUserByUsername = async (username) => {
+export const dbFindUserByUsername = async (username, id) => {
     try {
         const pool = await poolPromise;
         const result = await pool
             .request()
             .input("username", sql.NVarChar, username)
-            .query("SELECT id FROM users WHERE username = @username");
+            .input("id", sql.Int, id)
+            .query("SELECT id FROM users WHERE username = @username AND id != @id");
 
         // If a user is found, return it, otherwise return null
         return result.recordset.length > 0 ? result.recordset[0] : null;
@@ -59,13 +60,15 @@ export const dbFindUserByUsername = async (username) => {
     }
 };
 
-export const dbFindUserByEmail = async (email) => {
+
+export const dbFindUserByEmail = async (email, id) => {
     try {
         const pool = await poolPromise;
         const result = await pool
             .request()
             .input("email", sql.NVarChar, email)
-            .query("SELECT id FROM users WHERE email = @email");
+            .input("id", sql.Int, id)
+            .query("SELECT id FROM users WHERE email = @email AND id != @id");
 
         // If a user is found, return it, otherwise return null
         return result.recordset.length > 0 ? result.recordset[0] : null;
@@ -74,6 +77,7 @@ export const dbFindUserByEmail = async (email) => {
         throw new Error("Failed to query the database for email");
     }
 };
+
 
 
 
