@@ -3,7 +3,6 @@ export enum Routes {
     Register = '/register',
     Login = '/login',
     Products = '/products',
-    Product = '/products',
     Seller = '/sellers',
     Profile = '/profile',
     AddProduct = '/add-product',

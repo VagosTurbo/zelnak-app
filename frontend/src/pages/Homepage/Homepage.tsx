@@ -8,11 +8,16 @@ import { Product } from '../../types/Product'
 import Layout from '../layouts/Layout'
 import { HomepageCategories } from './HomepageCategories'
 import { HomepageProducts } from './HomepageProducts'
+import { HomepageEvents } from './HomepageEvents'
+import { Event } from '../../types/Event'
+import { User } from '../../types/User'
 
 const Homepage: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([])
     const [allProducts, setAllProducts] = useState<Product[]>([])
     const [products, setProducts] = useState<Product[]>([])
+    const [events, setEvents] = useState<Event[]>([])
+    const [users, setUsers] = useState<User[]>([])
 
     const [searchParams] = useSearchParams()
 
@@ -36,6 +41,25 @@ const Homepage: React.FC = () => {
         }
     }
 
+    const fetchEvents = async () => {
+        try {
+            const response = await apiGet<Event[]>('/events')
+            setEvents(response)
+        } catch (err: any) {
+            console.error('Failed to fetch events', err)
+        }
+    }
+
+    const fetchUsers = async () => {
+        try {
+            const response = await apiGet<User[]>('/users')
+            console.log(response)
+            setUsers(response)
+        } catch (err: any) {
+            console.error('Failed to fetch users', err)
+        }
+    }
+
     const handleUrlParams = () => {
         const category = searchParams.get('category')
         if (category) {
@@ -50,6 +74,8 @@ const Homepage: React.FC = () => {
     useEffect(() => {
         fetchCategories()
         fetchAllProducts()
+        fetchEvents()
+        fetchUsers()
     }, [])
 
     useEffect(() => {
@@ -104,6 +130,7 @@ const Homepage: React.FC = () => {
             </Typography>
             <HomepageCategories categories={categories} />
             <HomepageProducts products={products} />
+            <HomepageEvents events={events} users={users} />
         </Layout>
     )
 }

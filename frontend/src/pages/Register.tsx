@@ -1,13 +1,17 @@
-import React, { useState, FormEvent } from 'react'
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
+import React, { FormEvent, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import api from '../api/api'
-import { ZelnakInput } from '../components/ZelnakInput'
-import Navbar from '../components/Navbar'
 import { ZelnakButton } from '../components/ZelnakButton'
+import { ZelnakInput } from '../components/ZelnakInput'
+import { Routes } from '../enums'
+import { wait } from '../utils/myUtils'
 
 const Register: React.FC = () => {
     const [formData, setFormData] = useState({ username: '', email: '', password: '' })
     const [message, setMessage] = useState('')
+    const [error, setError] = useState('')
+    const navigate = useNavigate()
 
     // Updates form data when any field changes
     const handleSetValue = (key: keyof typeof formData, value: string) => {
@@ -16,11 +20,19 @@ const Register: React.FC = () => {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
+        setError('')
+        setMessage('')
+
         try {
             const response = await api.post('/register', formData)
-            setMessage(response.data.message || 'Registration successful!')
+            setMessage(
+                response.data.message || 'Registration successful!, Redirecting to login page...'
+            )
+            await wait(500).then(() => {
+                navigate(Routes.Login, { replace: true })
+            })
         } catch (error: any) {
-            setMessage(error.response?.data?.message || 'Error occurred')
+            setError(error.response?.data?.message || 'Error occurred')
         }
     }
 
@@ -76,9 +88,6 @@ const Register: React.FC = () => {
                         fullWidth
                         sx={{ mb: 3 }}
                     />
-                    {/* <Button variant="contained" color="primary" type="submit" fullWidth>
-                        Register
-                    </Button> */}
                     <ZelnakButton color="primary" type="submit" fullWidth>
                         Register
                     </ZelnakButton>
@@ -86,6 +95,12 @@ const Register: React.FC = () => {
                 {message && (
                     <Typography color="success.main" sx={{ mt: 2 }}>
                         {message}
+                    </Typography>
+                )}
+
+                {error && (
+                    <Typography color="error" sx={{ mt: 2 }}>
+                        {error}
                     </Typography>
                 )}
             </Box>

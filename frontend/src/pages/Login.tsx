@@ -1,39 +1,98 @@
-import React, { useState, FormEvent } from 'react'
-import { Box, Button, Typography } from '@mui/material'
-import api from '../api/api'
-import { ZelnakInput } from '../components/ZelnakInput'
+import { Box, CircularProgress, Stack, Typography } from '@mui/material'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LocalStorage } from '../enums'
+import { apiPost } from '../api/apiPost'
+import { ZelnakButton } from '../components/ZelnakButton'
+import { ZelnakInput } from '../components/ZelnakInput'
+import { useAuth } from '../context/AuthContext'
+import { LocalStorage, Routes } from '../enums'
+import colors from '../styles/colors'
+import { wait } from '../utils/myUtils'
 
-const Login: React.FC = () => {
-    const [formData, setFormData] = useState({ username: '', password: '' })
-    const [message, setMessage] = useState('')
-    const [token, setToken] = useState('')
+export interface LoginFormProps {}
+
+interface UserData {
+    username: string
+    password: string
+}
+
+interface Values extends UserData {
+    error: string
+    loading: boolean
+    success: boolean
+}
+
+interface LoginData {
+    username: string
+    password: string
+}
+
+const login = async (loginData: LoginData): Promise<any> => {
+    const url = '/login'
+    return apiPost<any>(url, loginData)
+}
+
+const Login = (_props: LoginFormProps) => {
+    const { setAccessToken, setUserId } = useAuth()
+
     const navigate = useNavigate()
 
-    // Updates form data when any field changes
-    const handleSetValue = (key: keyof typeof formData, value: string) => {
-        setFormData({ ...formData, [key]: value })
+    const [values, setValues] = useState<Values>({
+        username: '',
+        password: '',
+        error: '',
+        loading: false,
+        success: false,
+    })
+
+    const handleSubmit = async () => {
+        if (values.username && values.password) {
+            setValues({ ...values, loading: true })
+
+            const userData: LoginData = {
+                username: values.username,
+                password: values.password,
+            }
+
+            login(userData)
+                .then(async (response) => {
+                    const token = response.token
+                    const user_id = response.user_id
+                    setValues({
+                        ...values,
+                        error: '',
+                        success: true,
+                        loading: false,
+                    })
+
+                    setAccessToken(token)
+                    setUserId(user_id)
+                    localStorage.setItem(LocalStorage.AccessToken, token)
+                    localStorage.setItem(LocalStorage.UserId, user_id)
+
+                    await wait(500).then(() => {
+                        navigate(Routes.Homepage, { replace: true })
+                    })
+                })
+                .catch((error) => {
+                    setValues({
+                        ...values,
+                        error: 'Prihlásenie sa nepodarilo. '+ error,
+                        success: false,
+                        loading: false,
+                    })
+
+                    setAccessToken(null)
+                    setUserId(null)
+                    localStorage.removeItem(LocalStorage.AccessToken)
+                    localStorage.removeItem(LocalStorage.UserId)
+                })
+        }
     }
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault()
-        try {
-            const response = await api.post('/login', formData)
-            const token = response.data.token
-            const userId = response.data.id
-
-            // Store token and userId in localStorage using the LocalStorage enum
-            localStorage.setItem(LocalStorage.token, token)
-            localStorage.setItem(LocalStorage.UserId, userId)
-
-            setToken(token)
-            setMessage('Login successful!')
-
-            navigate('/')
-        } catch (error: any) {
-            setMessage(error.response?.data?.message || 'Error occurred')
-        }
+    const handleChange = (inputKey: keyof Values, value: Values[keyof Values]) => {
+        const newData: Values = { ...values, [inputKey]: value }
+        setValues(newData)
     }
 
     return (
@@ -42,58 +101,77 @@ const Login: React.FC = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                height: '100vh',
-                backgroundColor: '#f5f5f5',
+                height: '100svh',
+                backgroundColor: colors.colorBackground,
             }}>
             <Box
+                maxWidth={640}
                 sx={{
-                    width: 400,
-                    padding: 4,
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    backgroundColor: '#fff',
-                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                 }}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Login
+                <Typography component="h1" variant="h1" marginBottom={5}>
+                    Přihlášení
                 </Typography>
-                <form onSubmit={handleSubmit}>
-                    <ZelnakInput
-                        title="Username"
-                        type="text"
+                <Stack
+                    width={'100%'}
+                    component="form"
+                    noValidate
+                    spacing={2}
+                    onSubmit={(e) => {
+                        e.preventDefault()
+                        handleSubmit()
+                    }}>
+                    <ZelnakInput<Values>
+                        label={'Uživatelské jméno'}
                         inputKey="username"
-                        value={formData.username}
-                        setValue={handleSetValue}
-                        placeholder="Enter your username"
+                        value={values.username}
+                        type="text"
+                        setValue={handleChange}
                         fullWidth
-                        sx={{ mb: 2 }}
+                        inputProps={{
+                            size: 'medium',
+                            sx: { width: '400px' },
+                        }}
                     />
-                    <ZelnakInput
-                        title="Password"
-                        type="password"
+
+                    <ZelnakInput<Values>
+                        label={'Heslo'}
                         inputKey="password"
-                        value={formData.password}
-                        setValue={handleSetValue}
-                        placeholder="Enter your password"
+                        value={values.password}
+                        type="password"
+                        setValue={handleChange}
                         fullWidth
-                        sx={{ mb: 3 }}
+                        inputProps={{
+                            size: 'medium',
+                            sx: { width: '400px' },
+                        }}
                     />
-                    <Button variant="contained" color="primary" type="submit" fullWidth>
-                        Login
-                    </Button>
-                </form>
-                {message && (
-                    <Typography
-                        color={message.includes('successful') ? 'primary' : 'error'}
-                        sx={{ mt: 2 }}>
-                        {message}
-                    </Typography>
-                )}
-                {token && (
-                    <Typography color="success.main" sx={{ mt: 1, wordWrap: 'break-word' }}>
-                        Your token: {token}
-                    </Typography>
-                )}
+
+                    <ZelnakButton
+                        type="submit"
+                        size={'medium'}
+                        sx={{ mt: 3, mb: 2, mx: 'auto', display: 'block' }}>
+                        {values.loading ? (
+                            <CircularProgress size={28} color="secondary" />
+                        ) : (
+                            'Přihlásit se'
+                        )}
+                    </ZelnakButton>
+
+                    {values.error && (
+                        <Typography color="error" variant="body2">
+                            {values.error}
+                        </Typography>
+                    )}
+
+                    {values.success && (
+                        <Typography color="success" variant="body2">
+                            Přihlášení proběhlo úspěšně, přesměrovávám...
+                        </Typography>
+                    )}
+                </Stack>
             </Box>
         </Box>
     )

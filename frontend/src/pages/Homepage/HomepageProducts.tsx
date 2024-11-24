@@ -40,7 +40,7 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                         <CardContent>
                             <CardActionArea>
                                 <Link
-                                    to={`${Routes.Product}/${product.id}`}
+                                    to={`${Routes.Products}/${product.id}`}
                                     style={{ textDecoration: 'none' }}>
                                     <Typography
                                         gutterBottom
