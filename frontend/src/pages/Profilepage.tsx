@@ -7,7 +7,7 @@ import { apiGet } from '../api/apiGet'
 import { User } from '../types/User'
 
 const ProfilePage: React.FC = () => {
-    const [_user, setUser] = useState<User | null>(null)
+    const [user, setUser] = useState<User | null>(null)
     const [initialUser, setInitialUser] = useState<User | null>(null)
     const [username, setUsername] = useState<string>('')
     const [email, setEmail] = useState<string>('')
