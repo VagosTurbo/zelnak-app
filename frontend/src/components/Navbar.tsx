@@ -1,15 +1,9 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
-import { LocalStorage } from '../enums';
+import React from 'react'
+import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material'
+import { useAuth } from '../context/AuthContext'
 
 const Navbar: React.FC = () => {
-    const isLoggedIn = !!localStorage.getItem(LocalStorage.token); // Check if token exists
-
-    const handleLogout = () => {
-        localStorage.removeItem(LocalStorage.token);
-        localStorage.removeItem(LocalStorage.UserId);
-        window.location.reload();
-    };
+    const { authenticated, signOut } = useAuth()
 
     return (
         <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
@@ -28,12 +22,12 @@ const Navbar: React.FC = () => {
                         About
                     </Button>
                 </Box>
-                {isLoggedIn ? (
+                {authenticated ? (
                     <>
                         <Button color="inherit" href="#/profile">
                             Profile
                         </Button>
-                        <Button color="inherit" onClick={handleLogout}>
+                        <Button color="inherit" onClick={signOut}>
                             Logout
                         </Button>
                         <Button color="inherit" href="#/cart">
@@ -52,7 +46,7 @@ const Navbar: React.FC = () => {
                 )}
             </Toolbar>
         </AppBar>
-    );
-};
+    )
+}
 
-export default Navbar;
+export default Navbar
