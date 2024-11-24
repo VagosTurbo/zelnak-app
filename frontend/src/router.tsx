@@ -13,7 +13,8 @@ import AdminPage from './pages/AdminPage.tsx'
 import ProtectedRoute from './pages/ProtectedRoute.tsx'
 import { UserRole } from './enums/UserRole.ts'
 import Cart from './pages/Cart.tsx'
-import ProfilePage from './pages/Profile/Profilepage.tsx'
+import OrderDetail from './pages/Profile/OrderDetail.tsx'
+import ProfilePage from './pages/Profile/ProfilePage.tsx'
 const applicationRouter = createHashRouter([
     {
         path: Routes.Homepage,
@@ -35,6 +36,12 @@ const applicationRouter = createHashRouter([
         path: Routes.Profile,
         element: <ProfilePage />,
     },
+    {
+        path: Routes.Orders + '/:id',
+        element: <ProtectedRoute element={<OrderDetail />} allowedRoles={[UserRole.Admin]} />,
+        // TODO: roles
+    },
+
     {
         path: Routes.AddProduct,
         element: (

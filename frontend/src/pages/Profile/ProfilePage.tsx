@@ -12,7 +12,7 @@ import { apiGet } from '../../api/apiGet'
 import { formatDateTime } from '../../utils/myUtils'
 
 const ProfilePage: React.FC = () => {
-    const { currentUser, isFarmer, isAdmin } = useCurrentUser()
+    const { currentUser, isCustomer } = useCurrentUser()
     const { authenticated, accessToken } = useAuth()
 
     const [user, _setUser] = useState<User | null>(currentUser)
@@ -122,24 +122,24 @@ const ProfilePage: React.FC = () => {
                     )}
                 </Paper>
 
-                {/* Customer + Farmer orders */}
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        p: 3,
-                        my: 5,
-                    }}>
-                    <Paper elevation={3} sx={{ p: 3, width: '760px' }}>
-                        <ProfileOrders
-                            orders={userOrders}
-                            loading={loading}
-                            showFarmerButtons={isFarmer || isAdmin}
-                        />
-                    </Paper>
-                </Box>
+                {/* Customer orders */}
+                {isCustomer ||
+                    (true && (
+                        // TODO: remove true
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                p: 3,
+                                my: 5,
+                            }}>
+                            <Paper elevation={3} sx={{ p: 3, width: '760px' }}>
+                                <ProfileOrders orders={userOrders} loading={loading} />
+                            </Paper>
+                        </Box>
+                    ))}
             </Box>
         </Layout>
     )

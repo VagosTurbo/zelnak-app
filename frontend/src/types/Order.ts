@@ -8,4 +8,5 @@ export interface Order {
     quantity: number
     created_at: string
     status: OrderStatusEnum
+    productName?: string
 }
