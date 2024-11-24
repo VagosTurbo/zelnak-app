@@ -2,10 +2,12 @@ import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
 import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useCurrentUser } from '../context/CurrentUserContext'
+import { Link } from 'react-router-dom'
+import { Routes } from '../enums'
 
 const Navbar: React.FC = () => {
     const { authenticated, signOut } = useAuth()
-    const { currentUser } = useCurrentUser()
+    const { currentUser, isCustomer, isRegisteredUser, isAdmin } = useCurrentUser()
 
     return (
         <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
@@ -21,26 +23,17 @@ const Navbar: React.FC = () => {
                     </Typography>
                 )}
 
-                {/* Navigation Links */}
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Button color="inherit" href="/">
-                        Home
-                    </Button>
-                    <Button color="inherit" href="/about">
-                        About
-                    </Button>
+                    <MyLink to={Routes.Homepage} text="Home" />
                 </Box>
                 {authenticated ? (
                     <>
-                        <Button color="inherit" href="#/profile">
-                            Profile
-                        </Button>
+                        <MyLink to={Routes.Profile} text="Profile and orders" />
                         <Button color="inherit" onClick={signOut}>
                             Logout
                         </Button>
-                        <Button color="inherit" href="#/cart">
-                            Cart
-                        </Button>
+                        {isRegisteredUser ||
+                            (isCustomer && <MyLink to={Routes.Cart} text="Cart" />)}
                     </>
                 ) : (
                     <>
@@ -52,9 +45,28 @@ const Navbar: React.FC = () => {
                         </Button>
                     </>
                 )}
+
+                {isAdmin && (
+                    <Link to={Routes.AdminPage} style={{ textDecoration: 'none' }}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            sx={{
+                                mx: 1,
+                            }}>
+                            Admin dashboard
+                        </Button>
+                    </Link>
+                )}
             </Toolbar>
         </AppBar>
     )
 }
+
+const MyLink = ({ to, text }: { to: string; text: string }) => (
+    <Link to={to} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Button color="inherit">{text}</Button>
+    </Link>
+)
 
 export default Navbar
