@@ -57,7 +57,7 @@ const Login = (_props: LoginFormProps) => {
             login(userData)
                 .then(async (response) => {
                     const token = response.token
-                    const user_id = response.user_id
+                    const user_id = response.id
                     setValues({
                         ...values,
                         error: '',

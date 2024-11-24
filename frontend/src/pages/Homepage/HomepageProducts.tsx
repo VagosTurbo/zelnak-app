@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
     Box,
@@ -13,6 +13,8 @@ import { Product } from '../../types/Product'
 import { Routes } from '../../enums'
 import colors from '../../styles/colors'
 import { useCart } from '../../context/CartContext'
+import { useAuth } from '../../context/AuthContext'
+import { useCurrentUser } from '../../context/CurrentUserContext'
 
 interface HomepageProductsProps {
     products: Product[]
@@ -20,6 +22,7 @@ interface HomepageProductsProps {
 
 export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) => {
     const { addProduct } = useCart()
+    const { authenticated } = useAuth()
 
     return (
         <>
@@ -62,19 +65,25 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                             </Typography>
                             <Link to={`${Routes.Seller}/${product.user_id}`}>
                                 <Typography variant="body2" sx={{ color: colors.colorText }} mb={2}>
-                                    Prodejce: {product.user_id} 
+                                    Prodejce: {product.user_id}
                                 </Typography>
                             </Link>
-                            <Button
-                                onClick={() => addProduct(product.id, 1)}
-                                color="secondary"
-                                variant="contained"
-                                sx={{
-                                    mt: 'auto',
-                                }}
-                                fullWidth>
-                                Přidat do košíku
-                            </Button>
+                            {authenticated ? (
+                                <Button
+                                    onClick={() => addProduct(product.id, 1)}
+                                    color="secondary"
+                                    variant="contained"
+                                    sx={{
+                                        mt: 'auto',
+                                    }}
+                                    fullWidth>
+                                    Přidat do košíku
+                                </Button>
+                            ) : (
+                                <Typography variant="body2" sx={{ color: colors.colorText }} mb={2}>
+                                    Pro nákup se musíte přihlásit
+                                </Typography>
+                            )}
                         </CardContent>
                     </Card>
                 ))}
