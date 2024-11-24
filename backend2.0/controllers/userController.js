@@ -50,32 +50,33 @@ export const updateUser = async (req, res) => {
 
     // Ensure there's at least one field to update
     if (Object.keys(updatedUser).length === 0) {
-        return res.status(400).json({ success: false, message: "At least one field is required to update." });
+        return res.status(400).json({ message: "At least one field is required to update." });
     }
 
-    
+
     try {
         // Check if the user exists
         const existingUser = await dbGetUserById(userId);
         if (!existingUser) {
-            return res.status(404).json({ success: false, message: "User not found." });
+            return res.status(404).json({ message: "User not found." });
         }
-        
-        // Check if username or email is unique
-        if (updatedUser.username) {
+
+        // Check if username is unique (if being updated)
+        if (updatedUser.username && updatedUser.username !== existingUser.username) {
             const usernameExists = await dbFindUserByUsername(updatedUser.username);
             if (usernameExists) {
-                return res.status(400).json({ success: false, message: "Username is already taken." });
+                return res.status(400).json({ message: "Username is already taken." });
             }
         }
-        
-        if (updatedUser.email) {
+
+        // Check if email is unique (if being updated)
+        if (updatedUser.email && updatedUser.email !== existingUser.email) {
             const emailExists = await dbFindUserByEmail(updatedUser.email);
             if (emailExists) {
-                return res.status(400).json({ success: false, message: "Email is already taken." });
+                return res.status(400).json({ message: "Email is already taken." });
             }
         }
-        
+
 
         // Perform the update
         const success = await dbUpdateUser(userId, updatedUser);

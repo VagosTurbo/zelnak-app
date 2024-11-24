@@ -1,20 +1,19 @@
-import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import {
     Box,
     Button,
     Card,
+    CardActionArea,
     CardContent,
     CardMedia,
     Typography,
-    CardActionArea,
 } from '@mui/material'
-import { Product } from '../../types/Product'
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
+import { useCart } from '../../context/CartContext'
 import { Routes } from '../../enums'
 import colors from '../../styles/colors'
-import { useCart } from '../../context/CartContext'
-import { useAuth } from '../../context/AuthContext'
-import { useCurrentUser } from '../../context/CurrentUserContext'
+import { Product } from '../../types/Product'
 
 interface HomepageProductsProps {
     products: Product[]

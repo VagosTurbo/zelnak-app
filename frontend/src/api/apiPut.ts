@@ -16,7 +16,7 @@ export async function apiPut<T, U = unknown>(
         })
         .catch((error) => {
             if (axios.isAxiosError(error)) {
-                throw new Error(error.response?.data?.code || 'Internal error')
+                throw new Error(error.response?.data.message || 'Internal error')
             } else {
                 throw new Error('Internal error')
             }

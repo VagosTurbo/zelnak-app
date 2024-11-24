@@ -1,144 +1,108 @@
-import React, { useEffect, useState } from 'react'
-import { Box, Typography, Paper, TextField } from '@mui/material'
-import { LocalStorage } from '../enums'
-import { ZelnakButton } from '../components/ZelnakButton'
+import { Box, Paper, TextField, Typography } from '@mui/material'
+import React, { useState } from 'react'
 import { apiPut } from '../api/apiPut'
-import { apiGet } from '../api/apiGet'
+import { ZelnakButton } from '../components/ZelnakButton'
+import { useAuth } from '../context/AuthContext'
+import { useCurrentUser } from '../context/CurrentUserContext'
 import { User } from '../types/User'
+import Layout from './layouts/Layout'
 
 const ProfilePage: React.FC = () => {
-    const [user, setUser] = useState<User | null>(null)
-    const [initialUser, setInitialUser] = useState<User | null>(null)
-    const [username, setUsername] = useState<string>('')
-    const [email, setEmail] = useState<string>('')
-    const [loading, setLoading] = useState<boolean>(true)
+    const { currentUser } = useCurrentUser()
+    const { authenticated, accessToken } = useAuth()
+
+    const [user, _setUser] = useState<User | null>(currentUser)
+    const [username, setUsername] = useState<string>(currentUser?.username || '')
+    const [email, setEmail] = useState<string>(currentUser?.email || '')
+    const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
-    const [success, setSuccess] = useState<string | null>(null)
-
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            const token = localStorage.getItem(LocalStorage.token)
-            const userId = localStorage.getItem(LocalStorage.UserId)
-
-            if (!token || !userId) {
-                setError('User is not authenticated')
-                setLoading(false)
-                return
-            }
-
-            try {
-                const response = await apiGet<User>(`/users/${userId}`, token)
-                setUser(response)
-                setInitialUser(response) // Store the initial user data
-                setUsername(response.username) // Pre-fill the username field
-                setEmail(response.email) // Pre-fill the email field
-            } catch (err: any) {
-                setError(err.message || 'Failed to fetch profile data')
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        fetchUserProfile()
-    }, [])
+    const [_success, setSuccess] = useState<string | null>(null)
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        const token = localStorage.getItem(LocalStorage.token)
-        const userId = localStorage.getItem(LocalStorage.UserId)
+        if (!authenticated || !accessToken) return
 
-        if (!token || !userId) {
-            setError('User is not authenticated')
-            return
-        }
+        setLoading(true)
+        setError(null)
 
+        const updatedDetails = { username, email }
         try {
-            // Prepare the updated user details
-            const updatedDetails: Partial<User> = {}
-            if (username !== initialUser?.username) updatedDetails.username = username
-            if (email !== initialUser?.email) updatedDetails.email = email
-            // Add other fields as necessary
-
-            // Send the updated details to the backend
-            const response = await apiPut(`/users/${userId}`, updatedDetails, token)
-            setUser(response as any)
-
-            setSuccess('Profile updated successfully!')
-        } catch (err: any) {
-            setError('Failed to update profile')
+            await apiPut<User>(`/users/${user?.id}`, updatedDetails, accessToken)
+            setSuccess('Profile updated successfully')
+        } catch (error: any) {
+            setError(error.message)
         }
-    }
 
-    if (loading) {
-        return <Typography>Loading...</Typography>
-    }
-
-    if (error) {
-        return <Typography color="error">{error}</Typography>
+        setLoading(false)
     }
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                p: 3,
-            }}>
-            <Paper elevation={3} sx={{ p: 3, width: '100%', maxWidth: '500px' }}>
-                <Typography variant="h4" gutterBottom>
-                    Profile
-                </Typography>
-                {user && (
-                    <>
-                        <Typography variant="body1" sx={{ mt: 2 }}>
-                            <strong>ID:</strong> {user.id}
-                        </Typography>
-                        <Typography variant="body1" sx={{ mt: 2 }}>
-                            <strong>Username:</strong> {user.username}
-                        </Typography>
-                        <Typography variant="body1" sx={{ mt: 2 }}>
-                            <strong>Email:</strong> {user.email}
-                        </Typography>
-                        <Typography variant="body1" sx={{ mt: 2 }}>
-                            <strong>Account Created:</strong>{' '}
-                            {new Date(user.created_at).toLocaleString()}
-                        </Typography>
-                    </>
-                )}
-                <Box component="form" onSubmit={handleUpdateProfile} sx={{ mt: 3 }}>
-                    <TextField
-                        label="Username"
-                        variant="outlined"
-                        fullWidth
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        sx={{ mb: 2 }}
-                    />
-                    <TextField
-                        label="Email"
-                        variant="outlined"
-                        fullWidth
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        sx={{ mb: 2 }}
-                    />
-
-                    <ZelnakButton color="primary" type="submit" fullWidth>
-                        Update Profile
-                    </ZelnakButton>
-                </Box>
-
-                {success && (
-                    <Typography color="success.main" sx={{ mt: 2 }}>
-                        {success}
+        <Layout>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    p: 3,
+                    my: 5,
+                }}>
+                <Paper elevation={3} sx={{ p: 3, width: '100%', maxWidth: '500px' }}>
+                    <Typography variant="h4" gutterBottom>
+                        Profil uživatele
                     </Typography>
-                )}
-            </Paper>
-        </Box>
+                    {user && (
+                        <>
+                            <Typography variant="body1" sx={{ mt: 2 }}>
+                                <strong>ID:</strong> {user.id}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mt: 2 }}>
+                                <strong>Username:</strong> {user.username}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mt: 2 }}>
+                                <strong>Email:</strong> {user.email}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mt: 2 }}>
+                                <strong>Account Created:</strong>{' '}
+                                {new Date(user.created_at).toLocaleString()}
+                            </Typography>
+                        </>
+                    )}
+                    <Box component="form" onSubmit={handleUpdateProfile} sx={{ mt: 3 }}>
+                        <TextField
+                            label="Username"
+                            variant="outlined"
+                            fullWidth
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            sx={{ mb: 2 }}
+                        />
+                        <TextField
+                            label="Email"
+                            variant="outlined"
+                            fullWidth
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            sx={{ mb: 2 }}
+                        />
+
+                        <ZelnakButton color="primary" type="submit" fullWidth disabled={loading}>
+                            Update Profile
+                        </ZelnakButton>
+                    </Box>
+
+                    {loading && <Typography variant="body1">Loading...</Typography>}
+
+                    {error && (
+                        <Typography variant="body1" color="error">
+                            {error}
+                        </Typography>
+                    )}
+                </Paper>
+            </Box>
+        </Layout>
     )
 }
 
