@@ -1,14 +1,11 @@
-import React, { useEffect } from 'react'
-import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material'
+import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
+import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useCurrentUser } from '../context/CurrentUserContext'
 
 const Navbar: React.FC = () => {
     const { authenticated, signOut } = useAuth()
     const { currentUser } = useCurrentUser()
-    useEffect(() => {
-        console.log(currentUser)
-    }, [currentUser])
 
     return (
         <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
