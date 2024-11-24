@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Typography, Card, CardContent, CardMedia, Link, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
+import {
+    Box,
+    Typography,
+    Card,
+    CardContent,
+    CardMedia,
+    Link,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+} from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { apiGet } from '../api/apiGet'
 
@@ -27,7 +38,7 @@ interface Category {
 }
 
 const ProductsPage: React.FC = () => {
-    const [products, setProducts] = useState<Product[]>([])
+    const [products, setProducts] = useState<Product[] | any[]>([])
     const [users, setUsers] = useState<{ [key: number]: User }>({})
     const [categories, setCategories] = useState<{ [key: number]: Category[] }>({})
     const [error, setError] = useState<string | null>(null)
@@ -38,25 +49,31 @@ const ProductsPage: React.FC = () => {
         const fetchProducts = async () => {
             try {
                 const response = await apiGet('/products')
-                setProducts(response)
+                setProducts(response as any)
 
                 // Fetch user details for each product
-                const userIds = Array.from(new Set(response.map((product: Product) => product.user_id)))
+                const userIds = Array.from(
+                    new Set((response as any).map((product: Product) => product.user_id))
+                )
                 const userResponses = await Promise.all(userIds.map((id) => apiGet(`/users/${id}`)))
                 const usersData = userResponses.reduce((acc, user) => {
-                    acc[user.id] = user
+                    ;(acc as any)[(user as any).id] = user
                     return acc
                 }, {} as { [key: number]: User })
-                setUsers(usersData)
+                setUsers(usersData as any)
 
                 // Fetch category hierarchy for each product
-                const categoryIds = Array.from(new Set(response.map((product: Product) => product.category_id)))
-                const categoryResponses = await Promise.all(categoryIds.map((id) => apiGet(`/categories/${id}/hierarchy`)))
+                const categoryIds = Array.from(
+                    new Set((response as any).map((product: Product) => product.category_id))
+                )
+                const categoryResponses = await Promise.all(
+                    categoryIds.map((id) => apiGet(`/categories/${id}/hierarchy`))
+                )
                 const categoriesData = categoryResponses.reduce((acc, hierarchy, index) => {
-                    acc[categoryIds[index]] = hierarchy
+                    ;(acc as any)[categoryIds[index] as any] = hierarchy
                     return acc
                 }, {} as { [key: number]: Category[] })
-                setCategories(categoriesData)
+                setCategories(categoriesData as any)
             } catch (err: any) {
                 console.error('Error fetching products:', err)
                 setError(err.response?.data?.message || 'Failed to fetch products')
@@ -75,7 +92,7 @@ const ProductsPage: React.FC = () => {
     }
 
     const filteredProducts = selectedCategory
-        ? products.filter(product => product.category_id === selectedCategory)
+        ? products.filter((product) => product.category_id === selectedCategory)
         : products
 
     return (
@@ -91,17 +108,18 @@ const ProductsPage: React.FC = () => {
                 <Select
                     labelId="category-filter-label"
                     value={selectedCategory || ''}
-                    onChange={handleCategoryChange}
-                    label="Filter by Category"
-                >
+                    onChange={handleCategoryChange as any}
+                    label="Filter by Category">
                     <MenuItem value="">
                         <em>All Categories</em>
                     </MenuItem>
-                    {Object.values(categories).flat().map((category) => (
-                        <MenuItem key={category.id} value={category.id}>
-                            {category.name}
-                        </MenuItem>
-                    ))}
+                    {Object.values(categories)
+                        .flat()
+                        .map((category) => (
+                            <MenuItem key={category.id} value={category.id}>
+                                {category.name}
+                            </MenuItem>
+                        ))}
                 </Select>
             </FormControl>
 
@@ -126,12 +144,22 @@ const ProductsPage: React.FC = () => {
                             </Typography>
                             {users[product.user_id] && (
                                 <Typography variant="body2" color="text.secondary">
-                                    Seller: <Link component="button" onClick={() => handleFarmerClick(users[product.user_id].id)}>{users[product.user_id].username}</Link>
+                                    Seller:{' '}
+                                    <Link
+                                        component="button"
+                                        onClick={() =>
+                                            handleFarmerClick(users[product.user_id].id)
+                                        }>
+                                        {users[product.user_id].username}
+                                    </Link>
                                 </Typography>
                             )}
                             {categories[product.category_id] && (
                                 <Typography variant="body2" color="text.secondary">
-                                    Categories: {categories[product.category_id].map(cat => cat.name).join(' > ')}
+                                    Categories:{' '}
+                                    {categories[product.category_id]
+                                        .map((cat) => cat.name)
+                                        .join(' > ')}
                                 </Typography>
                             )}
                         </CardContent>

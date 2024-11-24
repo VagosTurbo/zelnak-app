@@ -5,8 +5,6 @@ import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material'
 import api from '../api/api'
 import { useNavigate } from 'react-router-dom'
 import { Routes } from '../enums/Routes'
-import { apiPost } from '../api/apiPost'
-import { useAuth } from '../context/AuthContext'
 
 interface Category {
     id: number
@@ -67,7 +65,7 @@ const AddCategory: React.FC = () => {
             const response = await api.post('/categories', categoryData)
 
             // Displaying a success message
-            setMessage(response.message || 'Category created successfully!')
+            setMessage(response.data.toString() || 'Category created successfully!')
             navigate(Routes.Categories)
         } catch (error: any) {
             // Handling error

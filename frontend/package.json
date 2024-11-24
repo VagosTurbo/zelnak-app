@@ -1,5 +1,6 @@
 {
     "name": "zelnak-app",
+    "homepage": "https://VagosTurbo.github.io/zelnak-app/",
     "private": true,
     "version": "0.0.0",
     "type": "module",
