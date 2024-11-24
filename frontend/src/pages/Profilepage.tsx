@@ -65,7 +65,9 @@ const ProfilePage: React.FC = () => {
                             </Typography>
                             <Typography variant="body1" sx={{ mt: 2 }}>
                                 <strong>Account Created:</strong>{' '}
-                                {new Date(user.created_at).toLocaleString()}
+                                {user.created_at
+                                    ? new Date(user.created_at).toLocaleString()
+                                    : 'N/A'}
                             </Typography>
                         </>
                     )}

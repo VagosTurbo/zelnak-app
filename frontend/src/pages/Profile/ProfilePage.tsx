@@ -85,10 +85,18 @@ const ProfilePage: React.FC = () => {
                                 <strong>Email:</strong> {user.email}
                             </Typography>
                             <Typography variant="body1" sx={{ mt: 2 }}>
-                                <strong>Account Created:</strong> {formatDateTime(user.created_at)}
+                                <strong>Account Created:</strong>{' '}
+                                {user.created_at ? formatDateTime(user.created_at) : 'N/A'}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mt: 2 }}>
+                                <strong>Account Created:</strong>{' '}
+                                {user.created_at
+                                    ? new Date(user.created_at).toLocaleString()
+                                    : 'N/A'}
                             </Typography>
                         </>
                     )}
+
                     <Box component="form" onSubmit={handleUpdateProfile} sx={{ mt: 3 }}>
                         <TextField
                             label="Username"
