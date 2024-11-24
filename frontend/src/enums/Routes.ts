@@ -10,6 +10,7 @@ export enum Routes {
     Categories = '/categories',
     AddCategory = '/add-category',
     Cart = '/cart',
+    Orders = '/orders',
     FarmerProfile = '/farmers/:id',
     AdminPage = '/admin'
 }

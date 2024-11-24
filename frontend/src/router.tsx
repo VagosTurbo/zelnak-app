@@ -4,7 +4,6 @@ import Homepage from './pages/Homepage/Homepage.tsx'
 import Register from './pages/Register.tsx'
 import Login from './pages/Login.tsx'
 import ProductsPage from './pages/ProductsPage.tsx'
-import Profile from './pages/Profilepage.tsx'
 import AddProduct from './pages/AddProduct.tsx'
 import Events from './pages/Events.tsx'
 import CategoriesPage from './pages/CategoryPage.tsx'
@@ -14,6 +13,7 @@ import AdminPage from './pages/AdminPage.tsx'
 import ProtectedRoute from './pages/ProtectedRoute.tsx'
 import { UserRole } from './enums/UserRole.ts'
 import Cart from './pages/Cart.tsx'
+import ProfilePage from './pages/Profile/Profilepage.tsx'
 const applicationRouter = createHashRouter([
     {
         path: Routes.Homepage,
@@ -33,11 +33,16 @@ const applicationRouter = createHashRouter([
     },
     {
         path: Routes.Profile,
-        element: <Profile />,
+        element: <ProfilePage />,
     },
     {
-        path: Routes.AddProduct, 
-        element: <ProtectedRoute element={<AddProduct />} allowedRoles={[UserRole.Farmer, UserRole.Registered]} />,
+        path: Routes.AddProduct,
+        element: (
+            <ProtectedRoute
+                element={<AddProduct />}
+                allowedRoles={[UserRole.Farmer, UserRole.Registered]}
+            />
+        ),
     },
     {
         path: Routes.Events,
@@ -62,7 +67,7 @@ const applicationRouter = createHashRouter([
     {
         path: Routes.Cart,
         element: <Cart />,
-    }
+    },
 ])
 
 const getRouter = () => {

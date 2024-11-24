@@ -1,3 +1,5 @@
+import { OrderStatusEnum } from '../enums/OrderStatus'
+
 export interface Order {
     id: number
     seller_id: number
@@ -5,4 +7,5 @@ export interface Order {
     product_id: number
     quantity: number
     created_at: string
+    status: OrderStatusEnum
 }
