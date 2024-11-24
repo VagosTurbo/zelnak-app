@@ -2,6 +2,61 @@ import { dbGetAllOrders, dbGetOrderById, dbCreateOrder, dbUpdateOrder, dbDeleteO
 import { dbCreateOrderItem, dbGetOrderItemsByOrderId, dbUpdateOrderItem } from '../models/orderItem.js';
 import { poolPromise, sql } from '../config/database.js';
 
+export const approveOrderItem = async (req, res) => {
+    const { id } = req.params; 
+    const { status } = req.body;
+
+    if (status !== 'Accepted') {
+        return res.status(400).json({ error: "Invalid status. Only 'Approved' status is allowed." });
+    }
+
+    const pool = await poolPromise;
+    const transaction = new sql.Transaction(pool);
+
+    try {
+        // Begin the transaction
+        await transaction.begin();
+
+        // Get the order item
+        const orderItem = await dbGetOrderItemById(id);
+        if (!orderItem) {
+            await transaction.rollback();
+            return res.status(404).json({ error: "Order item not found" });
+        }
+
+        // Get the product
+        const product = await dbGetProductById(orderItem.product_id);
+        if (!product) {
+            await transaction.rollback();
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        // Check if there is enough quantity
+        if (product.quantity < orderItem.quantity) {
+            await transaction.rollback();
+            return res.status(400).json({ error: "Not enough product quantity" });
+        }
+
+        // Update the product quantity
+        const newQuantity = product.quantity - orderItem.quantity;
+        await dbUpdateProductQuantity(orderItem.product_id, newQuantity, transaction);
+
+        // Update the order item status
+        await dbUpdateOrderItem(id, { status }, transaction);
+
+        // Commit the transaction
+        await transaction.commit();
+
+        res.json({ message: "Order item approved successfully" });
+    } catch (err) {
+        // Rollback the transaction in case of any error
+        await transaction.rollback();
+        res.status(500).json({ error: "Failed to approve order item: " + err.message });
+    }
+};
+
+
+
 export const getAllOrders = async (req, res) => {
     try {
         const orders = await dbGetAllOrders();
