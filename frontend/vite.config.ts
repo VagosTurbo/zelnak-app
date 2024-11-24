@@ -20,6 +20,7 @@ export default ({ mode }: { mode: string }) => {
     }
 
     console.log('output dir: ', getOutputDir(mode))
+    console.log(process.env.VITE_API_URL)
 
     return defineConfig({
         plugins: [react()],
@@ -27,17 +28,16 @@ export default ({ mode }: { mode: string }) => {
             outDir: getOutputDir(mode),
             target: 'esnext',
         },
-        base: '/zelnak-app', 
+        base: '/zelnak-app/',
         server: {
             proxy: {
                 '/api': {
-                    target: process.env.VITE_API_URL,  
+                    target: process.env.VITE_API_URL,
                     changeOrigin: true,
                     secure: false,
                     ws: true,
                 },
             },
         },
-        
     })
 }

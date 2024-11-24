@@ -2,7 +2,8 @@ import axios, { AxiosResponse } from 'axios'
 import { getAuthHeaders } from './getAuthHeaders'
 
 export async function apiGet<T>(url: string, accessToken?: string): Promise<T> {
-    const fullUrl = import.meta.env.VITE_API_URL + url
+    // const fullUrl = import.meta.env.VITE_API_URL + url
+    const fullUrl = 'https://zelnak-app.onrender.com' + url
     return axios
         .get<T>(fullUrl, {
             headers: getAuthHeaders(accessToken),
