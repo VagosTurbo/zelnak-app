@@ -4,7 +4,7 @@ import { Cart } from '../types/Cart'
 
 const CartContext = createContext<{
     cart: Cart
-    addProduct: (id: Product['id'], quantity: number) => void
+    addProduct: (id: Product['id'], quantity: number, sellerId: number) => void
     removeProduct: (id: Product['id']) => void
     clearCart: () => void
 }>({
@@ -17,23 +17,23 @@ const CartContext = createContext<{
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [cart, setCart] = useState<Cart>({ products: [] })
 
-    const addProduct = (id: Product['id'], quantity: number) => {
+    const addProduct = (id: Product['id'], quantity: number, sellerId: number) => {
         setCart((prevCart) => {
-            const existingProduct = prevCart.products.find((p) => p.id === id)
+            const existingProduct = prevCart.products.find((p) => p.id === id);
             if (existingProduct) {
                 return {
                     ...prevCart,
                     products: prevCart.products.map((p) =>
                         p.id === id ? { ...p, quantity: p.quantity + quantity } : p
                     ),
-                }
+                };
             }
             return {
                 ...prevCart,
-                products: [...prevCart.products, { id, quantity }],
-            }
-        })
-    }
+                products: [...prevCart.products, { id, quantity, seller_id: sellerId }],
+            };
+        });
+    };
 
     const removeProduct = (id: Product['id']) => {
         setCart((prevCart) => ({

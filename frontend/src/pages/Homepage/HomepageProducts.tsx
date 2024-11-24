@@ -66,7 +66,7 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                                 </Typography>
                             </Link>
                             <Button
-                                onClick={() => addProduct(product.id, 1)}
+                                onClick={() => addProduct(product.id, 1, product.user_id)}
                                 color="secondary"
                                 variant="contained"
                                 sx={{

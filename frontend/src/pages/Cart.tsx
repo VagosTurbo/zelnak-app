@@ -28,6 +28,7 @@ const Cart: React.FC = () => {
                 buyer_id: userId,
                 products: cart.products.map((product) => ({
                     product_id: product.id,
+                    seller_id: product.seller_id, // Ensure seller_id is included in the product data
                     quantity: product.quantity,
                 })),
             };
@@ -48,13 +49,6 @@ const Cart: React.FC = () => {
                         User ID: {userId}
                     </Typography>
                     {/* Test addProduct */}
-                    <Button variant="contained" color="primary" onClick={() => addProduct(1, 1)}>
-                        Add Product 1
-                    </Button>
-                    <Button variant="contained" color="primary" onClick={() => addProduct(2, 1)}>
-                        Add Product 2
-                    </Button>
-
                     <Typography variant="h4" component="h1" gutterBottom>
                         Shopping Cart
                     </Typography>
