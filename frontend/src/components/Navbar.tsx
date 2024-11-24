@@ -5,7 +5,7 @@ import { useCurrentUser } from '../context/CurrentUserContext'
 
 const Navbar: React.FC = () => {
     const { authenticated, signOut } = useAuth()
-    const { currentUser } = useCurrentUser()
+    const { currentUser, isCustomer, isRegisteredUser } = useCurrentUser()
 
     return (
         <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
@@ -38,9 +38,12 @@ const Navbar: React.FC = () => {
                         <Button color="inherit" onClick={signOut}>
                             Logout
                         </Button>
-                        <Button color="inherit" href="#/cart">
-                            Cart
-                        </Button>
+                        {isRegisteredUser ||
+                            (isCustomer && (
+                                <Button color="inherit" href="#/cart">
+                                    Cart
+                                </Button>
+                            ))}
                     </>
                 ) : (
                     <>
