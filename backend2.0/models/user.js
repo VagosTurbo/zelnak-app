@@ -35,6 +35,39 @@ export const dbFindUserByUsernameOrEmail = async (username, email) => {
     }
 };
 
+export const dbFindUserByUsername = async (username) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool
+            .request()
+            .input("username", sql.NVarChar, username)
+            .query("SELECT id FROM users WHERE username = @username");
+
+        // If a user is found, return it, otherwise return null
+        return result.recordset.length > 0 ? result.recordset[0] : null;
+    } catch (error) {
+        console.error("Database error (username check):", error.message);
+        throw new Error("Failed to query the database for username");
+    }
+};
+
+export const dbFindUserByEmail = async (email) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool
+            .request()
+            .input("email", sql.NVarChar, email)
+            .query("SELECT id FROM users WHERE email = @email");
+
+        // If a user is found, return it, otherwise return null
+        return result.recordset.length > 0 ? result.recordset[0] : null;
+    } catch (error) {
+        console.error("Database error (email check):", error.message);
+        throw new Error("Failed to query the database for email");
+    }
+};
+
+
 
 export const dbCreateUser = async (newUser) => {
     const pool = await poolPromise;
@@ -58,36 +91,44 @@ export const dbUpdateUser = async (id, updatedUser) => {
     const pool = await poolPromise;
     const request = pool.request();
 
-    // Prevent password updates
-    if (updatedUser.password) {
-        throw new Error("Password updates are not allowed via this method.");
+    // Prevent password updates and other disallowed fields
+    const disallowedFields = ['password', 'created_at'];
+    for (const field of disallowedFields) {
+        if (field in updatedUser) {
+            throw new Error(`Cannot update '${field}' field.`);
+        }
     }
 
-    // Dynamically build the SET clause and add inputs to the request
+    // Dynamically build the SET clause and bind inputs to the request
     const setClauses = [];
     for (const [key, value] of Object.entries(updatedUser)) {
-        if (key === "created_at") {
-            throw new Error("Cannot update 'created_at' field.");
-        }
         const paramName = `@${key}`;
         setClauses.push(`${key} = ${paramName}`);
-        if (key === "role") {
-            request.input(key, sql.Int, value); // Role is an INT
-        } else {
-            request.input(key, sql.NVarChar, value); // Use NVarChar for username and email
+
+        // Bind the parameter with the appropriate SQL type
+        switch (key) {
+            case "role":
+                request.input(key, sql.Int, value);
+                break;
+            default:
+                request.input(key, sql.NVarChar, value);
         }
     }
 
-    // Add the ID input
+    // Add the ID parameter
     request.input("id", sql.Int, id);
 
+    // Construct and execute the SQL query
     const query = `UPDATE users SET ${setClauses.join(", ")} WHERE id = @id`;
-
-    // Execute the query
-    const result = await request.query(query);
-
-    return result.rowsAffected[0] > 0;
+    try {
+        const result = await request.query(query);
+        return result.rowsAffected[0] > 0; // Return true if at least one row was updated
+    } catch (err) {
+        console.error("Error updating user:", err);
+        throw new Error("Database operation failed.");
+    }
 };
+
 
 
 export const dbDeleteUser = async (id) => {

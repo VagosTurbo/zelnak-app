@@ -15,6 +15,31 @@ export const createAttribute = async (req, res) => {
     }
 }
 
+export const updateAttribute = async (req, res) => {
+    const attributeId = req.params.id;
+    const updatedAttribute = req.body;  
+
+    try {
+        const result = await dbUpdateAttribute(attributeId, updatedAttribute);
+        res.json({ message: 'Attribute updated successfully', attribute: result });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+
+export const deleteAttribute = async (req, res) => {
+    const attributeId = req.params.id;
+
+    try {
+        const result = await dbDeleteAttribute(attributeId);
+        res.json(result);  // Returns { message: 'Attribute deleted successfully', id: attributeId }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+
 export const getAttributesByCategoryId = async (req, res) => {
     try {
         const attributes = await dbGetAttributesByCategoryId(req.params.categoryId);

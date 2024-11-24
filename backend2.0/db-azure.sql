@@ -6,6 +6,18 @@ GO
 USE zelnak;
 GO
 
+-- Drop the tables in reverse order of creation
+DROP TABLE IF EXISTS user_events;
+DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS attributes;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS users;
+GO
+
+
 -- Create the users table
 CREATE TABLE users (
     id INT PRIMARY KEY IDENTITY(1,1),
@@ -17,22 +29,12 @@ CREATE TABLE users (
 );
 GO
 
--- Create the user_events table
-CREATE TABLE user_events (
-    user_id INT NOT NULL,
-    event_id INT NOT NULL,
-    created_at DATETIME DEFAULT GETDATE(),
-    PRIMARY KEY (user_id, event_id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (event_id) REFERENCES events(id)
-);
-GO
-
 -- Create the categories table
 CREATE TABLE categories (
     id INT PRIMARY KEY IDENTITY(1,1),
     name NVARCHAR(255) NOT NULL,
     parent_id INT NULL,
+    is_approved BIT NOT NULL, 
     FOREIGN KEY (parent_id) REFERENCES categories(id)
 );
 GO
@@ -99,5 +101,16 @@ CREATE TABLE events (
     user_id INT NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (user_id) REFERENCES users(id)
+);
+GO
+
+-- Create the user_events table
+CREATE TABLE user_events (
+    user_id INT NOT NULL,
+    event_id INT NOT NULL,
+    created_at DATETIME DEFAULT GETDATE(),
+    PRIMARY KEY (user_id, event_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (event_id) REFERENCES events(id)
 );
 GO

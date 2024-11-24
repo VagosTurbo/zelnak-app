@@ -62,7 +62,7 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                             </Typography>
                             <Link to={`${Routes.Seller}/${product.user_id}`}>
                                 <Typography variant="body2" sx={{ color: colors.colorText }} mb={2}>
-                                    Prodejce: {product.price} Kč
+                                    Prodejce: {product.user_id} 
                                 </Typography>
                             </Link>
                             <Button

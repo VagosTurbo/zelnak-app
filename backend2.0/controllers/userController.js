@@ -1,5 +1,6 @@
 import { Roles } from "../enums/roles.js"
-import { dbGetAllUsers, dbGetUserById, dbCreateUser, dbUpdateUser, dbDeleteUser, dbAddUserEvent, dbRemoveUserEvent, dbGetUserEvents } from "../models/user.js";
+import { dbGetAllUsers, dbGetUserById, dbCreateUser, dbUpdateUser, dbDeleteUser, dbAddUserEvent, dbRemoveUserEvent, dbGetUserEvents} from "../models/user.js";
+import { dbCheckUserEvent } from "../models/event.js";
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -39,35 +40,55 @@ export const createUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     const userId = req.params.id;
+    const allowedFields = ['username', 'email', 'role'];
     const updatedUser = {};
 
-    // Only include fields that are allowed to be updated
-    if (req.body.username) updatedUser.username = req.body.username;
-    if (req.body.email) updatedUser.email = req.body.email;
-    if (req.body.role) updatedUser.role = req.body.role;
+    // Filter and include only allowed fields
+    allowedFields.forEach((field) => {
+        if (req.body[field]) updatedUser[field] = req.body[field];
+    });
 
-    // there must be at least one field to update
+    // Ensure there's at least one field to update
     if (Object.keys(updatedUser).length === 0) {
-        return res.status(400).json({ error: "At least one field is required to update." });
+        return res.status(400).json({ success: false, message: "At least one field is required to update." });
     }
 
     try {
-        // Does the user exist?
+        // Check if the user exists
         const existingUser = await dbGetUserById(userId);
         if (!existingUser) {
-            return res.status(404).json({ error: "User not found." });
+            return res.status(404).json({ success: false, message: "User not found." });
         }
 
-        // Exclude 'created_at' and 'user_id' fields from the update
-        const { created_at, user_id, ...userToUpdate } = updatedUser;
+        // // Check if username or email is unique
+        // if (updatedUser.username) {
+        //     const usernameExists = await dbFindUserByUsername(updatedUser.username);
+        //     if (usernameExists ) {
+        //         return res.status(400).json({ success: false, message: "Username is already taken." });
+        //     }
+        // }
+        
+        // if (updatedUser.email) {
+        //     const emailExists = await dbFindUserByEmail(updatedUser.email);
+        //     if (emailExists && emailExists.id !== userId) {
+        //         return res.status(400).json({ success: false, message: "Email is already taken." });
+        //     }
+        // }
+        
 
-        // Pass only the allowed fields to dbUpdateUser
-        await dbUpdateUser(userId, userToUpdate);
-        res.json({ message: "User updated successfully" });
+        // Perform the update
+        const success = await dbUpdateUser(userId, updatedUser);
+        if (success) {
+            return res.status(200).json({ success: true, message: "User updated successfully." });
+        } else {
+            return res.status(500).json({ success: false, message: "Failed to update user. Please try again." });
+        }
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("Error updating user:", err); // Log the error
+        return res.status(500).json({ success: false, message: "An unexpected error occurred.", error: err.message });
     }
 };
+
 
 export const deleteUser = async (req, res) => {
     const userId = req.params.id
@@ -97,6 +118,13 @@ export const addUserEvent = async (req, res) => {
     const eventId = req.body.eventId;
 
     try {
+        const exists = await dbCheckUserEvent(userId, eventId);
+
+        if (exists) {
+            return res.status(400).json({ error: "User already added to event" });
+        }
+
+
         const success = await dbAddUserEvent(userId, eventId);
         if (success) {
             res.json({ message: 'Event added successfully' });
