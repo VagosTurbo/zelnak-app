@@ -17,7 +17,12 @@ const router = Router();
 const permissions = {
   getAllCategories: [],
   getCategoryById: [],
-  createCategory: [],
+  createCategory: [
+    Roles.Admin,
+    Roles.Moderator,
+    Roles.Customer,
+    Roles.Registered,
+  ],
   updateCategory: [Roles.Admin, Roles.Moderator],
   deleteCategory: [Roles.Admin, Roles.Moderator],
   toggleApproval: [Roles.Admin, Roles.Moderator],
@@ -35,7 +40,7 @@ router.put(
   authenticateToken(permissions.toggleApproval),
   toggleCategoryApproval
 );
-router.post("/", createCategory);
+router.post("/", authenticateToken(permissions.createCategory), createCategory);
 router.delete(
   "/:id",
   authenticateToken(permissions.deleteCategory),
