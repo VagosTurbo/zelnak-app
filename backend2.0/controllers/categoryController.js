@@ -57,7 +57,9 @@ export const createCategory = async (req, res) => {
       .query("SELECT COUNT(*) AS count FROM categories WHERE name = @name");
 
     if (existingCategory.recordset[0].count > 0) {
-      throw new Error("Category name must be unique");
+      return res.json({
+        message: "Category name must be unique",
+      });
     }
 
     // 1. Create the category and get its ID

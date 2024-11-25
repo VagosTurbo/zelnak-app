@@ -28,8 +28,16 @@ const permissions = {
   toggleApproval: [Roles.Admin, Roles.Moderator],
 };
 
-router.get("/", getAllCategories);
-router.get("/:id", getCategoryById);
+router.get(
+  "/",
+  authenticateToken(permissions.getAllCategories),
+  getAllCategories
+);
+router.get(
+  "/:id",
+  authenticateToken(permissions.getCategoryById),
+  getCategoryById
+);
 router.put(
   "/:id",
   authenticateToken(permissions.updateCategory),

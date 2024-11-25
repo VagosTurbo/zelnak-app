@@ -1,7 +1,9 @@
-import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
+import { AppBar, Badge, Box, Button, Toolbar, Typography } from '@mui/material'
+
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
 import { useCurrentUser } from '../context/CurrentUserContext'
 import { Routes } from '../enums'
 import { UserRoleLabel } from '../enums/UserRole'
@@ -9,6 +11,7 @@ import { UserRoleLabel } from '../enums/UserRole'
 const Navbar: React.FC = () => {
     const { authenticated, signOut } = useAuth()
     const { currentUser, isCustomer, isRegisteredUser, isAdmin } = useCurrentUser()
+    const { cart } = useCart()
 
     return (
         <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
@@ -31,7 +34,13 @@ const Navbar: React.FC = () => {
                     <>
                         <MyLink to={Routes.Profile} text="Profile and orders" />
                         {(isRegisteredUser || isCustomer) && (
-                            <MyLink to={Routes.Cart} text="Cart" />
+                            <Box sx={{ pr: 2 }}>
+                                <MyLink to={Routes.Cart} text="Cart">
+                                    <Badge badgeContent={cart.products.length} color="secondary">
+                                        &nbsp;
+                                    </Badge>
+                                </MyLink>
+                            </Box>
                         )}
                         <Button color="inherit" onClick={signOut}>
                             Logout
@@ -65,9 +74,18 @@ const Navbar: React.FC = () => {
     )
 }
 
-const MyLink = ({ to, text }: { to: string; text: string }) => (
+const MyLink = ({
+    to,
+    text,
+    children,
+}: {
+    to: string
+    text: string
+    children?: React.ReactNode
+}) => (
     <Link to={to} style={{ textDecoration: 'none', color: 'inherit' }}>
         <Button color="inherit">{text}</Button>
+        {children}
     </Link>
 )
 
