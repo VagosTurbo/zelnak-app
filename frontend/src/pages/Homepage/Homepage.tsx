@@ -1,9 +1,8 @@
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { apiGet } from '../../api/apiGet'
 import { useCurrentUser } from '../../context/CurrentUserContext'
-import { Routes } from '../../enums/Routes'
 import { Category } from '../../types/Category'
 import { Event } from '../../types/Event'
 import { Product } from '../../types/Product'
@@ -88,49 +87,7 @@ const Homepage: React.FC = () => {
 
     return (
         <Layout>
-            <Box sx={{ p: 3 }}>
-                <nav>
-                    <Link to={Routes.Register} style={{ marginRight: '16px' }}>
-                        Register
-                    </Link>
-                    <Link to={Routes.Login} style={{ marginRight: '16px' }}>
-                        Login
-                    </Link>
-                    <Link to={Routes.Products} style={{ marginRight: '16px' }}>
-                        All Products
-                    </Link>
-                    <Link to={Routes.Profile} style={{ marginRight: '16px' }}>
-                        Profile
-                    </Link>
-                    <Link to={Routes.AddProduct} style={{ marginRight: '16px' }}>
-                        Add Product
-                    </Link>
-                    <Link to={Routes.Events} style={{ marginRight: '16px' }}>
-                        Events
-                    </Link>
-                    <Link to={Routes.Categories} style={{ marginRight: '16px' }}>
-                        Categories
-                    </Link>
-                    <Link to={Routes.AddCategory} style={{ marginRight: '16px' }}>
-                        Add Category
-                    </Link>
-                    <Link to="/admin" style={{ marginRight: '16px' }}>
-                        Admin Page
-                    </Link>
-                    <Link to={Routes.AddEvent} style={{ marginRight: '16px' }}>
-                        Add Event
-                    </Link>
-                </nav>
-            </Box>
-
-            <Box
-                sx={{
-                    background: 'primary',
-                    width: '100%',
-                    height: '50px',
-                }}></Box>
-
-            <Typography variant="h1" component="h1" mb={3} textAlign={'center'}>
+            <Typography variant="h1" component="h1" mb={3} textAlign={'center'} mt={6}>
                 Homepage
             </Typography>
             <ZelnakBox sx={{ width: '1080px' }} parentSx={{ py: 2 }}>

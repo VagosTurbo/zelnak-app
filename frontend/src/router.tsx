@@ -69,7 +69,12 @@ const applicationRouter = createHashRouter([
     },
     {
         path: Routes.AddCategory,
-        element: <ProtectedRoute element={<AddCategory />} allowedRoles={[UserRole.Customer]} />,
+        element: (
+            <ProtectedRoute
+                element={<AddCategory />}
+                allowedRoles={[UserRole.Customer, UserRole.Moderator, UserRole.Registered]}
+            />
+        ),
     },
     {
         path: Routes.FarmerProfile + '/:id',
@@ -94,7 +99,21 @@ const applicationRouter = createHashRouter([
     },
     {
         path: Routes.EditEvent + '/:id',
-        element: <AddEvent edit={true} />,
+        element: (
+            <ProtectedRoute
+                element={<AddEvent edit={true} />}
+                allowedRoles={[UserRole.Admin, UserRole.Farmer]}
+            />
+        ),
+    },
+    {
+        path: Routes.EditProduct + '/:id',
+        element: (
+            <ProtectedRoute
+                element={<AddProduct edit={true} />}
+                allowedRoles={[UserRole.Admin, UserRole.Farmer]}
+            />
+        ),
     },
 ])
 

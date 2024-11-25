@@ -165,7 +165,7 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({
                             <Typography variant="body2" sx={{ color: colors.colorText }}>
                                 Quantity: {product.quantity}
                             </Typography>
-                            {!isFarmer && (
+                            {!allowDelete && (
                                 <Link to={`${Routes.Seller}/${product.user_id}`}>
                                     <Typography
                                         variant="body2"
@@ -214,6 +214,21 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({
                                                 'Delete product'
                                             )}
                                         </ZelnakButton>
+                                    )}
+
+                                    {allowDelete && (
+                                        <Link
+                                            to={`${Routes.EditProduct}/${product.id}`}
+                                            style={{ textDecoration: 'none' }}>
+                                            <ZelnakButton
+                                                color="primary"
+                                                sx={{
+                                                    mt: 1,
+                                                }}
+                                                fullWidth>
+                                                Edit product
+                                            </ZelnakButton>
+                                        </Link>
                                     )}
 
                                     {productMessage?.productId === product.id && (
