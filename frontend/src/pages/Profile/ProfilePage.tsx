@@ -9,10 +9,11 @@ import { Order } from '../../types/Order'
 import { User } from '../../types/User'
 import { formatDateTime } from '../../utils/myUtils'
 import Layout from '../layouts/Layout'
+import ProfileFarmerOrders from './ProfileFarmerOrders'
 import ProfileOrders from './ProfileOrders'
 
 const ProfilePage: React.FC = () => {
-    const { currentUser, isCustomer } = useCurrentUser()
+    const { currentUser, isCustomer, isFarmer } = useCurrentUser()
     const { authenticated, accessToken } = useAuth()
 
     const [user, _setUser] = useState<User | null>(currentUser)
@@ -22,14 +23,25 @@ const ProfilePage: React.FC = () => {
     const [error, setError] = useState<string | null>(null)
     const [_success, setSuccess] = useState<string | null>(null)
     const [userOrders, setUserOrders] = useState<Order[]>([])
+    const [farmerOrders, setFarmerOrders] = useState<Order[]>([])
 
     const fetchUserOrders = async () => {
         if (!authenticated || !accessToken) return
 
         try {
             const response = await apiGet<Order[]>(`/orders/user/${user?.id}`, accessToken)
-            // const response = await apiGet<Order[]>(`/orders/10/items`, accessToken)
             setUserOrders(response)
+        } catch (err: any) {
+            console.error('Failed to fetch orders', err)
+        }
+    }
+
+    const fetchFarmerOrders = async () => {
+        if (!authenticated || !accessToken) return
+
+        try {
+            const response = await apiGet<Order[]>(`/orders/${user?.id}/items`, accessToken)
+            setFarmerOrders(response)
         } catch (err: any) {
             console.error('Failed to fetch orders', err)
         }
@@ -56,6 +68,7 @@ const ProfilePage: React.FC = () => {
 
     useEffect(() => {
         fetchUserOrders()
+        fetchFarmerOrders()
     }, [user])
 
     return (
@@ -66,8 +79,8 @@ const ProfilePage: React.FC = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    p: 3,
-                    my: 5,
+                    p: 5,
+                    gap: 3,
                 }}>
                 <Paper elevation={3} sx={{ p: 3, width: '760px' }}>
                     <Typography variant="h4" gutterBottom>
@@ -87,12 +100,6 @@ const ProfilePage: React.FC = () => {
                             <Typography variant="body1" sx={{ mt: 2 }}>
                                 <strong>Account Created:</strong>{' '}
                                 {user.created_at ? formatDateTime(user.created_at) : 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" sx={{ mt: 2 }}>
-                                <strong>Account Created:</strong>{' '}
-                                {user.created_at
-                                    ? new Date(user.created_at).toLocaleString()
-                                    : 'N/A'}
                             </Typography>
                         </>
                     )}
@@ -139,11 +146,25 @@ const ProfilePage: React.FC = () => {
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            p: 3,
-                            my: 5,
                         }}>
                         <Paper elevation={3} sx={{ p: 3, width: '760px' }}>
                             <ProfileOrders orders={userOrders} loading={loading} />
+                        </Paper>
+                    </Box>
+                )}
+
+                {/* Farmer orders */}
+                {(isFarmer || true) && (
+                    // TODO: remove true
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                        <Paper elevation={3} sx={{ p: 3, width: '760px' }}>
+                            <ProfileFarmerOrders orders={farmerOrders} loading={loading} />
                         </Paper>
                     </Box>
                 )}
