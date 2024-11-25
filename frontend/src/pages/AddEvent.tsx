@@ -1,8 +1,11 @@
-import { Box, Button, TextField, Typography } from '@mui/material'
+import { TextField, Typography } from '@mui/material'
 import React, { FormEvent, useState } from 'react'
 import { apiPost } from '../api/apiPost'
+import { ZelnakButton } from '../components/ZelnakButton'
 import { useAuth } from '../context/AuthContext'
 import { useCurrentUser } from '../context/CurrentUserContext'
+import Layout from './layouts/Layout'
+import ZelnakBox from './layouts/ZelnakBox'
 
 interface User {
     id: number
@@ -44,28 +47,13 @@ const AddEvent: React.FC = () => {
             )
             setMessage(response.message || 'Event added successfully!')
         } catch (error: any) {
-            setMessage(error.response?.message || 'Error occurred')
+            setMessage(error.message || 'Error occurred')
         }
     }
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh',
-                backgroundColor: '#f5f5f5',
-            }}>
-            <Box
-                sx={{
-                    width: 400,
-                    padding: 4,
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    backgroundColor: '#fff',
-                    textAlign: 'center',
-                }}>
+        <Layout>
+            <ZelnakBox>
                 <Typography variant="h4" component="h1" gutterBottom>
                     Add Event
                 </Typography>
@@ -104,17 +92,17 @@ const AddEvent: React.FC = () => {
                         onChange={(e) => handleSetValue('location', e.target.value)}
                         sx={{ mb: 2 }}
                     />
-                    <Button variant="contained" color="primary" type="submit" fullWidth>
+                    <ZelnakButton color="primary" type="submit" fullWidth>
                         Add Event
-                    </Button>
+                    </ZelnakButton>
                 </form>
                 {message && (
                     <Typography color="error" sx={{ mt: 2 }}>
                         {message}
                     </Typography>
                 )}
-            </Box>
-        </Box>
+            </ZelnakBox>
+        </Layout>
     )
 }
 
