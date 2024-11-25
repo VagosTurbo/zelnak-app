@@ -114,7 +114,7 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                                 </Typography>
                             )}
                             <Typography variant="body2" sx={{ color: colors.colorText }}>
-                                Price: {product.price} Kč
+                                Price: {product.price} $
                             </Typography>
                             <Typography variant="body2" sx={{ color: colors.colorText }}>
                                 Quantity: {product.quantity}
