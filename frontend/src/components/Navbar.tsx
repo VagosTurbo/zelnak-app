@@ -32,8 +32,9 @@ const Navbar: React.FC = () => {
                         <Button color="inherit" onClick={signOut}>
                             Logout
                         </Button>
-                        {isRegisteredUser ||
-                            (isCustomer && <MyLink to={Routes.Cart} text="Cart" />)}
+                        {(isRegisteredUser || isCustomer) && (
+                            <MyLink to={Routes.Cart} text="Cart" />
+                        )}
                     </>
                 ) : (
                     <>
