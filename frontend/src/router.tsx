@@ -96,6 +96,10 @@ const applicationRouter = createHashRouter([
         path: Routes.EditEvent + '/:id',
         element: <AddEvent edit={true} />,
     },
+    {
+        path: Routes.EditProduct + '/:id',
+        element: <AddProduct edit={true} />,
+    },
 ])
 
 const getRouter = () => {

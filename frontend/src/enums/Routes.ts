@@ -15,4 +15,5 @@ export enum Routes {
     AdminPage = '/admin',
     AddEvent = '/add-event',
     EditEvent = '/edit-event',
+    EditProduct = '/edit-product',
 }

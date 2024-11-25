@@ -216,6 +216,21 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({
                                         </ZelnakButton>
                                     )}
 
+                                    {allowDelete && (
+                                        <Link
+                                            to={`${Routes.EditProduct}/${product.id}`}
+                                            style={{ textDecoration: 'none' }}>
+                                            <ZelnakButton
+                                                color="primary"
+                                                sx={{
+                                                    mt: 1,
+                                                }}
+                                                fullWidth>
+                                                Edit product
+                                            </ZelnakButton>
+                                        </Link>
+                                    )}
+
                                     {productMessage?.productId === product.id && (
                                         <Typography
                                             color="success"
