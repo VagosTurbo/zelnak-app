@@ -1,14 +1,31 @@
 // frontend/src/pages/AddCategory.tsx
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material'
-import { Box, Button, IconButton, MenuItem, TextField, Typography } from '@mui/material'
+import { Box, IconButton, MenuItem, TextField, Typography } from '@mui/material'
 import React, { FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../api/api'
-import { Routes } from '../enums/Routes'
+import { apiGet } from '../api/apiGet'
+import { apiPost } from '../api/apiPost'
+import { ZelnakButton } from '../components/ZelnakButton'
+import { useAuth } from '../context/AuthContext'
+import { Routes } from '../enums'
+import { wait } from '../utils/myUtils'
+import Layout from './layouts/Layout'
+import ZelnakBox from './layouts/ZelnakBox'
 
 interface Category {
     id: number
     name: string
+}
+
+interface Attributes {
+    name: string
+    is_required: boolean
+}
+
+interface Request {
+    name: string
+    parent_id: number
+    attributes: Attributes[]
 }
 
 const AddCategory: React.FC = () => {
@@ -17,13 +34,20 @@ const AddCategory: React.FC = () => {
     const [attributes, setAttributes] = useState([{ name: '', isRequired: false }])
     const [categories, setCategories] = useState<Category[]>([])
     const [message, setMessage] = useState('')
+    const [loading, setLoading] = useState<boolean>(false)
+    const [error, setError] = useState<string | null>(null)
+
+    const { accessToken } = useAuth()
+
     const navigate = useNavigate()
 
     useEffect(() => {
         const fetchCategories = async () => {
+            if (!accessToken) return
+
             try {
-                const response = await api.get('/categories')
-                setCategories(response.data)
+                const response = await apiGet<Category[]>('/categories', accessToken)
+                setCategories(response)
             } catch (err: any) {
                 console.error('Failed to fetch categories', err)
             }
@@ -50,10 +74,15 @@ const AddCategory: React.FC = () => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
 
+        if (!accessToken) return
+
+        setLoading(true)
+        setError(null)
+
         // Creating the data in the desired format
-        const categoryData = {
+        const categoryData: Request = {
             name: categoryName,
-            parent_id: parentCategoryId,
+            parent_id: parentCategoryId || 0,
             attributes: attributes.map((attr) => ({
                 name: attr.name,
                 is_required: attr.isRequired,
@@ -61,36 +90,21 @@ const AddCategory: React.FC = () => {
         }
 
         try {
-            // Posting the data to the API
-            const response = await api.post('/categories', categoryData)
-
-            // Displaying a success message
-            setMessage(response.data.toString() || 'Category created successfully!')
-            navigate(Routes.Categories)
+            const response = await apiPost<any>('/categories', categoryData, accessToken)
+            setMessage(response.message || 'Category created successfully!')
+            setLoading(false)
+            setError(null)
+            await wait(1000).then(() => navigate(Routes.Categories))
         } catch (error: any) {
-            // Handling error
-            setMessage(error.response?.data?.message || 'Error occurred')
+            setError(error.message || 'Error occurred')
+            setMessage('')
+            setLoading(false)
         }
     }
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh',
-                backgroundColor: '#f5f5f5',
-            }}>
-            <Box
-                sx={{
-                    width: 400,
-                    padding: 4,
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    backgroundColor: '#fff',
-                    textAlign: 'center',
-                }}>
+        <Layout>
+            <ZelnakBox>
                 <Typography variant="h4" component="h1" gutterBottom>
                     Add Category
                 </Typography>
@@ -160,24 +174,28 @@ const AddCategory: React.FC = () => {
                             </IconButton>
                         </Box>
                     ))}
-                    <Button
-                        variant="outlined"
+                    <ZelnakButton
                         onClick={handleAddAttribute}
                         startIcon={<AddCircleOutline />}
                         sx={{ mb: 2 }}>
                         Add Attribute
-                    </Button>
-                    <Button variant="contained" color="primary" type="submit" fullWidth>
+                    </ZelnakButton>
+                    <ZelnakButton color="primary" type="submit" fullWidth disabled={loading}>
                         Add Category
-                    </Button>
+                    </ZelnakButton>
                 </form>
                 {message && (
-                    <Typography color="error" sx={{ mt: 2 }}>
+                    <Typography color="success.main" sx={{ mt: 2 }} textAlign={'center'}>
                         {message}
                     </Typography>
                 )}
-            </Box>
-        </Box>
+                {error && (
+                    <Typography color="error" sx={{ mt: 2 }} textAlign={'center'}>
+                        {error}
+                    </Typography>
+                )}
+            </ZelnakBox>
+        </Layout>
     )
 }
 

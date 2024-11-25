@@ -138,8 +138,7 @@ const ProfilePage: React.FC = () => {
                 </Paper>
 
                 {/* Customer orders */}
-                {(isCustomer || true) && (
-                    // TODO: remove true
+                {isCustomer && (
                     <Box
                         sx={{
                             display: 'flex',
@@ -154,8 +153,7 @@ const ProfilePage: React.FC = () => {
                 )}
 
                 {/* Farmer orders */}
-                {(isFarmer || true) && (
-                    // TODO: remove true
+                {isFarmer && (
                     <Box
                         sx={{
                             display: 'flex',
