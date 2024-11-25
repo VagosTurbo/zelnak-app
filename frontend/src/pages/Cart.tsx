@@ -1,9 +1,9 @@
-import React from 'react'
-import { Box, Button, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material'
-import { useCart } from '../context/CartContext'
-import { useAuth } from '../context/AuthContext'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { Box, Button, IconButton, List, ListItem, ListItemText, Typography } from '@mui/material'
+import React from 'react'
 import { apiPost } from '../api/apiPost'
+import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
 import { LocalStorage } from '../enums/LocalStorage'
 import { Order } from '../types/Order'
 
@@ -35,7 +35,7 @@ const Cart: React.FC = () => {
             }
 
             const response = await apiPost<Order[]>('/orders', orderData, token)
-            setMessage(response.toString() || 'Order created successfully!')
+            setMessage('Order created successfully!')
             clearCart() // Clear the cart after creating the order
         } catch (error: any) {
             setMessage(error.response?.data?.message || 'Failed to create order')
