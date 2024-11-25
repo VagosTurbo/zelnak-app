@@ -4,13 +4,13 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { apiGet } from '../../api/apiGet'
 import { Routes } from '../../enums/Routes'
 import { Category } from '../../types/Category'
+import { Event } from '../../types/Event'
 import { Product } from '../../types/Product'
+import { User } from '../../types/User'
 import Layout from '../layouts/Layout'
 import { HomepageCategories } from './HomepageCategories'
-import { HomepageProducts } from './HomepageProducts'
 import { HomepageEvents } from './HomepageEvents'
-import { Event } from '../../types/Event'
-import { User } from '../../types/User'
+import { HomepageProducts } from './HomepageProducts'
 
 const Homepage: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([])

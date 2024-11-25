@@ -11,4 +11,5 @@ export interface Product {
     user_id: User['id']
     category_id: Category['id']
     created_at: string
+    username: string
 }

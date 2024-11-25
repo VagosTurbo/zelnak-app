@@ -30,12 +30,12 @@ const Navbar: React.FC = () => {
                 {authenticated ? (
                     <>
                         <MyLink to={Routes.Profile} text="Profile and orders" />
-                        <Button color="inherit" onClick={signOut}>
-                            Logout
-                        </Button>
                         {(isRegisteredUser || isCustomer) && (
                             <MyLink to={Routes.Cart} text="Cart" />
                         )}
+                        <Button color="inherit" onClick={signOut}>
+                            Logout
+                        </Button>
                     </>
                 ) : (
                     <>
