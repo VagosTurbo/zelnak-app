@@ -7,11 +7,6 @@ import { useCurrentUser } from '../context/CurrentUserContext'
 import Layout from './layouts/Layout'
 import ZelnakBox from './layouts/ZelnakBox'
 
-interface User {
-    id: number
-    username: string
-}
-
 const AddEvent: React.FC = () => {
     const [formData, setFormData] = useState({
         name: '',
