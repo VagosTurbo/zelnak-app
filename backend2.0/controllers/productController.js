@@ -75,23 +75,29 @@ export const getProductsByUserId = async (req, res) => {
 // Create a new product
 export const createProduct = async (req, res) => {
   try {
-    const { name, price, description, user_id, image, category_id } = req.body;
+    const { name, price, description, user_id, image, category_id, quantity } =
+      req.body;
 
     // Validate required fields
     if (
       !user_id ||
       !price ||
       !name ||
+      !quantity ||
       !category_id ||
       name.trim().length === 0
     ) {
-      return res
-        .status(400)
-        .json({ message: "Name, price, category, and user_id are required" });
+      return res.status(400).json({
+        message: "Name, price, category,user_id and quantity are required",
+      });
     }
 
     if (price < 0) {
       return res.status(400).json({ message: "Price has wrong value" });
+    }
+
+    if (quantity < 1) {
+      return res.status(400).json({ message: "Quantity has wrong value" });
     }
 
     // Check if user exists
@@ -120,6 +126,7 @@ export const createProduct = async (req, res) => {
       image: imageUrl,
       category_id,
       seller_username: user.username,
+      quantity,
     });
 
     if (productCreated) {
@@ -218,11 +225,9 @@ export const deleteProduct = async (req, res) => {
 
     // Only allow the deletion if the user is an admin or the user who created the event
     if (userRole !== Roles.Admin && existingProduct.user_id !== userId) {
-      return res
-        .status(403)
-        .json({
-          error: "Forbidden: You are not authorized to delete this product",
-        });
+      return res.status(403).json({
+        error: "Forbidden: You are not authorized to delete this product",
+      });
     }
 
     // Delete related order items
