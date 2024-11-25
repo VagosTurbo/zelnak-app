@@ -1,10 +1,12 @@
 import { Box, Paper, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { apiGet } from '../../api/apiGet'
 import { apiPut } from '../../api/apiPut'
 import { ZelnakButton } from '../../components/ZelnakButton'
 import { useAuth } from '../../context/AuthContext'
 import { useCurrentUser } from '../../context/CurrentUserContext'
+import { Routes } from '../../enums'
 import { Order } from '../../types/Order'
 import { User } from '../../types/User'
 import { formatDateTime } from '../../utils/myUtils'
@@ -13,7 +15,7 @@ import ProfileFarmerOrders from './ProfileFarmerOrders'
 import ProfileOrders from './ProfileOrders'
 
 const ProfilePage: React.FC = () => {
-    const { currentUser, isCustomer, isFarmer } = useCurrentUser()
+    const { currentUser, isCustomer, isFarmer, isModerator, isRegisteredUser } = useCurrentUser()
     const { authenticated, accessToken } = useAuth()
 
     const [user, _setUser] = useState<User | null>(currentUser)
@@ -71,6 +73,7 @@ const ProfilePage: React.FC = () => {
         fetchFarmerOrders()
     }, [user])
 
+    const condition = isModerator || isCustomer || isRegisteredUser
     return (
         <Layout>
             <Box
@@ -102,6 +105,12 @@ const ProfilePage: React.FC = () => {
                                 {user.created_at ? formatDateTime(user.created_at) : 'N/A'}
                             </Typography>
                         </>
+                    )}
+
+                    {condition && (
+                        <Link to={Routes.AddCategory}>
+                            <ZelnakButton sx={{ my: 1 }}>Suggest category</ZelnakButton>
+                        </Link>
                     )}
 
                     <Box component="form" onSubmit={handleUpdateProfile} sx={{ mt: 3 }}>
