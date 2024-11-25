@@ -1,4 +1,5 @@
 import { createHashRouter } from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute.tsx'
 import { Routes } from './enums/Routes.ts'
 import { UserRole } from './enums/UserRole.ts'
 import AddCategory from './pages/AddCategory.tsx'
@@ -6,14 +7,11 @@ import AddProduct from './pages/AddProduct.tsx'
 import AdminPage from './pages/AdminPage.tsx'
 import Cart from './pages/Cart.tsx'
 import CategoriesPage from './pages/CategoryPage.tsx'
-import Events from './pages/Events.tsx'
 import FarmerProfile from './pages/FarmerProfile.tsx'
 import Homepage from './pages/Homepage/Homepage.tsx'
 import Login from './pages/Login.tsx'
-import ProductsPage from './pages/ProductsPage.tsx'
 import OrderDetail from './pages/Profile/OrderDetail.tsx'
 import ProfilePage from './pages/Profile/ProfilePage.tsx'
-import ProtectedRoute from './pages/ProtectedRoute.tsx'
 import Register from './pages/Register.tsx'
 const applicationRouter = createHashRouter([
     {
@@ -29,12 +27,19 @@ const applicationRouter = createHashRouter([
         element: <Login />,
     },
     {
-        path: Routes.Products,
-        element: <ProductsPage />,
-    },
-    {
         path: Routes.Profile,
-        element: <ProfilePage />,
+        element: (
+            <ProtectedRoute
+                element={<ProfilePage />}
+                allowedRoles={[
+                    UserRole.Customer,
+                    UserRole.Registered,
+                    UserRole.Admin,
+                    UserRole.Farmer,
+                    UserRole.Moderator,
+                ]}
+            />
+        ),
     },
     {
         path: Routes.Orders + '/:id',
@@ -56,10 +61,6 @@ const applicationRouter = createHashRouter([
         ),
     },
     {
-        path: Routes.Events,
-        element: <Events />,
-    },
-    {
         path: Routes.Categories,
         element: (
             <ProtectedRoute element={<CategoriesPage />} allowedRoles={[UserRole.Moderator]} />
@@ -67,7 +68,7 @@ const applicationRouter = createHashRouter([
     },
     {
         path: Routes.AddCategory,
-        element: <AddCategory />,
+        element: <ProtectedRoute element={<AddCategory />} allowedRoles={[UserRole.Customer]} />,
     },
     {
         path: '/farmers/:id',
@@ -79,7 +80,12 @@ const applicationRouter = createHashRouter([
     },
     {
         path: Routes.Cart,
-        element: <Cart />,
+        element: (
+            <ProtectedRoute
+                element={<Cart />}
+                allowedRoles={[UserRole.Customer, UserRole.Registered]}
+            />
+        ),
     },
 ])
 

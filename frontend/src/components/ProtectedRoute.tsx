@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { Routes } from '../enums'
+import { useCurrentUser } from '../context/CurrentUserContext'
+import { Routes, UserRole } from '../enums'
 
 interface ProtectedRouteProps {
     element: JSX.Element
     by?: 'all'
+    allowedRoles: UserRole[]
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element, by }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element, allowedRoles }) => {
     const [condition, setCondition] = useState<boolean>(true)
+    const { currentUser } = useCurrentUser()
+    const userRole = currentUser?.role
 
     useEffect(() => {
-        if (by === 'all') {
+        if (allowedRoles.includes(userRole!)) {
+            setCondition(true)
+        } else {
             setCondition(false)
         }
     }, [])
