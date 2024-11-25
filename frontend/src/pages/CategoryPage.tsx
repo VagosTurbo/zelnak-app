@@ -17,10 +17,13 @@ import {
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../api/api'
 import { apiDelete } from '../api/apiDelete'
+import { apiGet } from '../api/apiGet'
 import { apiPut } from '../api/apiPut'
+import { ZelnakButton } from '../components/ZelnakButton'
 import { useAuth } from '../context/AuthContext'
+import Layout from './layouts/Layout'
+import ZelnakBox from './layouts/ZelnakBox'
 
 interface Category {
     id: number
@@ -48,9 +51,11 @@ const CategoriesPage: React.FC = () => {
     const { accessToken } = useAuth()
     useEffect(() => {
         const fetchCategories = async () => {
+            if (!accessToken) return
+
             try {
-                const response = await api.get('/categories')
-                setCategories(response.data)
+                const response = await apiGet<Category[]>('/categories')
+                setCategories(response)
             } catch (err: any) {
                 console.error('Failed to fetch categories', err)
             }
@@ -63,8 +68,8 @@ const CategoriesPage: React.FC = () => {
         if (selectedCategory !== null) {
             const fetchAttributes = async () => {
                 try {
-                    const response = await api.get(`/attributes/${selectedCategory}`)
-                    setAttributes(response.data)
+                    const response = await apiGet<Attribute[]>(`/attributes/${selectedCategory}`)
+                    setAttributes(response)
                 } catch (err: any) {
                     console.error('Failed to fetch attributes', err)
                 }
@@ -171,144 +176,168 @@ const CategoriesPage: React.FC = () => {
     }
 
     return (
-        <Box sx={{ padding: 4 }}>
-            <Typography variant="h4" gutterBottom>
-                Moderator page - Categories
-            </Typography>
+        <Layout>
+            <ZelnakBox>
+                <Typography variant="h4" gutterBottom>
+                    Moderator page - Categories
+                </Typography>
 
-            {/* Add Category Button */}
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={() => navigate('/add-category')} // Navigate to Add Category page
-                sx={{ mb: 2 }}>
-                Add Category
-            </Button>
+                {/* Add Category Button */}
+                <ZelnakButton
+                    color="primary"
+                    onClick={() => navigate('/add-category')} // Navigate to Add Category page
+                    sx={{ mb: 2 }}>
+                    Add new Category
+                </ZelnakButton>
 
-            <List>
-                {categories.map((category) => (
-                    <ListItem key={category.id}>
-                        <ListItemText
-                            primary={category.name}
-                            onClick={() => handleEditCategory(category)} // Open the edit dialog on click
-                            style={{ cursor: 'pointer' }}
-                        />
-                        <Switch
-                            checked={category.is_approved}
-                            onChange={() => handleApprovalToggle(category.id, category.is_approved)}
-                            name="approvalToggle"
-                            color="primary"
-                        />
-                        <IconButton
-                            color="error"
-                            onClick={() => confirmDeleteCategory(category)}
-                            aria-label="delete"
-                            sx={{ marginLeft: 2 }}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </ListItem>
-                ))}
-            </List>
+                {/* headers */}
+                <List
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderBottom: '1px solid #ccc',
+                        mb: 2,
+                    }}>
+                    <ListItemText primary="Category Name" />
+                    <ListItemText primary="Is approved" />
+                    <ListItemText primary="Delete category" />
+                </List>
 
-            {/* Edit Category Dialog */}
-            <Dialog open={dialogOpen} onClose={handleDialogClose}>
-                <DialogTitle>Edit Category</DialogTitle>
-                <DialogContent>
-                    {editCategory && (
-                        <Box>
-                            <TextField
-                                label="Category Name"
-                                variant="outlined"
-                                fullWidth
-                                value={editCategory.name}
-                                onChange={(e) =>
-                                    setEditCategory({ ...editCategory, name: e.target.value })
-                                }
-                                sx={{ mb: 2 }}
+                <List>
+                    {categories?.map((category) => (
+                        <ListItem
+                            key={category.id}
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                borderBottom: '1px solid #ccc',
+                            }}>
+                            <ListItemText
+                                primary={category.name}
+                                onClick={() => handleEditCategory(category)} // Open the edit dialog on click
+                                style={{ cursor: 'pointer' }}
                             />
-                            <Typography variant="body1" gutterBottom>
-                                Approval Status:
-                            </Typography>
                             <Switch
-                                checked={editCategory.is_approved}
-                                onChange={(e) =>
-                                    setEditCategory({
-                                        ...editCategory,
-                                        is_approved: e.target.checked,
-                                    })
+                                checked={category.is_approved}
+                                onChange={() =>
+                                    handleApprovalToggle(category.id, category.is_approved)
                                 }
                                 name="approvalToggle"
                                 color="primary"
                             />
-                            <Typography variant="h6" gutterBottom>
-                                Attributes
-                            </Typography>
-                            {editAttributes.map((attribute, index) => (
-                                <Box
-                                    key={index}
-                                    sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                    <TextField
-                                        label="Attribute Name"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={attribute.name}
-                                        onChange={(e) =>
-                                            handleAttributeChange(index, 'name', e.target.value)
-                                        }
-                                        sx={{ mr: 2 }}
-                                    />
-                                    <TextField
-                                        label="Required"
-                                        variant="outlined"
-                                        fullWidth
-                                        select
-                                        SelectProps={{ native: true }}
-                                        value={attribute.is_required ? 'true' : 'false'}
-                                        onChange={(e) =>
-                                            handleAttributeChange(
-                                                index,
-                                                'is_required',
-                                                e.target.value === 'true'
-                                            )
-                                        }
-                                        sx={{ mr: 2 }}>
-                                        <option value="true">Yes</option>
-                                        <option value="false">No</option>
-                                    </TextField>
-                                </Box>
-                            ))}
-                        </Box>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDialogClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleUpdateCategory} color="primary">
-                        Update
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                            <IconButton
+                                color="error"
+                                onClick={() => confirmDeleteCategory(category)}
+                                aria-label="delete"
+                                sx={{ marginLeft: 2 }}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </ListItem>
+                    ))}
+                </List>
 
-            {/* Delete Confirmation Dialog */}
-            <Dialog open={categoryToDelete !== null} onClose={handleDialogClose}>
-                <DialogTitle>Confirm Deletion</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Are you sure you want to delete the category "{categoryToDelete?.name}"?
-                        This action cannot be undone.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDialogClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleDeleteCategory} color="error">
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </Box>
+                {/* Edit Category Dialog */}
+                <Dialog open={dialogOpen} onClose={handleDialogClose}>
+                    <DialogTitle>Edit Category</DialogTitle>
+                    <DialogContent>
+                        {editCategory && (
+                            <Box>
+                                <TextField
+                                    label="Category Name"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={editCategory.name}
+                                    onChange={(e) =>
+                                        setEditCategory({ ...editCategory, name: e.target.value })
+                                    }
+                                    sx={{ mb: 2 }}
+                                />
+                                <Typography variant="body1" gutterBottom>
+                                    Approval Status:
+                                </Typography>
+                                <Switch
+                                    checked={editCategory.is_approved}
+                                    onChange={(e) =>
+                                        setEditCategory({
+                                            ...editCategory,
+                                            is_approved: e.target.checked,
+                                        })
+                                    }
+                                    name="approvalToggle"
+                                    color="primary"
+                                />
+                                <Typography variant="h6" gutterBottom>
+                                    Attributes
+                                </Typography>
+                                {editAttributes.map((attribute, index) => (
+                                    <Box
+                                        key={index}
+                                        sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                        <TextField
+                                            label="Attribute Name"
+                                            variant="outlined"
+                                            fullWidth
+                                            value={attribute.name}
+                                            onChange={(e) =>
+                                                handleAttributeChange(index, 'name', e.target.value)
+                                            }
+                                            sx={{ mr: 2 }}
+                                        />
+                                        <TextField
+                                            label="Required"
+                                            variant="outlined"
+                                            fullWidth
+                                            select
+                                            SelectProps={{ native: true }}
+                                            value={attribute.is_required ? 'true' : 'false'}
+                                            onChange={(e) =>
+                                                handleAttributeChange(
+                                                    index,
+                                                    'is_required',
+                                                    e.target.value === 'true'
+                                                )
+                                            }
+                                            sx={{ mr: 2 }}>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </TextField>
+                                    </Box>
+                                ))}
+                            </Box>
+                        )}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleDialogClose} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleUpdateCategory} color="primary">
+                            Update
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Delete Confirmation Dialog */}
+                <Dialog open={categoryToDelete !== null} onClose={handleDialogClose}>
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Are you sure you want to delete the category "{categoryToDelete?.name}"?
+                            This action cannot be undone.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleDialogClose} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleDeleteCategory} color="error">
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </ZelnakBox>
+        </Layout>
     )
 }
 

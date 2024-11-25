@@ -61,7 +61,9 @@ const applicationRouter = createHashRouter([
     },
     {
         path: Routes.Categories,
-        element: <CategoriesPage />,
+        element: (
+            <ProtectedRoute element={<CategoriesPage />} allowedRoles={[UserRole.Moderator]} />
+        ),
     },
     {
         path: Routes.AddCategory,
