@@ -89,6 +89,23 @@
       </tr>
     </table>
 
+    <p>
+        <strong>Registrovaný používateľ</strong> - stane sa buď farmárom, alebo zákazníkom na základe jeho akcií.
+      </p>
+      <p>
+        <strong>Zákazník</strong> - vytvára objednávky, môže sa prihlásiť na samozber.
+      </p>
+      <p>
+        <strong>Farmár</strong> - vytvára produkty, udalosti, spravuje objednávky jeho produktov.
+      </p>
+      <p>
+        <strong>Moderátor</strong> - schvaľuje kategórie, spravuje kategórie.
+      </p>
+      <p>
+        <strong>Admin</strong> - spravuje používateľov.
+      </p>
+
+
     <h3>Video</h3>
 
     <p>
@@ -222,17 +239,41 @@
     <img src="db.png" alt="Databáze" />
 
     <h2>Instalace</h2>
-
-    Stručně popište:
-    <ul>
-      <li>postup instalace na server,</li>
-      <li>softwarové požadavky (verze PHP apod.),</li>
-      <li>jak rozbalit, konfigurovat, inicializovat databázi, ...</li>
-    </ul>
-
+    <p>Inštalácia FE a BE lokálne, databáza beží vzdialene.</p>
+    
+    <h3>Postup</h3>
+    <ol>
+      <li>Rozbalenie repozitára</li>
+      <li>V root adresári spustite príkaz:
+        <pre><code>npm install</code></pre>
+      </li>
+      <li>V adresári <code>backend2.0</code> spustite príkaz:
+        <pre><code>npm install</code></pre>
+      </li>
+      <li>V adresári <code>frontend</code> spustite príkaz:
+        <pre><code>npm install</code></pre>
+      </li>
+      <li>Do adresára <code>frontend</code> pridajte súbor <code>.env</code> s nasledujúcou premennou:
+        <pre><code>VITE_API_URL=http://localhost:3000/</code></pre>
+      </li>
+      <li>Do adresára <code>backend2.0</code> pridajte súbor <code>.env</code> s nasledujúcimi premennými:
+        <pre><code>PORT=3000
+    DB_HOST=zelnak-db.database.windows.net
+    DB_USER=admin123
+    DB_PASSWORD=zrGCIYwIgV.
+    DB_DATABASE=zelnak-db
+    JWT_SECRET=s5gJK2rUUSM1cqH1BBhZGXeXHR3KmH9wMyJT7Jdhlr0=
+    DB_PORT=1433</code></pre>
+      </li>
+      <li>V root adresári spustite príkaz:
+        <pre><code>npm run dev</code></pre>
+      </li>
+    </ol>
+    
+    <p>Tento príkaz spustí frontend aj backend server súčasne. Backend server bude bežať na <code>http://localhost:3000</code> a frontend server bude komunikovať s backendom cez túto URL.</p>
     <h2>Známé problémy</h2>
     <p>
-      Atributy - bolo implementované iba vytváranie, atribútov, ale pri
+      Atributy - implementované vytváranie, editovanie, deletovanie atribútov, ale pri
       následnom vytváraní produktov nie sú použité. Je to najmä z dôvodu
       nedostatku času.
     </p>

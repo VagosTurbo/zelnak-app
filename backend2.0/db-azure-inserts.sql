@@ -36,6 +36,8 @@ GO
 --     ('farmer8', 'password8', 'farmer8@example.com', 3);
 -- GO
 
+--uzivatelov je nutne vytvorit cez registraciu, kvoli hashovaniu hesiel
+
 --products
 INSERT INTO products (name, price, description, user_id, image, category_id, quantity)
 VALUES
