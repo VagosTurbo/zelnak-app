@@ -1,13 +1,6 @@
--- Create the database
--- CREATE DATABASE zelnak;GO
-
--- Use the database
-USE zelnak;
-GO
-
--- Drop the tables in reverse order of creation
 DROP TABLE IF EXISTS user_events;
 DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS attributes;
@@ -58,6 +51,7 @@ CREATE TABLE products (
     user_id INT NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
 	category_id INT NOT NULL,
+    quantity INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
 	FOREIGN KEY (category_id) REFERENCES categories(id)
 );
@@ -68,7 +62,7 @@ CREATE TABLE orders (
     id INT PRIMARY KEY IDENTITY(1,1),
     buyer_id INT NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
-    status NVARCHAR(50) DEFAULT 'Pending';
+    status NVARCHAR(50) DEFAULT 'Pending',
     FOREIGN KEY (buyer_id) REFERENCES users(id)
 );
 GO
@@ -152,3 +146,4 @@ BEGIN
         WHERE id = @order_id;
     END
 END;
+
