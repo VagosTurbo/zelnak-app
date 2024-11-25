@@ -18,6 +18,8 @@ import {
   dbGetProductById,
   dbUpdateProductQuantity,
 } from "../models/product.js";
+import { dbGetUserById, dbUpdateUser } from "../models/user.js";
+import { Roles } from "../enums/roles.js";
 
 export const approveOrderItem = async (req, res) => {
   const { id } = req.params;
@@ -33,20 +35,20 @@ export const approveOrderItem = async (req, res) => {
     const orderItem = await dbGetOrderItemById(id);
     if (!orderItem) {
       await transaction.rollback();
-      return res.status(404).json({ error: "Order item not found" });
+      return res.status(404).json({ message: "Order item not found" });
     }
 
     // Get the product
     const product = await dbGetProductById(orderItem.product_id);
     if (!product) {
       await transaction.rollback();
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     // Check if there is enough quantity
     if (product.quantity < orderItem.quantity) {
       await transaction.rollback();
-      return res.status(400).json({ error: "Not enough product quantity" });
+      return res.status(400).json({ message: "Not enough product quantity" });
     }
 
     // Update the product quantity
@@ -71,7 +73,7 @@ export const approveOrderItem = async (req, res) => {
     await transaction.rollback();
     res
       .status(500)
-      .json({ error: "Failed to approve order item: " + err.message });
+      .json({ message: "Failed to approve order item: " + err.message });
   }
 };
 
@@ -129,13 +131,30 @@ export const createOrder = async (req, res) => {
     // Commit the transaction
     await transaction.commit();
 
+    const user = await dbGetUserById(buyer_id);
+    if (user.role === Roles.Registered) {
+      // Update user role to Farmer
+      const roleUpdated = await dbUpdateUser(buyer_id, {
+        role: Roles.Customer,
+      });
+      if (roleUpdated) {
+        return res.status(201).json({
+          message: "Order created successfully, user role updated to Customer",
+        });
+      } else {
+        return res.status(500).json({
+          error: "Order created, but failed to update user role to Customer",
+        });
+      }
+    }
+
     res
       .status(201)
       .json({ message: "Order created successfully", order: createdOrder });
   } catch (err) {
     // Rollback the transaction in case of any error
     await transaction.rollback();
-    res.status(500).json({ error: "Failed to create order: " + err.message });
+    res.status(500).json({ message: "Failed to create order: " + err.message });
   }
 };
 
@@ -189,6 +208,7 @@ export const createOrderItem = async (req, res) => {
       status: "Pending",
     };
     const createdOrderItem = await dbCreateOrderItem(newOrderItem);
+
     res.status(201).json({
       message: "Order item created successfully",
       orderItem: createdOrderItem,
