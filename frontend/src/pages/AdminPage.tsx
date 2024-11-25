@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Box, Typography, List, ListItem, ListItemText, Select, MenuItem } from '@mui/material'
 import api from '../api/api'
 import { UserRole, UserRoleLabel } from '../enums/UserRole'
+import EditUserModal from '../components/EditUserModal'
 
 interface User {
     id: number
@@ -12,6 +13,7 @@ interface User {
 
 const AdminPage: React.FC = () => {
     const [users, setUsers] = useState<User[]>([])
+    const [selectedUser, setSelectedUser] = useState<User | null>(null)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
@@ -38,6 +40,14 @@ const AdminPage: React.FC = () => {
         }
     }
 
+    const handleUserClick = (user: User) => {
+        setSelectedUser(user)
+    }
+
+    const handleUserUpdated = (updatedUser: User) => {
+        setUsers(users.map((user) => (user.id === updatedUser.id ? updatedUser : user)))
+    }
+
     return (
         <Box sx={{ padding: 4 }}>
             <Typography variant="h4" gutterBottom>
@@ -49,7 +59,18 @@ const AdminPage: React.FC = () => {
             <List>
                 {users.map((user) => (
                     <ListItem key={user.id}>
-                        <ListItemText primary={user.username} secondary={user.email} />
+                        <ListItemText
+                            primary={
+                                <Typography
+                                    variant="body1"
+                                    component="span"
+                                    sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                    onClick={() => handleUserClick(user)}>
+                                    {user.username}
+                                </Typography>
+                            }
+                            secondary={user.email}
+                        />
                         <Select
                             value={user.role}
                             onChange={(e) =>
@@ -71,6 +92,15 @@ const AdminPage: React.FC = () => {
                     </ListItem>
                 ))}
             </List>
+
+            {selectedUser && (
+                <EditUserModal
+                    user={selectedUser}
+                    open={Boolean(selectedUser)}
+                    onClose={() => setSelectedUser(null)}
+                    onUserUpdated={handleUserUpdated}
+                />
+            )}
         </Box>
     )
 }

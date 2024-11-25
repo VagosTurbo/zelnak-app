@@ -1,18 +1,14 @@
 import { Box, Paper, TextField, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import { apiPut } from '../../api/apiPut'
-import { ZelnakButton } from '../../components/ZelnakButton'
-import { useAuth } from '../../context/AuthContext'
-import { useCurrentUser } from '../../context/CurrentUserContext'
-import { User } from '../../types/User'
-import Layout from '../layouts/Layout'
-import ProfileOrders from './ProfileOrders'
-import { Order } from '../../types/Order'
-import { apiGet } from '../../api/apiGet'
-import { formatDateTime } from '../../utils/myUtils'
+import React, { useState } from 'react'
+import { apiPut } from '../api/apiPut'
+import { ZelnakButton } from '../components/ZelnakButton'
+import { useAuth } from '../context/AuthContext'
+import { useCurrentUser } from '../context/CurrentUserContext'
+import { User } from '../types/User'
+import Layout from './layouts/Layout'
 
 const ProfilePage: React.FC = () => {
-    const { currentUser, isCustomer } = useCurrentUser()
+    const { currentUser } = useCurrentUser()
     const { authenticated, accessToken } = useAuth()
 
     const [user, _setUser] = useState<User | null>(currentUser)
@@ -21,19 +17,6 @@ const ProfilePage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [_success, setSuccess] = useState<string | null>(null)
-    const [userOrders, setUserOrders] = useState<Order[]>([])
-
-    const fetchUserOrders = async () => {
-        if (!authenticated || !accessToken) return
-
-        try {
-            const response = await apiGet<Order[]>(`/orders/user/${user?.id}`, accessToken)
-            // const response = await apiGet<Order[]>(`/orders/10/items`, accessToken)
-            setUserOrders(response)
-        } catch (err: any) {
-            console.error('Failed to fetch orders', err)
-        }
-    }
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -54,10 +37,6 @@ const ProfilePage: React.FC = () => {
         setLoading(false)
     }
 
-    useEffect(() => {
-        fetchUserOrders()
-    }, [user])
-
     return (
         <Layout>
             <Box
@@ -69,9 +48,9 @@ const ProfilePage: React.FC = () => {
                     p: 3,
                     my: 5,
                 }}>
-                <Paper elevation={3} sx={{ p: 3, width: '760px' }}>
+                <Paper elevation={3} sx={{ p: 3, width: '100%', maxWidth: '500px' }}>
                     <Typography variant="h4" gutterBottom>
-                        User profile
+                        Profil uživatele
                     </Typography>
                     {user && (
                         <>
@@ -86,17 +65,12 @@ const ProfilePage: React.FC = () => {
                             </Typography>
                             <Typography variant="body1" sx={{ mt: 2 }}>
                                 <strong>Account Created:</strong>{' '}
-                                {user.created_at ? formatDateTime(user.created_at) : 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" sx={{ mt: 2 }}>
-                                <strong>Account Created:</strong>{' '}
                                 {user.created_at
                                     ? new Date(user.created_at).toLocaleString()
                                     : 'N/A'}
                             </Typography>
                         </>
                     )}
-
                     <Box component="form" onSubmit={handleUpdateProfile} sx={{ mt: 3 }}>
                         <TextField
                             label="Username"
@@ -129,30 +103,9 @@ const ProfilePage: React.FC = () => {
                         </Typography>
                     )}
                 </Paper>
-
-                {/* Customer orders */}
-                {isCustomer ||
-                    (true && (
-                        // TODO: remove true
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                p: 3,
-                                my: 5,
-                            }}>
-                            <Paper elevation={3} sx={{ p: 3, width: '760px' }}>
-                                <ProfileOrders orders={userOrders} loading={loading} />
-                            </Paper>
-                        </Box>
-                    ))}
             </Box>
         </Layout>
     )
-
-    // get orders by userid
 }
 
 export default ProfilePage

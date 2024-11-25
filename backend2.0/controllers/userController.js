@@ -62,16 +62,16 @@ export const updateUser = async (req, res) => {
         }
 
         // Check if username is unique (if being updated)
-        if (updatedUser.username && updatedUser.username !== existingUser.username) {
-            const usernameExists = await dbFindUserByUsername(updatedUser.username);
+        if (updatedUser.username) {
+            const usernameExists = await dbFindUserByUsername(updatedUser.username, userId);
             if (usernameExists) {
                 return res.status(400).json({ message: "Username is already taken." });
             }
         }
 
         // Check if email is unique (if being updated)
-        if (updatedUser.email && updatedUser.email !== existingUser.email) {
-            const emailExists = await dbFindUserByEmail(updatedUser.email);
+        if (updatedUser.email) {
+            const emailExists = await dbFindUserByEmail(updatedUser.email, userId);
             if (emailExists) {
                 return res.status(400).json({ message: "Email is already taken." });
             }
