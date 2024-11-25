@@ -1,8 +1,10 @@
+import { Box, List, ListItem, ListItemText, MenuItem, Select, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { Box, Typography, List, ListItem, ListItemText, Select, MenuItem } from '@mui/material'
 import api from '../api/api'
-import { UserRole, UserRoleLabel } from '../enums/UserRole'
 import EditUserModal from '../components/EditUserModal'
+import { UserRole, UserRoleLabel } from '../enums/UserRole'
+import Layout from './layouts/Layout'
+import ZelnakBox from './layouts/ZelnakBox'
 
 interface User {
     id: number
@@ -49,59 +51,67 @@ const AdminPage: React.FC = () => {
     }
 
     return (
-        <Box sx={{ padding: 4 }}>
-            <Typography variant="h4" gutterBottom>
-                Admin - Manage User Roles
-            </Typography>
+        <Layout>
+            <ZelnakBox>
+                <Box sx={{ padding: 4 }}>
+                    <Typography variant="h4" gutterBottom>
+                        Admin - Manage User Roles
+                    </Typography>
 
-            {error && <Typography color="error">{error}</Typography>}
+                    {error && <Typography color="error">{error}</Typography>}
 
-            <List>
-                {users.map((user) => (
-                    <ListItem key={user.id}>
-                        <ListItemText
-                            primary={
-                                <Typography
-                                    variant="body1"
-                                    component="span"
-                                    sx={{ cursor: 'pointer', textDecoration: 'underline' }}
-                                    onClick={() => handleUserClick(user)}>
-                                    {user.username}
-                                </Typography>
-                            }
-                            secondary={user.email}
+                    <List>
+                        {users.map((user) => (
+                            <ListItem key={user.id}>
+                                <ListItemText
+                                    primary={
+                                        <Typography
+                                            variant="body1"
+                                            component="span"
+                                            sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                            onClick={() => handleUserClick(user)}>
+                                            {user.username}
+                                        </Typography>
+                                    }
+                                    secondary={user.email}
+                                />
+                                <Select
+                                    value={user.role}
+                                    onChange={(e) =>
+                                        handleRoleChange(
+                                            user.id,
+                                            parseInt(e.target.value as string) as UserRole
+                                        )
+                                    }>
+                                    {Object.keys(UserRole)
+                                        .filter((key) => isNaN(Number(key))) // Filter out numeric values
+                                        .map((role) => (
+                                            <MenuItem
+                                                key={UserRole[role as keyof typeof UserRole]}
+                                                value={UserRole[role as keyof typeof UserRole]}>
+                                                {
+                                                    UserRoleLabel[
+                                                        UserRole[role as keyof typeof UserRole]
+                                                    ]
+                                                }
+                                            </MenuItem>
+                                        ))}
+                                </Select>
+                            </ListItem>
+                        ))}
+                    </List>
+
+                    {selectedUser && (
+                        <EditUserModal
+                            user={selectedUser}
+                            open={Boolean(selectedUser)}
+                            onClose={() => setSelectedUser(null)}
+                            onUserUpdated={handleUserUpdated}
                         />
-                        <Select
-                            value={user.role}
-                            onChange={(e) =>
-                                handleRoleChange(
-                                    user.id,
-                                    parseInt(e.target.value as string) as UserRole
-                                )
-                            }>
-                            {Object.keys(UserRole)
-                                .filter((key) => isNaN(Number(key))) // Filter out numeric values
-                                .map((role) => (
-                                    <MenuItem
-                                        key={UserRole[role as keyof typeof UserRole]}
-                                        value={UserRole[role as keyof typeof UserRole]}>
-                                        {UserRoleLabel[UserRole[role as keyof typeof UserRole]]}
-                                    </MenuItem>
-                                ))}
-                        </Select>
-                    </ListItem>
-                ))}
-            </List>
-
-            {selectedUser && (
-                <EditUserModal
-                    user={selectedUser}
-                    open={Boolean(selectedUser)}
-                    onClose={() => setSelectedUser(null)}
-                    onUserUpdated={handleUserUpdated}
-                />
-            )}
-        </Box>
+                    )}
+                </Box>
+            </ZelnakBox>
+        </Layout>
     )
 }
 
