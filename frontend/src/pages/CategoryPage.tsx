@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import DeleteIcon from '@mui/icons-material/Delete'
 import {
     Box,
-    Typography,
-    List,
-    ListItem,
-    ListItemText,
-    Switch,
-    IconButton,
-    Menu,
-    MenuItem,
+    Button,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Button,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Switch,
+    Typography,
 } from '@mui/material'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import DeleteIcon from '@mui/icons-material/Delete'
+import React, { useEffect, useState } from 'react'
 import api from '../api/api'
 
 interface Category {
@@ -40,8 +37,6 @@ const CategoriesPage: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
     const [dialogOpen, setDialogOpen] = useState(false) // Dialog open state
     const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null) // Category to delete
-    const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null) // Menu anchor
-    const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null) // Category to edit
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -111,24 +106,6 @@ const CategoriesPage: React.FC = () => {
         setCategoryToDelete(null)
     }
 
-    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, category: Category) => {
-        setMenuAnchorEl(event.currentTarget)
-        setCategoryToEdit(category)
-    }
-
-    const handleMenuClose = () => {
-        setMenuAnchorEl(null)
-        setCategoryToEdit(null)
-    }
-
-    const handleEditCategory = () => {
-        if (categoryToEdit) {
-            // Navigate to edit page or open an edit dialog (example)
-            console.log(`Editing category: ${categoryToEdit.name}`)
-        }
-        handleMenuClose()
-    }
-
     return (
         <Box sx={{ padding: 4 }}>
             <Typography variant="h4" gutterBottom>
@@ -149,20 +126,12 @@ const CategoriesPage: React.FC = () => {
                             color="primary"
                         />
                         <IconButton
-                            onClick={(event) => handleMenuOpen(event, category)}
-                            aria-label="menu"
+                            color="error"
+                            onClick={() => confirmDeleteCategory(category)}
+                            aria-label="delete"
                             sx={{ marginLeft: 2 }}>
-                            <MoreVertIcon />
+                            <DeleteIcon />
                         </IconButton>
-                        <Menu
-                            anchorEl={menuAnchorEl}
-                            open={Boolean(menuAnchorEl)}
-                            onClose={handleMenuClose}>
-                            <MenuItem onClick={handleEditCategory}>Edit</MenuItem>
-                            <MenuItem onClick={() => confirmDeleteCategory(category)}>
-                                Delete
-                            </MenuItem>
-                        </Menu>
                     </ListItem>
                 ))}
             </List>
