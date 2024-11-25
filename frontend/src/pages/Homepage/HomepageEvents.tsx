@@ -227,6 +227,21 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({
                                 </ZelnakButton>
                             )}
 
+                            {allowDelete && (
+                                <Link
+                                    to={`${Routes.EditEvent}/${event.id}`}
+                                    style={{ textDecoration: 'none' }}>
+                                    <ZelnakButton
+                                        color="primary"
+                                        sx={{
+                                            mt: 1,
+                                        }}
+                                        fullWidth>
+                                        Edit event
+                                    </ZelnakButton>
+                                </Link>
+                            )}
+
                             {eventMessage?.productId === event.id && (
                                 <Typography color="success" sx={{ mt: 2 }} textAlign={'center'}>
                                     {eventMessage.message} abc

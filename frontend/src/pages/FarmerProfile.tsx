@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { apiGet } from '../api/apiGet'
@@ -9,6 +9,7 @@ import { User } from '../types/User'
 import { HomepageEvents } from './Homepage/HomepageEvents'
 import { HomepageProducts } from './Homepage/HomepageProducts'
 import Layout from './layouts/Layout'
+import ZelnakBox from './layouts/ZelnakBox'
 
 const FarmerProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>()
@@ -83,30 +84,28 @@ const FarmerProfile: React.FC = () => {
 
     return (
         <Layout>
-            <Box
-                sx={{
-                    background: 'primary',
-                    width: '100%',
-                    height: '50px',
-                }}></Box>
+            <ZelnakBox>
+                <Typography variant="h2" component="h1" mb={3} sx={{ textAlign: 'center' }}>
+                    Farmer name: {farmer.username}
+                </Typography>
+                <Typography variant="h2" component="div" mb={3} sx={{ textAlign: 'center' }}>
+                    Farmer email: {farmer.email}
+                </Typography>
 
-            <Typography variant="h1" component="h1" mb={3}>
-                Farmer Profile: {farmer.username}
-            </Typography>
-            <Typography variant="h5" component="div">
-                Email: {farmer.email}
-            </Typography>
-
-            {/* Display Products */}
-            <HomepageProducts products={products} allowDelete={isMyProfile()} />
-
-            {/* Display Events */}
-            <HomepageEvents
-                events={events}
-                users={[farmer]}
-                showAddButton={false}
-                allowDelete={isMyProfile()}
-            />
+                {/* Display Products */}
+                {products.length > 0 && (
+                    <HomepageProducts products={products} allowDelete={isMyProfile()} />
+                )}
+                {/* Display Events */}
+                {events.length > 0 && (
+                    <HomepageEvents
+                        events={events}
+                        users={[farmer]}
+                        showAddButton={false}
+                        allowDelete={isMyProfile()}
+                    />
+                )}
+            </ZelnakBox>
         </Layout>
     )
 }

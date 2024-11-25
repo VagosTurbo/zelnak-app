@@ -72,7 +72,7 @@ const applicationRouter = createHashRouter([
         element: <ProtectedRoute element={<AddCategory />} allowedRoles={[UserRole.Customer]} />,
     },
     {
-        path: '/farmers/:id',
+        path: Routes.FarmerProfile + '/:id',
         element: <FarmerProfile />,
     },
     {
@@ -91,6 +91,10 @@ const applicationRouter = createHashRouter([
     {
         path: Routes.AddEvent,
         element: <AddEvent />,
+    },
+    {
+        path: Routes.EditEvent + '/:id',
+        element: <AddEvent edit={true} />,
     },
 ])
 
