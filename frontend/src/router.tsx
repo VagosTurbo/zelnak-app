@@ -1,4 +1,5 @@
 import { createHashRouter } from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute.tsx'
 import { Routes } from './enums/Routes.ts'
 import { UserRole } from './enums/UserRole.ts'
 import AddCategory from './pages/AddCategory.tsx'
@@ -13,7 +14,6 @@ import Login from './pages/Login.tsx'
 import ProductsPage from './pages/ProductsPage.tsx'
 import OrderDetail from './pages/Profile/OrderDetail.tsx'
 import ProfilePage from './pages/Profile/ProfilePage.tsx'
-import ProtectedRoute from './pages/ProtectedRoute.tsx'
 import Register from './pages/Register.tsx'
 const applicationRouter = createHashRouter([
     {
