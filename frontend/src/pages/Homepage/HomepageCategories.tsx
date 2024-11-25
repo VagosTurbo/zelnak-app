@@ -1,8 +1,8 @@
+import { Box, Card, CardActionArea, CardContent, Typography } from '@mui/material'
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Box, Card, CardContent, CardActionArea, Typography } from '@mui/material'
-import { Category } from '../../types/Category'
 import { UrlParams } from '../../enums/UrlParams'
+import { Category } from '../../types/Category'
 
 interface HomepageCategoriesProps {
     categories: Category[]
@@ -12,7 +12,7 @@ export const HomepageCategories: React.FC<HomepageCategoriesProps> = ({ categori
     return (
         <>
             <Typography variant="h1" component="h2" mb={3} textAlign="center">
-                Kategorie
+                Categories
             </Typography>
             <Box
                 className="all-categories"

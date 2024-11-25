@@ -13,7 +13,7 @@ export const getAllCategories = async (req, res) => {
     const categories = await dbGetAllCategories();
     res.json(categories);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -22,16 +22,24 @@ export const getCategoryById = async (req, res) => {
     const category = await dbGetCategoryById(req.params.id);
     res.json(category);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
 export const createCategory = async (req, res) => {
+  // Check if the name is provided
+  if (!req.body.name || req.body.name.trim() === "") {
+    return res.status(400).json({
+      message: "Category name is required",
+    });
+  }
+
   const newCategory = {
     name: req.body.name,
     parent_id: req.body.parent_id,
     is_approved: 0,
   };
+
   // Attributes are expected to be an array of objects
   const attributes = req.body.attributes || []; // Default to empty array if no attributes
 
@@ -81,7 +89,7 @@ export const createCategory = async (req, res) => {
     await transaction.rollback();
     console.error("Error creating category and attributes:", err);
     res.status(500).json({
-      error:
+      message:
         "Failed to create category and attributes. Please try again later.",
     });
   }
@@ -115,7 +123,7 @@ export const toggleCategoryApproval = async (req, res) => {
     // Rollback the transaction in case of any error
     console.error("Error toggling category approval status:", err);
     res.status(500).json({
-      error:
+      message:
         err.message ||
         "Failed to toggle category approval status. Please try again later.",
     });
@@ -170,14 +178,17 @@ export const updateCategory = async (req, res) => {
     // 3. Optionally, update attributes if provided
     if (attributes.length > 0) {
       for (let attribute of attributes) {
+        console.log(attribute);
+
         await transaction
           .request()
+          .input("id", sql.Int, attribute.id)
           .input("name", sql.NVarChar, attribute.name)
           .input("is_required", sql.Bit, attribute.is_required)
           .input("category_id", sql.Int, categoryId).query(`
-                        INSERT INTO attributes (name, is_required, category_id)
-                        VALUES (@name, @is_required, @category_id)
-                    `);
+                        UPDATE attributes
+                        SET name = @name, is_required = @is_required, category_id = @category_id
+                        WHERE id = @id`);
       }
     }
 
@@ -200,7 +211,7 @@ export const updateCategory = async (req, res) => {
     await transaction.rollback();
     console.error("Error updating category and attributes:", err);
     res.status(500).json({
-      error:
+      message:
         err.message ||
         "Failed to update category and attributes. Please try again later.",
     });
@@ -301,7 +312,7 @@ export const deleteCategory = async (req, res) => {
       err
     );
     res.status(500).json({
-      error:
+      message:
         err.message ||
         "Failed to delete category, attributes, products, reviews, and order items. Please try again later.",
     });

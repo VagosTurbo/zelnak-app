@@ -18,6 +18,9 @@ import {
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/api'
+import { apiDelete } from '../api/apiDelete'
+import { apiPut } from '../api/apiPut'
+import { useAuth } from '../context/AuthContext'
 
 interface Category {
     id: number
@@ -42,7 +45,7 @@ const CategoriesPage: React.FC = () => {
     const [editCategory, setEditCategory] = useState<Category | null>(null) // Category being edited
     const [editAttributes, setEditAttributes] = useState<Attribute[]>([]) // Attributes being edited
     const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null) // Category to delete
-
+    const { accessToken } = useAuth()
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -71,9 +74,19 @@ const CategoriesPage: React.FC = () => {
         }
     }, [selectedCategory])
 
+    useEffect(() => {
+        if (selectedCategory !== null) {
+            const filteredAttributes = attributes.filter(
+                (attr) => attr.category_id === selectedCategory
+            )
+            setEditAttributes(filteredAttributes) // Update the attributes array
+        }
+    }, [selectedCategory, attributes])
+
     const handleApprovalToggle = async (categoryId: number, currentApprovalStatus: boolean) => {
+        if (!accessToken) return
         try {
-            await api.put(`/categories/${categoryId}/toggle`, {})
+            await apiPut(`/categories/${categoryId}/toggle`, {}, accessToken)
             setCategories((prevCategories) =>
                 prevCategories.map((category) =>
                     category.id === categoryId
@@ -87,9 +100,10 @@ const CategoriesPage: React.FC = () => {
     }
 
     const handleDeleteCategory = async () => {
+        if (!accessToken) return
         if (categoryToDelete) {
             try {
-                await api.delete(`/categories/${categoryToDelete.id}`)
+                await apiDelete(`/categories/${categoryToDelete.id}`, accessToken)
                 setCategories((prevCategories) =>
                     prevCategories.filter((category) => category.id !== categoryToDelete.id)
                 )
@@ -114,17 +128,19 @@ const CategoriesPage: React.FC = () => {
     }
 
     const handleEditCategory = (category: Category) => {
-        setEditCategory(category)
-        setEditAttributes(attributes.filter((attr) => attr.category_id === category.id)) // Preload attributes
-        setDialogOpen(true) // Open the dialog when editing
+        setSelectedCategory(category.id) // Set selected category ID
+        setEditCategory(category) // Set the category being edited
+        setDialogOpen(true) // Open the dialog
     }
 
     const handleUpdateCategory = async () => {
+        if (!accessToken) return
         if (editCategory) {
             try {
                 const categoryData = {
                     name: editCategory.name,
                     is_approved: editCategory.is_approved,
+                    parent_id: editCategory.parent_id,
                     attributes: editAttributes.map((attr) => ({
                         id: attr.id,
                         name: attr.name,
@@ -132,7 +148,7 @@ const CategoriesPage: React.FC = () => {
                     })),
                 }
 
-                await api.put(`/categories/${editCategory.id}`, categoryData)
+                await apiPut(`/categories/${editCategory.id}`, categoryData, accessToken)
                 setCategories((prevCategories) =>
                     prevCategories.map((category) =>
                         category.id === editCategory.id
@@ -141,6 +157,7 @@ const CategoriesPage: React.FC = () => {
                     )
                 )
                 handleDialogClose() // Close dialog after update
+                window.location.reload()
             } catch (err: any) {
                 console.error('Failed to update category', err)
             }
@@ -156,7 +173,7 @@ const CategoriesPage: React.FC = () => {
     return (
         <Box sx={{ padding: 4 }}>
             <Typography variant="h4" gutterBottom>
-                Categories
+                Moderator page - Categories
             </Typography>
 
             {/* Add Category Button */}
