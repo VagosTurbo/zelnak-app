@@ -10,7 +10,7 @@ import { UserRoleLabel } from '../enums/UserRole'
 
 const Navbar: React.FC = () => {
     const { authenticated, signOut } = useAuth()
-    const { currentUser, isCustomer, isRegisteredUser, isAdmin } = useCurrentUser()
+    const { currentUser, isCustomer, isRegisteredUser, isAdmin, isModerator } = useCurrentUser()
     const { cart } = useCart()
 
     return (
@@ -66,6 +66,19 @@ const Navbar: React.FC = () => {
                                 mx: 1,
                             }}>
                             Admin dashboard
+                        </Button>
+                    </Link>
+                )}
+
+                {isModerator && (
+                    <Link to={Routes.Categories} style={{ textDecoration: 'none' }}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            sx={{
+                                mx: 1,
+                            }}>
+                            Moderator dashboard
                         </Button>
                     </Link>
                 )}
