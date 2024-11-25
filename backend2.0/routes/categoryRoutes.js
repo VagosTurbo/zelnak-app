@@ -20,7 +20,7 @@ const permissions = {
   createCategory: [],
   updateCategory: [Roles.Admin, Roles.Moderator],
   deleteCategory: [Roles.Admin, Roles.Moderator],
-  toggleApproval: [],
+  toggleApproval: [Roles.Admin, Roles.Moderator],
 };
 
 router.get("/", getAllCategories);
@@ -30,9 +30,17 @@ router.put(
   authenticateToken(permissions.updateCategory),
   updateCategory
 );
-router.put("/:id/toggle", toggleCategoryApproval);
+router.put(
+  "/:id/toggle",
+  authenticateToken(permissions.toggleApproval),
+  toggleCategoryApproval
+);
 router.post("/", createCategory);
-router.delete("/:id", deleteCategory);
+router.delete(
+  "/:id",
+  authenticateToken(permissions.deleteCategory),
+  deleteCategory
+);
 router.get("/:categoryId/hierarchy", getCategoryHierarchy);
 
 export default router;
