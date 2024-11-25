@@ -15,8 +15,6 @@ import { authenticateToken } from "../middleware/auth.js";
 const router = Router();
 
 const permissions = {
-  getAllCategories: [],
-  getCategoryById: [],
   createCategory: [
     Roles.Admin,
     Roles.Moderator,
@@ -28,16 +26,8 @@ const permissions = {
   toggleApproval: [Roles.Admin, Roles.Moderator],
 };
 
-router.get(
-  "/",
-  authenticateToken(permissions.getAllCategories),
-  getAllCategories
-);
-router.get(
-  "/:id",
-  authenticateToken(permissions.getCategoryById),
-  getCategoryById
-);
+router.get("/", getAllCategories);
+router.get("/:id", getCategoryById);
 router.put(
   "/:id",
   authenticateToken(permissions.updateCategory),
