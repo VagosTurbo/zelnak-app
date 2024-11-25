@@ -171,7 +171,6 @@ export const updateProduct = async (req, res) => {
         .json({ message: "Cannot update 'created_at' or 'user_id' fields" });
     }
 
-    // Add the allowed fields to updatedProduct object
     if (req.body.name) updatedProduct.name = req.body.name;
     if (req.body.price) updatedProduct.price = req.body.price;
     if (req.body.description) updatedProduct.description = req.body.description;
