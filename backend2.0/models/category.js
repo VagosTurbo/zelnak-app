@@ -29,6 +29,26 @@ export const dbCreateCategory = async (newCategory, transaction) => {
     return result.recordset[0].id;  // return category id
 };
 
+export const dbToggleCategoryApproval = async (categoryId, newStatus) => {
+    const pool = await poolPromise;
+
+    try {
+        const result = await pool.request()
+            .input('id', sql.Int, categoryId)
+            .input('is_approved', sql.Bit, newStatus)
+            .query(`
+                UPDATE categories
+                SET is_approved = @is_approved
+                WHERE id = @id
+            `);
+
+        // Return true if the update affected any rows
+        return result.rowsAffected[0] > 0;
+    } catch (err) {
+        console.error('Error toggling category approval:', err);
+        throw new Error('Database operation failed');
+    }
+};
 
 
 export const dbGetCategoryHierarchy = async (categoryId) => {

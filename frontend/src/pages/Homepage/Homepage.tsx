@@ -118,15 +118,13 @@ const Homepage: React.FC = () => {
 
             <Box
                 sx={{
-                    background: 'black',
+                    background: 'primary',
                     width: '100%',
                     height: '50px',
-                }}>
-                separator
-            </Box>
+                }}></Box>
 
             <Typography variant="h1" component="h1" mb={3}>
-                Domovská stránka
+                Home page
             </Typography>
             <HomepageCategories categories={categories} />
             <HomepageProducts products={products} />

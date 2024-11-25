@@ -1,5 +1,5 @@
 // backend2.0/controllers/categoryController.js
-import { dbGetAllCategories, dbGetCategoryById, dbCreateCategory, dbGetCategoryHierarchy } from "../models/category.js";
+import { dbGetAllCategories, dbGetCategoryById, dbCreateCategory, dbGetCategoryHierarchy, dbToggleCategoryApproval } from "../models/category.js";
 import { poolPromise, sql } from '../config/database.js';
 
 export const getAllCategories = async (req, res) => {
@@ -78,6 +78,39 @@ export const createCategory = async (req, res) => {
         res.status(500).json({ error: 'Failed to create category and attributes. Please try again later.' });
     }
 };
+
+export const toggleCategoryApproval = async (req, res) => {
+    const categoryId = req.params.id; // Get category ID from URL parameters
+
+    try {
+        const category = await dbGetCategoryById(categoryId);
+        if (!category) {
+            throw new Error('Category not found');
+        }
+
+        const currentStatus = category.is_approved;
+        const newStatus = currentStatus == 1 ? 0 : 1; // Toggle the status
+
+        const success = await dbToggleCategoryApproval(categoryId, newStatus);
+
+        if(!success){
+            res.json({message: `Category approval status failed to update`});
+        }
+
+        // Return success response
+        res.json({
+            message: `Category approval status updated successfully`,
+            categoryId,
+            is_approved: newStatus
+        });
+
+    } catch (err) {
+        // Rollback the transaction in case of any error
+        console.error('Error toggling category approval status:', err);
+        res.status(500).json({ error: err.message || 'Failed to toggle category approval status. Please try again later.' });
+    }
+};
+
 
 export const updateCategory = async (req, res) => {
     const categoryId = req.params.id;  // Get category ID from the URL parameters

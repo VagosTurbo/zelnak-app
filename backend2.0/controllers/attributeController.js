@@ -1,6 +1,7 @@
 // backend2.0/controllers/attributeController.js
-import { dbCreateAttribute, dbGetAttributesByCategoryId } from "../models/attribute.js";
+import { dbCreateAttribute, dbGetAttributesByCategoryId  } from "../models/attribute.js";
 
+// Create a new attribute
 export const createAttribute = async (req, res) => {
     const newAttribute = {
         name: req.body.name,
@@ -15,6 +16,7 @@ export const createAttribute = async (req, res) => {
     }
 }
 
+// Update an existing attribute
 export const updateAttribute = async (req, res) => {
     const attributeId = req.params.id;
     const updatedAttribute = req.body;  
@@ -27,7 +29,7 @@ export const updateAttribute = async (req, res) => {
     }
 };
 
-
+// Delete an attribute
 export const deleteAttribute = async (req, res) => {
     const attributeId = req.params.id;
 
@@ -39,7 +41,18 @@ export const deleteAttribute = async (req, res) => {
     }
 };
 
+// Get all attributes
+export const getAllAttributes = async (req, res) => {
+    try {
+        const categoryId = req.body.category_id
+        const attributes = await dbGetAttributesByCategoryId(categoryId);  // Assume dbGetAllAttributes fetches all attributes
+        res.json(attributes);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
 
+// Get attributes by category ID
 export const getAttributesByCategoryId = async (req, res) => {
     try {
         const attributes = await dbGetAttributesByCategoryId(req.params.categoryId);
