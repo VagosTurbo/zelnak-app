@@ -1,8 +1,8 @@
 import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCurrentUser } from '../context/CurrentUserContext'
-import { Link } from 'react-router-dom'
 import { Routes } from '../enums'
 
 const Navbar: React.FC = () => {
@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
 
                 {authenticated && currentUser && (
                     <Typography variant="h6" component="div" sx={{ mr: 2 }}>
-                        Přihlášen jako: {currentUser.username}
+                        Logged in: {currentUser.username}
                     </Typography>
                 )}
 

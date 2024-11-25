@@ -1,9 +1,9 @@
 // frontend/src/pages/AddCategory.tsx
-import React, { useState, useEffect, FormEvent } from 'react'
-import { Box, Button, TextField, Typography, IconButton, MenuItem } from '@mui/material'
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material'
-import api from '../api/api'
+import { Box, Button, IconButton, MenuItem, TextField, Typography } from '@mui/material'
+import React, { FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import api from '../api/api'
 import { Routes } from '../enums/Routes'
 
 interface Category {
