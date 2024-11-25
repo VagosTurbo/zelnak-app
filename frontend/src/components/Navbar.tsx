@@ -10,7 +10,8 @@ import { UserRoleLabel } from '../enums/UserRole'
 
 const Navbar: React.FC = () => {
     const { authenticated, signOut } = useAuth()
-    const { currentUser, isCustomer, isRegisteredUser, isAdmin, isModerator } = useCurrentUser()
+    const { currentUser, isCustomer, isRegisteredUser, isAdmin, isFarmer, isModerator } =
+        useCurrentUser()
     const { cart } = useCart()
 
     return (
@@ -30,6 +31,11 @@ const Navbar: React.FC = () => {
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <MyLink to={Routes.Homepage} text="Home" />
                 </Box>
+
+                {isFarmer && (
+                    <MyLink to={Routes.FarmerProfile + '/' + currentUser?.id} text="My page" />
+                )}
+
                 {authenticated ? (
                     <>
                         <MyLink to={Routes.Profile} text="Profile and orders" />

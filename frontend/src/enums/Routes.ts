@@ -11,7 +11,8 @@ export enum Routes {
     AddCategory = '/add-category',
     Cart = '/cart',
     Orders = '/orders',
-    FarmerProfile = '/farmers/:id',
+    FarmerProfile = '/farmers',
     AdminPage = '/admin',
     AddEvent = '/add-event',
+    EditEvent = '/edit-event',
 }
