@@ -1,7 +1,9 @@
 import { Box, List, ListItem, ListItemText, MenuItem, Select, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import api from '../api/api'
+import { apiPut } from '../api/apiPut'
 import EditUserModal from '../components/EditUserModal'
+import { useAuth } from '../context/AuthContext'
 import { UserRole, UserRoleLabel } from '../enums/UserRole'
 import Layout from './layouts/Layout'
 import ZelnakBox from './layouts/ZelnakBox'
@@ -18,6 +20,8 @@ const AdminPage: React.FC = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null)
     const [error, setError] = useState<string | null>(null)
 
+    const { accessToken } = useAuth()
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -33,8 +37,10 @@ const AdminPage: React.FC = () => {
     }, [])
 
     const handleRoleChange = async (userId: number, newRole: UserRole) => {
+        if (!accessToken) return
+
         try {
-            await api.put(`/users/${userId}`, { role: newRole.toString() })
+            await apiPut(`/users/${userId}`, { role: newRole.toString() }, accessToken)
             setUsers(users.map((user) => (user.id === userId ? { ...user, role: newRole } : user)))
         } catch (err: any) {
             console.error('Failed to update user role', err)
