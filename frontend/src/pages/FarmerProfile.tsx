@@ -2,6 +2,7 @@ import { Box, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { apiGet } from '../api/apiGet'
+import { useCurrentUser } from '../context/CurrentUserContext'
 import { Event } from '../types/Event'
 import { Product } from '../types/Product'
 import { User } from '../types/User'
@@ -15,6 +16,14 @@ const FarmerProfile: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([])
     const [events, setEvents] = useState<Event[]>([])
     const [error, setError] = useState<string | null>(null)
+
+    const { currentUser } = useCurrentUser()
+
+    const isMyProfile = () => {
+        if (!id) return false
+
+        return currentUser?.id === parseInt(id, 10)
+    }
 
     const [searchParams] = useSearchParams()
 
@@ -89,10 +98,15 @@ const FarmerProfile: React.FC = () => {
             </Typography>
 
             {/* Display Products */}
-            <HomepageProducts products={products} />
+            <HomepageProducts products={products} allowDelete={isMyProfile()} />
 
             {/* Display Events */}
-            <HomepageEvents events={events} users={[farmer]} showAddButton={false} />
+            <HomepageEvents
+                events={events}
+                users={[farmer]}
+                showAddButton={false}
+                allowDelete={isMyProfile()}
+            />
         </Layout>
     )
 }

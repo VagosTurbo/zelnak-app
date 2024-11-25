@@ -1,15 +1,17 @@
 import {
     Box,
-    Button,
     Card,
     CardActionArea,
     CardContent,
     CardMedia,
+    CircularProgress,
     Typography,
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { apiDelete } from '../../api/apiDelete'
 import { apiGet } from '../../api/apiGet'
+import { ZelnakButton } from '../../components/ZelnakButton'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useCurrentUser } from '../../context/CurrentUserContext'
@@ -20,6 +22,8 @@ import { Product } from '../../types/Product'
 
 interface HomepageProductsProps {
     products: Product[]
+    allowDelete?: boolean
+    showAddButton?: boolean // Add the parameter to show/hide the "Create New Event" button
 }
 
 /**
@@ -27,9 +31,13 @@ interface HomepageProductsProps {
  * seller name vypsat, kubo nejdriv prida
  */
 
-export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) => {
+export const HomepageProducts: React.FC<HomepageProductsProps> = ({
+    products,
+    allowDelete = false,
+    showAddButton = false,
+}) => {
     const { addProduct } = useCart()
-    const { authenticated } = useAuth()
+    const { authenticated, accessToken } = useAuth()
     const { isFarmer } = useCurrentUser()
 
     const [categories, setCategories] = useState<{ [key: number]: Category[] }>({})
@@ -56,6 +64,44 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
             setCategories(categoriesData)
         } catch (err: any) {
             console.error('Failed to fetch categories', err)
+        }
+    }
+
+    /**
+     * Delete
+     */
+    const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
+    const [deleteError, setDeleteError] = useState<{
+        productId: number | null
+        message: string
+    } | null>({
+        productId: null,
+        message: '',
+    })
+
+    const deleteProduct = async (productId: number) => {
+        if (!accessToken || !authenticated) return
+
+        setDeleteError(null)
+        setProductMessage(null)
+        setDeleteLoading(true)
+
+        try {
+            setDeleteLoading(true)
+            await apiDelete<any>(`/products/${productId}`, accessToken)
+            setDeleteLoading(false)
+            setProductMessage({ productId: productId, message: 'Product deleted' })
+            setTimeout(() => {
+                setProductMessage(null)
+            }, 3000)
+            window.location.reload()
+        } catch (error: any) {
+            console.log('Failed to delete product', error)
+            setDeleteError({
+                productId: productId,
+                message: error.message,
+            })
+            setDeleteLoading(false)
         }
     }
 
@@ -119,14 +165,19 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                             <Typography variant="body2" sx={{ color: colors.colorText }}>
                                 Quantity: {product.quantity}
                             </Typography>
-                            <Link to={`${Routes.Seller}/${product.user_id}`}>
-                                <Typography variant="body2" sx={{ color: colors.colorText }} mb={2}>
-                                    Seller: {product.username}
-                                </Typography>
-                            </Link>
+                            {!isFarmer && (
+                                <Link to={`${Routes.Seller}/${product.user_id}`}>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{ color: colors.colorText }}
+                                        mb={2}>
+                                        Seller: {product.username}
+                                    </Typography>
+                                </Link>
+                            )}
                             {authenticated ? (
                                 <>
-                                    <Button
+                                    <ZelnakButton
                                         onClick={() => {
                                             addProduct(
                                                 product.id,
@@ -138,27 +189,53 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                                             handleProductMessage(product.id, 'Added to cart')
                                         }}
                                         color="secondary"
-                                        variant="contained"
                                         sx={{
-                                            mt: 'auto',
+                                            mt: 1,
                                         }}
                                         disabled={product.quantity === 0 || isFarmer}
                                         fullWidth>
                                         Add to cart
-                                    </Button>
-                                    {productMessage?.message &&
-                                        productMessage.productId === product.id && (
-                                            <Typography
-                                                variant="body1"
-                                                textAlign={'center'}
-                                                sx={{ color: 'success.main' }}
-                                                mt={2}>
-                                                {productMessage.message}
-                                            </Typography>
-                                        )}
+                                    </ZelnakButton>
+
+                                    {allowDelete && (
+                                        <ZelnakButton
+                                            onClick={() => {
+                                                deleteProduct(product.id)
+                                            }}
+                                            color="secondary"
+                                            sx={{
+                                                mt: 1,
+                                            }}
+                                            disabled={deleteLoading}
+                                            fullWidth>
+                                            {deleteLoading ? (
+                                                <CircularProgress size={20} />
+                                            ) : (
+                                                'Delete product'
+                                            )}
+                                        </ZelnakButton>
+                                    )}
+
+                                    {productMessage?.productId === product.id && (
+                                        <Typography
+                                            color="success"
+                                            sx={{ mt: 2 }}
+                                            textAlign={'center'}>
+                                            {productMessage.message} abc
+                                        </Typography>
+                                    )}
+
+                                    {deleteError && deleteError.productId === product.id && (
+                                        <Typography
+                                            color="error"
+                                            sx={{ mt: 2 }}
+                                            textAlign={'center'}>
+                                            {deleteError.message}
+                                        </Typography>
+                                    )}
                                 </>
                             ) : (
-                                <Typography variant="body2" sx={{ color: colors.colorText }} mb={2}>
+                                <Typography color="error" sx={{ mt: 2 }} textAlign={'center'}>
                                     You have have to login first.
                                 </Typography>
                             )}
@@ -166,6 +243,18 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                     </Card>
                 ))}
             </Box>
+
+            {showAddButton && (
+                <Link to={Routes.AddProduct} style={{ textDecoration: 'none' }}>
+                    <ZelnakButton
+                        sx={{
+                            display: 'block',
+                            margin: 'auto',
+                        }}>
+                        Přidat produkt
+                    </ZelnakButton>
+                </Link>
+            )}
         </>
     )
 }

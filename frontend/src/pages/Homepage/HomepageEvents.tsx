@@ -1,10 +1,12 @@
-import { Box, Button, Card, CardActionArea, CardContent, Typography } from '@mui/material'
+import { Box, Card, CardActionArea, CardContent, CircularProgress, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiDelete } from '../../api/apiDelete'
 import { apiGet } from '../../api/apiGet'
 import { apiPost } from '../../api/apiPost'
+import { ZelnakButton } from '../../components/ZelnakButton'
 import { useAuth } from '../../context/AuthContext'
+import { useCurrentUser } from '../../context/CurrentUserContext'
 import { Routes } from '../../enums'
 import colors from '../../styles/colors'
 import { Event } from '../../types/Event'
@@ -15,16 +17,22 @@ interface HomepageEventsProps {
     events: Event[]
     users: User[]
     showAddButton?: boolean // Add the parameter to show/hide the "Create New Event" button
+    allowDelete?: boolean
 }
 
 export const HomepageEvents: React.FC<HomepageEventsProps> = ({
     events,
     users,
     showAddButton = true,
+    allowDelete = false,
 }) => {
     const { authenticated, userId, accessToken } = useAuth()
+    const { isFarmer } = useCurrentUser()
 
     const [userRegisteredEvents, setUserRegisteredEvents] = useState<Event[]>([])
+    const [eventMessage, setEventMessage] = useState<{ productId: number; message: string } | null>(
+        null
+    )
 
     const fetchUserEvents = async () => {
         if (!authenticated || !accessToken) return
@@ -87,6 +95,44 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({
         }
     }, [events])
 
+    /**
+     * Delete
+     */
+    const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
+    const [deleteError, setDeleteError] = useState<{
+        productId: number | null
+        message: string
+    } | null>({
+        productId: null,
+        message: '',
+    })
+
+    const deleteEvent = async (eventId: number) => {
+        if (!accessToken || !authenticated) return
+
+        setDeleteError(null)
+        setEventMessage(null)
+        setDeleteLoading(true)
+
+        try {
+            setDeleteLoading(true)
+            await apiDelete<any>(`/events/${eventId}`, accessToken)
+            setDeleteLoading(false)
+            setEventMessage({ productId: eventId, message: 'Product deleted' })
+            setTimeout(() => {
+                setEventMessage(null)
+            }, 3000)
+            window.location.reload()
+        } catch (error: any) {
+            console.log('Failed to delete product', error)
+            setDeleteError({
+                productId: eventId,
+                message: error.message,
+            })
+            setDeleteLoading(false)
+        }
+    }
+
     return (
         <>
             <Typography variant="h1" component="h2" mb={3} textAlign="center">
@@ -134,32 +180,62 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({
                             {authenticated ? (
                                 <>
                                     {isUserRegisteredForEvent(event.id) ? (
-                                        <Button
+                                        <ZelnakButton
                                             color="primary"
-                                            variant="contained"
                                             sx={{
                                                 mt: 'auto',
                                             }}
                                             onClick={() => signOffFromEvent(event.id)}
                                             fullWidth>
                                             Remove from my events
-                                        </Button>
+                                        </ZelnakButton>
                                     ) : (
-                                        <Button
+                                        <ZelnakButton
                                             onClick={() => signUpForEvent(event.id)}
                                             color="secondary"
-                                            variant="contained"
                                             sx={{
                                                 mt: 'auto',
                                             }}
+                                            disabled={isFarmer}
                                             fullWidth>
                                             Add to my events
-                                        </Button>
+                                        </ZelnakButton>
                                     )}
                                 </>
                             ) : (
                                 <Typography variant="body2" sx={{ color: colors.colorText }}>
                                     Pro zápis na událost se musíte přihlásit
+                                </Typography>
+                            )}
+
+                            {allowDelete && (
+                                <ZelnakButton
+                                    onClick={() => {
+                                        deleteEvent(event.id)
+                                    }}
+                                    color="secondary"
+                                    sx={{
+                                        mt: 1,
+                                    }}
+                                    disabled={deleteLoading}
+                                    fullWidth>
+                                    {deleteLoading ? (
+                                        <CircularProgress size={20} />
+                                    ) : (
+                                        'Delete event'
+                                    )}
+                                </ZelnakButton>
+                            )}
+
+                            {eventMessage?.productId === event.id && (
+                                <Typography color="success" sx={{ mt: 2 }} textAlign={'center'}>
+                                    {eventMessage.message} abc
+                                </Typography>
+                            )}
+
+                            {deleteError && deleteError.productId === event.id && (
+                                <Typography color="error" sx={{ mt: 2 }} textAlign={'center'}>
+                                    {deleteError.message}
                                 </Typography>
                             )}
                         </CardContent>
@@ -168,7 +244,15 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({
             </Box>
 
             {showAddButton && (
-                <Button>Vytvořit novou událost</Button> // Show button only if showAddButton is true
+                <Link to={Routes.AddEvent} style={{ textDecoration: 'none' }}>
+                    <ZelnakButton
+                        sx={{
+                            display: 'block',
+                            margin: 'auto',
+                        }}>
+                        Vytvořit novou událost
+                    </ZelnakButton>
+                </Link>
             )}
         </>
     )

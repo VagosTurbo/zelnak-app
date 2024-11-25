@@ -2,12 +2,14 @@ import { Box, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { apiGet } from '../../api/apiGet'
+import { useCurrentUser } from '../../context/CurrentUserContext'
 import { Routes } from '../../enums/Routes'
 import { Category } from '../../types/Category'
 import { Event } from '../../types/Event'
 import { Product } from '../../types/Product'
 import { User } from '../../types/User'
 import Layout from '../layouts/Layout'
+import ZelnakBox from '../layouts/ZelnakBox'
 import { HomepageCategories } from './HomepageCategories'
 import { HomepageEvents } from './HomepageEvents'
 import { HomepageProducts } from './HomepageProducts'
@@ -20,6 +22,8 @@ const Homepage: React.FC = () => {
     const [users, setUsers] = useState<User[]>([])
 
     const [searchParams] = useSearchParams()
+
+    const { isFarmer } = useCurrentUser()
 
     const fetchCategories = async () => {
         try {
@@ -126,12 +130,18 @@ const Homepage: React.FC = () => {
                     height: '50px',
                 }}></Box>
 
-            <Typography variant="h1" component="h1" mb={3}>
-                Home page
+            <Typography variant="h1" component="h1" mb={3} textAlign={'center'}>
+                Homepage
             </Typography>
-            <HomepageCategories categories={categories} />
-            <HomepageProducts products={products} />
-            <HomepageEvents events={events} users={users} />
+            <ZelnakBox sx={{ width: '1080px' }} parentSx={{ py: 2 }}>
+                <HomepageCategories categories={categories} />
+            </ZelnakBox>
+            <ZelnakBox sx={{ width: '1080px' }} parentSx={{ py: 2 }}>
+                <HomepageProducts products={products} showAddButton={isFarmer} />
+            </ZelnakBox>
+            <ZelnakBox sx={{ width: '1080px' }} parentSx={{ py: 2 }}>
+                <HomepageEvents events={events} users={users} showAddButton={isFarmer} />
+            </ZelnakBox>
         </Layout>
     )
 }
