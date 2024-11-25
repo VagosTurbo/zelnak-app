@@ -14,7 +14,7 @@ const permissions = {
   createAttribute: [],
   updateAttribute: [Roles.Admin, Roles.Moderator],
   deleteAttribute: [Roles.Admin, Roles.Moderator],
-  getAttributes: [], // Allow Admin, Moderator, and User roles to view attributes
+  getAttributes: [],
 };
 
 // Route to create an attribute
