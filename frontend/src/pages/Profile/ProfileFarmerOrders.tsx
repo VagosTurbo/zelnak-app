@@ -10,6 +10,7 @@ import { DataGrid, GridColDef, useGridApiRef } from '@mui/x-data-grid'
 import { apiPut } from '../../api/apiPut'
 import { ZelnakButton } from '../../components/ZelnakButton'
 import { useAuth } from '../../context/AuthContext'
+import { useCurrentUser } from '../../context/CurrentUserContext'
 import { OrderStatus, OrderStatusEnum } from '../../enums/OrderStatus'
 
 const columnsEnum = {
@@ -28,6 +29,7 @@ interface ProfileFarmerOrdersProps {
 const ProfileFarmerOrders = (props: ProfileFarmerOrdersProps) => {
     const { orders, loading } = props
     const { accessToken, authenticated } = useAuth()
+    const { isFarmer } = useCurrentUser()
 
     const apiRef = useGridApiRef()
 
@@ -125,7 +127,7 @@ const ProfileFarmerOrders = (props: ProfileFarmerOrdersProps) => {
                             },
                             columns: {
                                 columnVisibilityModel: {
-                                    // [columnsEnum.accept]: showFarmerButtons,
+                                    [columnsEnum.approve]: isFarmer ? true : false,
                                 },
                             },
                         }}
