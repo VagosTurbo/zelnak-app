@@ -6,6 +6,7 @@ export interface Product {
     name: string
     price: number
     description: string
+    quantity: number
     image: string
     user_id: User['id']
     category_id: Category['id']

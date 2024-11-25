@@ -124,3 +124,31 @@ CREATE TABLE user_events (
     FOREIGN KEY (event_id) REFERENCES events(id)
 );
 GO
+
+CREATE TRIGGER trg_update_order_status
+ON order_items
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @order_id INT;
+
+    -- Get the order_id from the updated order_items
+    SELECT @order_id = order_id
+    FROM inserted;
+
+    -- Check if all order items for the order are approved
+    IF NOT EXISTS (
+        SELECT 1
+        FROM order_items
+        WHERE order_id = @order_id
+        AND status != 'Approved'
+    )
+    BEGIN
+        -- Update the order status to 'Finished'
+        UPDATE orders
+        SET status = 'Finished'
+        WHERE id = @order_id;
+    END
+END;
