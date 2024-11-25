@@ -109,7 +109,6 @@ export const createOrder = async (req, res) => {
   const transaction = new sql.Transaction(pool);
 
   try {
-    // Begin the transaction
     await transaction.begin();
 
     // Create the order
@@ -128,12 +127,11 @@ export const createOrder = async (req, res) => {
       await dbCreateOrderItem(newOrderItem, transaction);
     }
 
-    // Commit the transaction
     await transaction.commit();
 
     const user = await dbGetUserById(buyer_id);
     if (user.role === Roles.Registered) {
-      // Update user role to Farmer
+      // Update user role to Customer
       const roleUpdated = await dbUpdateUser(buyer_id, {
         role: Roles.Customer,
       });

@@ -92,7 +92,6 @@ export const updateUser = async (req, res) => {
       }
     }
 
-    // Perform the update
     const success = await dbUpdateUser(userId, updatedUser);
     if (success) {
       return res
@@ -105,7 +104,7 @@ export const updateUser = async (req, res) => {
       });
     }
   } catch (err) {
-    console.error("Error updating user:", err); // Log the error
+    console.error("Error updating user:", err);
     return res.status(500).json({
       success: false,
       message: "An unexpected error occurred.",
@@ -126,7 +125,7 @@ export const deleteUser = async (req, res) => {
 
     const result = await dbDeleteUser(userId);
 
-    // was the user deleted?
+    // check if the user was deleted
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "User not found." });
     }

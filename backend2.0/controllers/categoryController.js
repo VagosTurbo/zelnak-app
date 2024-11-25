@@ -40,11 +40,10 @@ export const createCategory = async (req, res) => {
     is_approved: 0,
   };
 
-  // Attributes are expected to be an array of objects
   const attributes = req.body.attributes || []; // Default to empty array if no attributes
 
-  const pool = await poolPromise; // Use the existing connection pool
-  const transaction = new sql.Transaction(pool); // Start a transaction
+  const pool = await poolPromise;
+  const transaction = new sql.Transaction(pool);
 
   try {
     // Begin the transaction
@@ -62,10 +61,10 @@ export const createCategory = async (req, res) => {
       });
     }
 
-    // 1. Create the category and get its ID
+    // Create the category and get its ID
     const categoryId = await dbCreateCategory(newCategory, transaction);
 
-    // 2. Create attributes if provided
+    // Create attributes if provided
     if (attributes.length > 0) {
       for (let attribute of attributes) {
         await transaction
@@ -98,7 +97,7 @@ export const createCategory = async (req, res) => {
 };
 
 export const toggleCategoryApproval = async (req, res) => {
-  const categoryId = req.params.id; // Get category ID from URL parameters
+  const categoryId = req.params.id;
 
   try {
     const category = await dbGetCategoryById(categoryId);
@@ -115,7 +114,6 @@ export const toggleCategoryApproval = async (req, res) => {
       res.json({ message: `Category approval status failed to update` });
     }
 
-    // Return success response
     res.json({
       message: `Category approval status updated successfully`,
       categoryId,
@@ -133,24 +131,23 @@ export const toggleCategoryApproval = async (req, res) => {
 };
 
 export const updateCategory = async (req, res) => {
-  const categoryId = req.params.id; // Get category ID from the URL parameters
+  const categoryId = req.params.id;
   const updatedCategory = {
     name: req.body.name,
     parent_id: req.body.parent_id,
-    is_approved: req.body.is_approved || 0, // Default to 0 if not provided
+    is_approved: req.body.is_approved || 0, // Default false
   };
 
-  // Attributes are expected to be an array of objects
-  const attributes = req.body.attributes || []; // Default to empty array if no attributes
+  const attributes = req.body.attributes || []; // Default to empty array
 
-  const pool = await poolPromise; // Use the existing connection pool
-  const transaction = new sql.Transaction(pool); // Start a transaction
+  const pool = await poolPromise;
+  const transaction = new sql.Transaction(pool);
 
   try {
     // Begin the transaction
     await transaction.begin();
 
-    // 1. Check if the name is unique (only if the name has changed)
+    // Check if the name is unique (only if the name has changed)
     const existingCategory = await transaction
       .request()
       .input("name", sql.NVarChar, updatedCategory.name)
@@ -165,7 +162,7 @@ export const updateCategory = async (req, res) => {
       throw new Error("Category name must be unique");
     }
 
-    // 2. Update the category
+    // Update the category
     const result = await transaction
       .request()
       .input("name", sql.NVarChar, updatedCategory.name)
@@ -177,7 +174,7 @@ export const updateCategory = async (req, res) => {
                 WHERE id = @id
             `);
 
-    // 3. Optionally, update attributes if provided
+    // Update attributes if provided
     if (attributes.length > 0) {
       for (let attribute of attributes) {
         console.log(attribute);
@@ -197,7 +194,6 @@ export const updateCategory = async (req, res) => {
     // Commit the transaction after both operations
     await transaction.commit();
 
-    // Return success response with updated category and attributes
     res.json({
       message: "Category and attributes updated successfully",
       category: {
@@ -205,7 +201,7 @@ export const updateCategory = async (req, res) => {
         name: updatedCategory.name,
         parent_id: updatedCategory.parent_id,
         is_approved: updatedCategory.is_approved,
-        attributes: attributes, // Include the attributes in the response if needed
+        attributes: attributes,
       },
     });
   } catch (err) {
@@ -221,15 +217,15 @@ export const updateCategory = async (req, res) => {
 };
 
 export const deleteCategory = async (req, res) => {
-  const categoryId = req.params.id; // Get category ID from URL parameters
-  const pool = await poolPromise; // Use the existing connection pool
-  const transaction = new sql.Transaction(pool); // Start a transaction
+  const categoryId = req.params.id;
+  const pool = await poolPromise;
+  const transaction = new sql.Transaction(pool);
 
   try {
     // Begin the transaction
     await transaction.begin();
 
-    // 1. Check if the category exists
+    // Check if the category exists
     const category = await transaction
       .request()
       .input("id", sql.Int, categoryId)
@@ -239,25 +235,23 @@ export const deleteCategory = async (req, res) => {
       throw new Error("Category not found");
     }
 
-    // 2. Check if there are any subcategories
+    // Check if there are any subcategories
     const subcategories = await transaction
       .request()
       .input("parent_id", sql.Int, categoryId)
       .query("SELECT id FROM categories WHERE parent_id = @parent_id");
 
     if (subcategories.recordset.length > 0) {
-      // If there are subcategories, either reassign them or delete them first
-      // Example: Reassign subcategories to a default parent (e.g., NULL or another category)
       await transaction
         .request()
-        .input("parent_id", sql.Int, null) // Reassign to no parent (or another category ID)
+        .input("parent_id", sql.Int, null)
         .input("category_id", sql.Int, categoryId)
         .query(
           "UPDATE categories SET parent_id = @parent_id WHERE parent_id = @category_id"
         );
     }
 
-    // 3. Delete associated reviews for each product in this category
+    // Delete associated reviews for each product in this category
     const products = await transaction
       .request()
       .input("category_id", sql.Int, categoryId)
@@ -271,7 +265,7 @@ export const deleteCategory = async (req, res) => {
         .query("DELETE FROM reviews WHERE product_id = @product_id");
     }
 
-    // 4. Delete associated order_items for each product in this category
+    // Delete associated order_items for each product in this category
     for (let product of products.recordset) {
       await transaction
         .request()
@@ -279,19 +273,19 @@ export const deleteCategory = async (req, res) => {
         .query("DELETE FROM order_items WHERE product_id = @product_id");
     }
 
-    // 5. Delete the products from the category
+    // Delete the products from the category
     await transaction
       .request()
       .input("category_id", sql.Int, categoryId)
       .query("DELETE FROM products WHERE category_id = @category_id");
 
-    // 6. Delete associated attributes
+    // Delete associated attributes
     await transaction
       .request()
       .input("category_id", sql.Int, categoryId)
       .query("DELETE FROM attributes WHERE category_id = @category_id");
 
-    // 7. Delete the category
+    // Delete the category
     await transaction
       .request()
       .input("id", sql.Int, categoryId)
@@ -300,7 +294,6 @@ export const deleteCategory = async (req, res) => {
     // Commit the transaction after all operations
     await transaction.commit();
 
-    // Return success response
     res.json({
       message:
         "Category, its attributes, associated products, reviews, and order items deleted successfully",
