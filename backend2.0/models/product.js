@@ -78,12 +78,11 @@ export const dbUpdateProduct = async (id, updatedProduct) => {
     .input("name", sql.NVarChar, updatedProduct.name)
     .input("price", sql.Decimal, updatedProduct.price)
     .input("description", sql.NVarChar, updatedProduct.description)
-    .input("user_id", sql.Int, updatedProduct.user_id)
     .input("image", sql.NVarChar, updatedProduct.image)
     .input("category_id", sql.Int, updatedProduct.category_id)
-    .input("quantity", sql.Int, newProduct.quantity)
+    .input("quantity", sql.Int, updatedProduct.quantity)
     .query(
-      "UPDATE products SET name = @name, price = @price, description = @description, user_id = @user_id, image = @image, category_id = @category_id, quantity = @quantity WHERE id = @id"
+      "UPDATE products SET name = @name, price = @price, description = @description, image = @image, category_id = @category_id, quantity = @quantity WHERE id = @id"
     );
   return result.rowsAffected > 0; // Returns true if rows were affected
 };
