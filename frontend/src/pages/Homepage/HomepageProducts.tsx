@@ -69,7 +69,10 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                             </Link>
                             {authenticated ? (
                                 <Button
-                                    onClick={() => addProduct(product.id, 1, product.user_id)}
+                                    onClick={() => {
+                                        console.log('Product price', product.price)
+                                        addProduct(product.id, 3, product.price, product.user_id)
+                                    }}
                                     color="secondary"
                                     variant="contained"
                                     sx={{

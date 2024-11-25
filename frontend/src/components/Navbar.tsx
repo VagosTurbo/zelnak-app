@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCurrentUser } from '../context/CurrentUserContext'
 import { Routes } from '../enums'
+import { UserRoleLabel } from '../enums/UserRole'
 
 const Navbar: React.FC = () => {
     const { authenticated, signOut } = useAuth()
@@ -13,13 +14,13 @@ const Navbar: React.FC = () => {
         <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
             <Toolbar>
                 {/* App Title */}
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                    Zelnak IS
-                </Typography>
+                <Box sx={{ flexGrow: 1 }}>
+                    <MyLink to={Routes.Homepage} text={'Zelnak IS'} />
+                </Box>
 
                 {authenticated && currentUser && (
-                    <Typography variant="h6" component="div" sx={{ mr: 2 }}>
-                        Logged in: {currentUser.username}
+                    <Typography variant="body1" component="div" sx={{ mr: 2 }}>
+                        Logged in: {currentUser.username}, role: {UserRoleLabel[currentUser.role]}
                     </Typography>
                 )}
 

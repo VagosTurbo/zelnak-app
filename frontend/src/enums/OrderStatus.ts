@@ -1,11 +1,11 @@
 export enum OrderStatusEnum {
     Pending = 'Pending',
-    Accepted = 'Accepted',
+    Approved = 'Approved',
     Rejected = 'Rejected',
 }
 
 export const OrderStatus: Record<OrderStatusEnum, string> = {
     [OrderStatusEnum.Pending]: 'Pending',
-    [OrderStatusEnum.Accepted]: 'Accepted',
+    [OrderStatusEnum.Approved]: 'Approved',
     [OrderStatusEnum.Rejected]: 'Rejected',
 }

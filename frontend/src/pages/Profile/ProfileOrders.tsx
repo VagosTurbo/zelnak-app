@@ -92,7 +92,7 @@ const ProfileOrders = (props: ProfileOrdersProps) => {
     return (
         <>
             <Typography variant="h4" gutterBottom>
-                Orders
+                My orders
             </Typography>
 
             <Box

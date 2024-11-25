@@ -1,15 +1,15 @@
 import { Box, Button, Card, CardActionArea, CardContent, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { apiDelete } from '../../api/apiDelete'
+import { apiGet } from '../../api/apiGet'
+import { apiPost } from '../../api/apiPost'
+import { useAuth } from '../../context/AuthContext'
 import { Routes } from '../../enums'
 import colors from '../../styles/colors'
 import { Event } from '../../types/Event'
-import { useAuth } from '../../context/AuthContext'
-import { apiPost } from '../../api/apiPost'
-import { apiGet } from '../../api/apiGet'
-import { apiDelete } from '../../api/apiDelete'
-import { formatDate } from '../../utils/myUtils'
 import { User } from '../../types/User'
+import { formatDate } from '../../utils/myUtils'
 
 interface HomepageEventsProps {
     events: Event[]
@@ -47,6 +47,11 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({
         try {
             const response = await apiPost<any>(`/users/${userId}/events`, { eventId }, accessToken)
             console.log(response)
+            // Update the state to reflect the new event registration
+            setUserRegisteredEvents((prevEvents) => [
+                ...prevEvents,
+                events.find((event) => event.id === eventId)!,
+            ])
         } catch (err: any) {
             console.error('Failed to add event', err)
         }
@@ -58,6 +63,10 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({
         try {
             const response = await apiDelete<any>(`/users/${userId}/events/${eventId}`, accessToken)
             console.log(response)
+            // Update the state to reflect the event removal
+            setUserRegisteredEvents((prevEvents) =>
+                prevEvents.filter((event) => event.id !== eventId)
+            )
         } catch (err: any) {
             console.error('Failed to remove event', err)
         }

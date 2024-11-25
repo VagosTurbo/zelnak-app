@@ -1,19 +1,41 @@
-import React from 'react'
-import { Box, Button, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material'
-import { useCart } from '../context/CartContext'
-import { useAuth } from '../context/AuthContext'
-import DeleteIcon from '@mui/icons-material/Delete'
+import AddIcon from '@mui/icons-material/Add'
+import RemoveIcon from '@mui/icons-material/Remove'
+import { Box, Button, IconButton, List, ListItem, ListItemText, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import { apiPost } from '../api/apiPost'
-import { LocalStorage } from '../enums/LocalStorage'
-import { Order } from '../types/Order'
+import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
+import { LocalStorage } from '../enums'
+
+interface OrderResponse {
+    message: string
+    order: {
+        id: number
+        buyer_id: string
+        status: string
+    }
+}
 
 const Cart: React.FC = () => {
-    const { cart, removeProduct, clearCart } = useCart()
     const { authenticated, userId } = useAuth()
-    const [message, setMessage] = React.useState<string | null>(null)
+    const { cart, updateProductQuantity, clearCart } = useCart()
+    const [message, setMessage] = useState<string | null>(null)
+    const [totalPrice, setTotalPrice] = useState<number>(0)
+
+    useEffect(() => {
+        const calculateTotalPrice = () => {
+            const total = cart.products.reduce(
+                (sum, product) => sum + product.price * product.quantity,
+                0
+            )
+            setTotalPrice(total)
+        }
+
+        calculateTotalPrice()
+    }, [cart.products])
 
     const handleCreateOrder = async () => {
-        if (!userId) {
+        if (!authenticated) {
             setMessage('User is not authenticated')
             return
         }
@@ -34,12 +56,21 @@ const Cart: React.FC = () => {
                 })),
             }
 
-            const response = await apiPost<Order[]>('/orders', orderData, token)
-            setMessage(response.toString() || 'Order created successfully!')
+            const response = await apiPost<OrderResponse>('/orders', orderData, token)
+            console.log('Order response:', response)
+            setMessage(response.message || 'Order created successfully!')
             clearCart() // Clear the cart after creating the order
         } catch (error: any) {
             setMessage(error.response?.data?.message || 'Failed to create order')
         }
+    }
+
+    const handleIncreaseQuantity = (productId: number) => {
+        updateProductQuantity(productId, 1)
+    }
+
+    const handleDecreaseQuantity = (productId: number) => {
+        updateProductQuantity(productId, -1)
     }
 
     return (
@@ -49,7 +80,6 @@ const Cart: React.FC = () => {
                     <Typography variant="h6" component="div" sx={{ mb: 2 }}>
                         User ID: {userId}
                     </Typography>
-                    {/* Test addProduct */}
                     <Typography variant="h4" component="h1" gutterBottom>
                         Shopping Cart
                     </Typography>
@@ -65,32 +95,28 @@ const Cart: React.FC = () => {
                                             secondary={`Quantity: ${product.quantity}`}
                                         />
                                         <IconButton
-                                            edge="end"
-                                            aria-label="delete"
-                                            onClick={() => removeProduct(product.id)}>
-                                            <DeleteIcon />
+                                            color="primary"
+                                            onClick={() => handleIncreaseQuantity(product.id)}>
+                                            <AddIcon />
+                                        </IconButton>
+                                        <IconButton
+                                            color="secondary"
+                                            onClick={() => handleDecreaseQuantity(product.id)}>
+                                            <RemoveIcon />
                                         </IconButton>
                                     </ListItem>
                                 ))}
                             </List>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                onClick={clearCart}
-                                sx={{ mt: 2 }}>
-                                Clear Cart
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleCreateOrder}
-                                sx={{ mt: 2 }}>
+                            <Typography variant="h6" component="div" sx={{ mt: 2 }}>
+                                Total Price: ${totalPrice.toFixed(2)}
+                            </Typography>
+                            <Button variant="contained" color="primary" onClick={handleCreateOrder}>
                                 Create Order
                             </Button>
                         </>
                     )}
                     {message && (
-                        <Typography color="error" sx={{ mt: 2 }}>
+                        <Typography variant="body1" color="primary" sx={{ mt: 2 }}>
                             {message}
                         </Typography>
                     )}
