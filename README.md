@@ -37,14 +37,11 @@ spusteni BE lokalne:
 /////
 
 edit product - susi
-add product - susi
 add event - v discordu - susi
 router.tsx - vyresit prava - JP
 zkontrolovat prava na BE - NEVIM KDO
 na farmer page pridat ze pokud je to jeho page tak bude mit tlacitko na edit - nevim kdo
 edit event - susi
-zmenit {error: } na {message: } na BE - nevim kdo
 delete event
 delete product
 pozadi na admin page modal
-do create product přidat quantity

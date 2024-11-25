@@ -226,7 +226,7 @@ export const deleteProduct = async (req, res) => {
     // Only allow the deletion if the user is an admin or the user who created the event
     if (userRole !== Roles.Admin && existingProduct.user_id !== userId) {
       return res.status(403).json({
-        error: "Forbidden: You are not authorized to delete this product",
+        message: "Forbidden: You are not authorized to delete this product",
       });
     }
 
