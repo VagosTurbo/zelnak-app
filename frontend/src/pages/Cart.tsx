@@ -1,11 +1,23 @@
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
-import { Box, Button, IconButton, List, ListItem, ListItemText, Typography } from '@mui/material'
+import {
+    Box,
+    CircularProgress,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Paper,
+    Typography,
+} from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { apiPost } from '../api/apiPost'
+import { ZelnakButton } from '../components/ZelnakButton'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
-import { LocalStorage } from '../enums'
+import { LocalStorage, Routes } from '../enums'
+import Layout from './layouts/Layout'
 
 interface OrderResponse {
     message: string
@@ -21,6 +33,8 @@ const Cart: React.FC = () => {
     const { cart, updateProductQuantity, clearCart } = useCart()
     const [message, setMessage] = useState<string | null>(null)
     const [totalPrice, setTotalPrice] = useState<number>(0)
+    const [loading, setLoading] = useState<boolean>(false)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         const calculateTotalPrice = () => {
@@ -46,6 +60,9 @@ const Cart: React.FC = () => {
             return
         }
 
+        setLoading(true)
+        setError(null)
+
         try {
             const orderData = {
                 buyer_id: userId,
@@ -57,11 +74,15 @@ const Cart: React.FC = () => {
             }
 
             const response = await apiPost<OrderResponse>('/orders', orderData, token)
-            console.log('Order response:', response)
             setMessage(response.message || 'Order created successfully!')
-            clearCart() // Clear the cart after creating the order
+            setLoading(false)
+            setError(null)
+
+            clearCart()
         } catch (error: any) {
-            setMessage(error.response?.data?.message || 'Failed to create order')
+            setMessage(null)
+            setError(error.response?.data?.message || 'Failed to create order')
+            setLoading(false)
         }
     }
 
@@ -74,57 +95,111 @@ const Cart: React.FC = () => {
     }
 
     return (
-        <Box sx={{ padding: 2 }}>
-            {authenticated ? (
-                <>
-                    <Typography variant="h6" component="div" sx={{ mb: 2 }}>
-                        User ID: {userId}
-                    </Typography>
-                    <Typography variant="h4" component="h1" gutterBottom>
-                        Shopping Cart
-                    </Typography>
-                    {cart.products.length === 0 ? (
-                        <Typography variant="body1">Your cart is empty.</Typography>
-                    ) : (
+        <Layout>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    p: 5,
+                }}>
+                <Paper elevation={3} sx={{ p: 3, width: '760px' }}>
+                    {authenticated ? (
                         <>
-                            <List>
-                                {cart.products.map((product) => (
-                                    <ListItem key={product.id}>
-                                        <ListItemText
-                                            primary={`Product ID: ${product.id}`}
-                                            secondary={`Quantity: ${product.quantity}`}
-                                        />
-                                        <IconButton
-                                            color="primary"
-                                            onClick={() => handleIncreaseQuantity(product.id)}>
-                                            <AddIcon />
-                                        </IconButton>
-                                        <IconButton
-                                            color="secondary"
-                                            onClick={() => handleDecreaseQuantity(product.id)}>
-                                            <RemoveIcon />
-                                        </IconButton>
-                                    </ListItem>
-                                ))}
-                            </List>
-                            <Typography variant="h6" component="div" sx={{ mt: 2 }}>
-                                Total Price: ${totalPrice.toFixed(2)}
+                            <Typography variant="h4" component="h1" gutterBottom>
+                                Shopping Cart
                             </Typography>
-                            <Button variant="contained" color="primary" onClick={handleCreateOrder}>
-                                Create Order
-                            </Button>
+                            {cart.products.length === 0 ? (
+                                <>
+                                    <Typography variant="body1" mb={2}>
+                                        Your cart is empty.
+                                    </Typography>
+                                    <Link to={Routes.Homepage}>
+                                        <ZelnakButton color="primary">
+                                            Add products to cart
+                                        </ZelnakButton>
+                                    </Link>
+                                </>
+                            ) : (
+                                <>
+                                    <List
+                                        sx={{
+                                            gap: 1,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                        }}>
+                                        {cart.products.map((product) => (
+                                            <ListItem
+                                                key={product.id}
+                                                sx={{
+                                                    border: 0.5,
+                                                }}>
+                                                <ListItemText
+                                                    primary={`Product name: ${product.productName}`}
+                                                    secondary={`Quantity: ${product.quantity}`}
+                                                />
+                                                <IconButton
+                                                    color="primary"
+                                                    onClick={() =>
+                                                        handleIncreaseQuantity(product.id)
+                                                    }>
+                                                    <AddIcon />
+                                                </IconButton>
+                                                <IconButton
+                                                    color="secondary"
+                                                    onClick={() =>
+                                                        handleDecreaseQuantity(product.id)
+                                                    }>
+                                                    <RemoveIcon />
+                                                </IconButton>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                    <Typography variant="h6" component="div" sx={{ my: 2 }}>
+                                        Total Price: ${totalPrice.toFixed(2)}
+                                    </Typography>
+                                    <ZelnakButton
+                                        color="primary"
+                                        sx={{
+                                            textAlign: 'center',
+                                            display: 'block',
+                                            margin: '0 auto',
+                                        }}
+                                        onClick={handleCreateOrder}
+                                        disabled={loading}>
+                                        {loading ? <CircularProgress size={24} /> : 'Create Order'}
+                                    </ZelnakButton>
+                                </>
+                            )}
+                            {message && (
+                                <>
+                                    <Typography
+                                        variant="body1"
+                                        color="success.main"
+                                        sx={{ mt: 2, mb: 2 }}>
+                                        {message}
+                                    </Typography>
+
+                                    <Link to={Routes.Profile}>
+                                        <ZelnakButton color="primary">
+                                            Show your orders
+                                        </ZelnakButton>
+                                    </Link>
+                                </>
+                            )}
+                            {error && (
+                                <Typography variant="body1" color="error" sx={{ mt: 2 }}>
+                                    {error}
+                                </Typography>
+                            )}
                         </>
+                    ) : (
+                        <Typography variant="body1">Please log in to view your cart.</Typography>
                     )}
-                    {message && (
-                        <Typography variant="body1" color="primary" sx={{ mt: 2 }}>
-                            {message}
-                        </Typography>
-                    )}
-                </>
-            ) : (
-                <Typography variant="body1">Please log in to view your cart.</Typography>
-            )}
-        </Box>
+                </Paper>
+            </Box>
+        </Layout>
     )
 }
 
