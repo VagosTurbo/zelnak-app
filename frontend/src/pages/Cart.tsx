@@ -30,7 +30,7 @@ interface OrderResponse {
 
 const Cart: React.FC = () => {
     const { authenticated, userId } = useAuth()
-    const { cart, updateProductQuantity, clearCart } = useCart()
+    const { cart, updateProductQuantity, clearCart, removeProduct } = useCart()
     const [message, setMessage] = useState<string | null>(null)
     const [totalPrice, setTotalPrice] = useState<number>(0)
     const [loading, setLoading] = useState<boolean>(false)
@@ -91,7 +91,11 @@ const Cart: React.FC = () => {
     }
 
     const handleDecreaseQuantity = (productId: number) => {
-        updateProductQuantity(productId, -1)
+        if (cart.products.find((product) => product.id === productId)?.quantity === 1) {
+            removeProduct(productId)
+        } else {
+            updateProductQuantity(productId, -1)
+        }
     }
 
     return (

@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom'
 import { apiGet } from '../../api/apiGet'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
+import { useCurrentUser } from '../../context/CurrentUserContext'
 import { Routes } from '../../enums'
 import colors from '../../styles/colors'
 import { Category } from '../../types/Category'
@@ -29,6 +30,7 @@ interface HomepageProductsProps {
 export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) => {
     const { addProduct } = useCart()
     const { authenticated } = useAuth()
+    const { isFarmer } = useCurrentUser()
 
     const [categories, setCategories] = useState<{ [key: number]: Category[] }>({})
     const [productMessage, setProductMessage] = useState<{
@@ -140,7 +142,7 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({ products }) 
                                         sx={{
                                             mt: 'auto',
                                         }}
-                                        disabled={product.quantity === 0}
+                                        disabled={product.quantity === 0 || isFarmer}
                                         fullWidth>
                                         Add to cart
                                     </Button>
