@@ -113,6 +113,9 @@ const Homepage: React.FC = () => {
                     <Link to="/admin" style={{ marginRight: '16px' }}>
                         Admin Page
                     </Link>
+                    <Link to={Routes.AddEvent} style={{ marginRight: '16px' }}>
+                        Add Event
+                    </Link>
                 </nav>
             </Box>
 

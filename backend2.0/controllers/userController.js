@@ -18,7 +18,7 @@ export const getAllUsers = async (req, res) => {
     const users = await dbGetAllUsers();
     res.json(users);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -27,7 +27,7 @@ export const getUserById = async (req, res) => {
     const user = await dbGetUserById(req.params.id);
     res.json(user);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -45,7 +45,7 @@ export const createUser = async (req, res) => {
     await dbCreateUser(newUser);
     res.json({ message: "User created successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -109,7 +109,7 @@ export const updateUser = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "An unexpected error occurred.",
-      error: err.message,
+      message: err.message,
     });
   }
 };
@@ -121,19 +121,19 @@ export const deleteUser = async (req, res) => {
     // test existence
     const existingUser = await dbGetUserById(userId);
     if (!existingUser) {
-      return res.status(404).json({ error: "User not found." });
+      return res.status(404).json({ message: "User not found." });
     }
 
     const result = await dbDeleteUser(userId);
 
     // was the user deleted?
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "User not found." });
+      return res.status(404).json({ message: "User not found." });
     }
 
     res.json({ message: "User deleted successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -145,17 +145,17 @@ export const addUserEvent = async (req, res) => {
     const exists = await dbCheckUserEvent(userId, eventId);
 
     if (exists) {
-      return res.status(400).json({ error: "User already added to event" });
+      return res.status(400).json({ message: "User already added to event" });
     }
 
     const success = await dbAddUserEvent(userId, eventId);
     if (success) {
       res.json({ message: "Event added successfully" });
     } else {
-      res.status(500).json({ error: "Failed to add event" });
+      res.status(500).json({ message: "Failed to add event" });
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -168,10 +168,10 @@ export const removeUserEvent = async (req, res) => {
     if (success) {
       res.json({ message: "Event removed successfully" });
     } else {
-      res.status(500).json({ error: "Failed to remove event" });
+      res.status(500).json({ message: "Failed to remove event" });
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -182,6 +182,6 @@ export const getUserEvents = async (req, res) => {
     const events = await dbGetUserEvents(userId);
     res.json(events);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };

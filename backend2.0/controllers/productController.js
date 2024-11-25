@@ -19,7 +19,7 @@ export const getAllProducts = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ error: "Failed to retrieve products: " + err.message });
+      .json({ message: "Failed to retrieve products: " + err.message });
   }
 };
 
@@ -29,20 +29,20 @@ export const getProductById = async (req, res) => {
     const productId = req.params.id;
 
     if (!productId) {
-      return res.status(400).json({ error: "Product ID is required" });
+      return res.status(400).json({ message: "Product ID is required" });
     }
 
     const product = await dbGetProductById(productId);
 
     if (!product) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     res.json(product);
   } catch (err) {
     res
       .status(500)
-      .json({ error: "Failed to retrieve product: " + err.message });
+      .json({ message: "Failed to retrieve product: " + err.message });
   }
 };
 
@@ -52,13 +52,13 @@ export const getProductsByUserId = async (req, res) => {
     const userId = req.params.id;
 
     if (!userId) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ message: "User ID is required" });
     }
 
     // test existence
     const existingUser = await dbGetUserById(userId);
     if (!existingUser) {
-      return res.status(404).json({ error: "User not found." });
+      return res.status(404).json({ message: "User not found." });
     }
 
     // Retrieve products by user_id
@@ -68,7 +68,7 @@ export const getProductsByUserId = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ error: "Failed to retrieve products: " + err.message });
+      .json({ message: "Failed to retrieve products: " + err.message });
   }
 };
 
@@ -78,22 +78,32 @@ export const createProduct = async (req, res) => {
     const { name, price, description, user_id, image, category_id } = req.body;
 
     // Validate required fields
-    if (!user_id || !price || !name || !category_id) {
+    if (
+      !user_id ||
+      !price ||
+      !name ||
+      !category_id ||
+      name.trim().length === 0
+    ) {
       return res
         .status(400)
-        .json({ error: "Name, price, category, and user_id are required" });
+        .json({ message: "Name, price, category, and user_id are required" });
+    }
+
+    if (price < 0) {
+      return res.status(400).json({ message: "Price has wrong value" });
     }
 
     // Check if user exists
     const user = await dbGetUserById(user_id);
     if (!user) {
-      return res.status(400).json({ error: "User ID doesn't exist" });
+      return res.status(400).json({ message: "User ID doesn't exist" });
     }
 
     // Check if category exists
     const category = await dbGetCategoryById(category_id);
     if (!category) {
-      return res.status(400).json({ error: "Category doesn't exist" });
+      return res.status(400).json({ message: "Category doesn't exist" });
     }
 
     // Set default image if not provided
@@ -124,17 +134,20 @@ export const createProduct = async (req, res) => {
           });
         } else {
           return res.status(500).json({
-            error: "Product created, but failed to update user role to Farmer",
+            message:
+              "Product created, but failed to update user role to Farmer",
           });
         }
       }
 
       res.status(201).json({ message: "Product created successfully" });
     } else {
-      res.status(500).json({ error: "Failed to create product" });
+      res.status(500).json({ message: "Failed to create product" });
     }
   } catch (err) {
-    res.status(400).json({ error: "Failed to create product: " + err.message });
+    res
+      .status(400)
+      .json({ message: "Failed to create product: " + err.message });
   }
 };
 
@@ -148,7 +161,7 @@ export const updateProduct = async (req, res) => {
     if (req.body.created_at || req.body.user_id) {
       return res
         .status(400)
-        .json({ error: "Cannot update 'created_at' or 'user_id' fields" });
+        .json({ message: "Cannot update 'created_at' or 'user_id' fields" });
     }
 
     // Add the allowed fields to updatedProduct object
@@ -161,13 +174,13 @@ export const updateProduct = async (req, res) => {
     if (Object.keys(updatedProduct).length === 0) {
       return res
         .status(400)
-        .json({ error: "At least one field is required to update" });
+        .json({ message: "At least one field is required to update" });
     }
 
     // Check if the product exists
     const existingProduct = await dbGetProductById(productId);
     if (!existingProduct) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     // Update the product in the database
@@ -176,10 +189,12 @@ export const updateProduct = async (req, res) => {
     if (productUpdated) {
       res.json({ message: "Product updated successfully" });
     } else {
-      res.status(500).json({ error: "Failed to update product" });
+      res.status(500).json({ message: "Failed to update product" });
     }
   } catch (err) {
-    res.status(500).json({ error: "Failed to update product: " + err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update product: " + err.message });
   }
 };
 
@@ -188,13 +203,13 @@ export const deleteProduct = async (req, res) => {
     const productId = req.params.id;
 
     if (!productId) {
-      return res.status(400).json({ error: "Product ID is required" });
+      return res.status(400).json({ message: "Product ID is required" });
     }
 
     const existingProduct = await dbGetProductById(productId);
 
     if (!existingProduct) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     // Check if the user is authorized to delete the event
@@ -218,6 +233,8 @@ export const deleteProduct = async (req, res) => {
 
     res.json({ message: "Product deleted successfully" });
   } catch (err) {
-    res.status(500).json({ error: "Failed to delete product: " + err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to delete product: " + err.message });
   }
 };

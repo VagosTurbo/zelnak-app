@@ -3,6 +3,7 @@ import ProtectedRoute from './components/ProtectedRoute.tsx'
 import { Routes } from './enums/Routes.ts'
 import { UserRole } from './enums/UserRole.ts'
 import AddCategory from './pages/AddCategory.tsx'
+import AddEvent from './pages/AddEvent.tsx'
 import AddProduct from './pages/AddProduct.tsx'
 import AdminPage from './pages/AdminPage.tsx'
 import Cart from './pages/Cart.tsx'
@@ -86,6 +87,10 @@ const applicationRouter = createHashRouter([
                 allowedRoles={[UserRole.Customer, UserRole.Registered]}
             />
         ),
+    },
+    {
+        path: Routes.AddEvent,
+        element: <AddEvent />,
     },
 ])
 
