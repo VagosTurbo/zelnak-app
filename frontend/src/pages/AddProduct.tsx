@@ -1,10 +1,14 @@
 import { FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
-import React, { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import api from '../api/api'
+import { apiGet } from '../api/apiGet'
 import { apiPost } from '../api/apiPost'
+import { apiPut } from '../api/apiPut'
 import { ZelnakButton } from '../components/ZelnakButton'
 import { useAuth } from '../context/AuthContext'
 import { useCurrentUser } from '../context/CurrentUserContext'
+import { Product } from '../types/Product'
 import Layout from './layouts/Layout'
 import ZelnakBox from './layouts/ZelnakBox'
 
@@ -13,15 +17,58 @@ interface Category {
     name: string
 }
 
-const AddProduct: React.FC = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        price: '',
-        description: '',
-        image: '',
-        category_id: '',
-        quantity: 0,
-    })
+interface AddProductProps {
+    edit?: boolean
+}
+
+interface FormData {
+    name: string
+    price: number
+    description: string
+    image: string
+    category_id: number
+    quantity: number
+}
+
+const emptyFormData = {
+    name: '',
+    price: 0,
+    description: '',
+    image: '',
+    category_id: 0,
+    quantity: 0,
+}
+
+const AddProduct = (props: AddProductProps) => {
+    const { edit = false } = props
+
+    const { id } = useParams<{ id: string }>()
+
+    const getProductById = async (id: string) => {
+        try {
+            const response = await apiGet<Product>(`/products/${id}`)
+            console.log(response)
+
+            setFormData({
+                name: response.name,
+                price: response.price,
+                description: response.description,
+                image: response.image,
+                category_id: Number(response.category_id),
+                quantity: response.quantity,
+            })
+        } catch (error: any) {
+            console.error('Failed to fetch product', error)
+        }
+    }
+
+    useEffect(() => {
+        if (edit && id) {
+            getProductById(id)
+        }
+    }, [edit, id])
+
+    const [formData, setFormData] = useState<FormData>(emptyFormData)
     const [categories, setCategories] = useState<Category[]>([])
     const [message, setMessage] = useState('')
     const { accessToken } = useAuth()
@@ -53,14 +100,11 @@ const AddProduct: React.FC = () => {
                 setMessage('User is not authenticated')
                 return
             }
-            const response = await apiPost<any>(
-                '/products',
-                {
-                    ...formData,
-                    user_id: userId, // Include user_id in the request payload
-                },
-                accessToken
-            )
+
+            const response = !edit
+                ? await apiPost<any>('/products', { ...formData, user_id: userId }, accessToken)
+                : await apiPut<any>(`/products/${id}`, formData, accessToken)
+
             setMessage(response.message || 'Product added successfully!')
         } catch (error: any) {
             setMessage(error.message || 'Error occurred')
@@ -71,7 +115,7 @@ const AddProduct: React.FC = () => {
         <Layout>
             <ZelnakBox>
                 <Typography variant="h4" component="h1" gutterBottom>
-                    Add Product
+                    {edit ? 'Edit Product' : 'Add Product'}
                 </Typography>
                 <form onSubmit={handleSubmit}>
                     <TextField
@@ -111,7 +155,9 @@ const AddProduct: React.FC = () => {
                         <Select
                             labelId="category-label"
                             value={formData.category_id}
-                            onChange={(e) => handleSetValue('category_id', e.target.value)}
+                            onChange={(e) =>
+                                handleSetValue('category_id', e.target.value as string)
+                            }
                             label="Category">
                             {categories.map((category) => (
                                 <MenuItem key={category.id} value={category.id}>
@@ -129,11 +175,11 @@ const AddProduct: React.FC = () => {
                         sx={{ mb: 2 }}
                     />
                     <ZelnakButton color="primary" type="submit" fullWidth>
-                        Add Product
+                        {edit ? 'Edit Product' : 'Add Product'}
                     </ZelnakButton>
                 </form>
                 {message && (
-                    <Typography color="error" sx={{ mt: 2 }}>
+                    <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>
                         {message}
                     </Typography>
                 )}
