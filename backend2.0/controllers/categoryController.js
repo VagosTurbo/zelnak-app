@@ -326,6 +326,6 @@ export const getCategoryHierarchy = async (req, res) => {
     const hierarchy = await dbGetCategoryHierarchy(req.params.categoryId);
     res.json(hierarchy);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };

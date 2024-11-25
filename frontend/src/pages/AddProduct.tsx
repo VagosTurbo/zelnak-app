@@ -1,11 +1,16 @@
-import React, { useState, useEffect, FormEvent } from 'react';
-import { Box, Button, TextField, Typography, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
-import api from '../api/api';
-import { LocalStorage } from '../enums';
+import { FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
+import React, { FormEvent, useEffect, useState } from 'react'
+import api from '../api/api'
+import { apiPost } from '../api/apiPost'
+import { ZelnakButton } from '../components/ZelnakButton'
+import { useAuth } from '../context/AuthContext'
+import { useCurrentUser } from '../context/CurrentUserContext'
+import Layout from './layouts/Layout'
+import ZelnakBox from './layouts/ZelnakBox'
 
 interface Category {
-    id: number;
-    name: string;
+    id: number
+    name: string
 }
 
 const AddProduct: React.FC = () => {
@@ -15,68 +20,56 @@ const AddProduct: React.FC = () => {
         description: '',
         image: '',
         category_id: '',
-    });
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [message, setMessage] = useState('');
+        quantity: 0,
+    })
+    const [categories, setCategories] = useState<Category[]>([])
+    const [message, setMessage] = useState('')
+    const { accessToken } = useAuth()
+    const { currentUser } = useCurrentUser()
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await api.get('/categories');
-                setCategories(response.data);
+                const response = await api.get('/categories')
+                setCategories(response.data)
             } catch (err: any) {
-                setMessage(err.response?.data?.message || 'Failed to fetch categories');
+                setMessage(err.response?.data?.message || 'Failed to fetch categories')
             }
-        };
+        }
 
-        fetchCategories();
-    }, []);
+        fetchCategories()
+    }, [])
 
     const handleSetValue = (key: keyof typeof formData, value: string) => {
-        setFormData({ ...formData, [key]: value });
-    };
+        setFormData({ ...formData, [key]: value })
+    }
 
     const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
+        e.preventDefault()
+
         try {
-            const token = localStorage.getItem(LocalStorage.token);
-            const userId = localStorage.getItem(LocalStorage.UserId);
-            if (!token || !userId) {
-                setMessage('User is not authenticated');
-                return;
+            const userId = currentUser?.id
+            if (!accessToken || !userId) {
+                setMessage('User is not authenticated')
+                return
             }
-            const response = await api.post('/products', {
-                ...formData,
-                user_id: userId, // Include user_id in the request payload
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            const response = await apiPost<any>(
+                '/products',
+                {
+                    ...formData,
+                    user_id: userId, // Include user_id in the request payload
                 },
-            });
-            setMessage(response.data.message || 'Product added successfully!');
+                accessToken
+            )
+            setMessage(response.message || 'Product added successfully!')
         } catch (error: any) {
-            setMessage(error.response?.data?.message || 'Error occurred');
+            setMessage(error.message || 'Error occurred')
         }
-    };
+    }
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh',
-                backgroundColor: '#f5f5f5',
-            }}>
-            <Box
-                sx={{
-                    width: 400,
-                    padding: 4,
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    backgroundColor: '#fff',
-                    textAlign: 'center',
-                }}>
+        <Layout>
+            <ZelnakBox>
                 <Typography variant="h4" component="h1" gutterBottom>
                     Add Product
                 </Typography>
@@ -119,8 +112,7 @@ const AddProduct: React.FC = () => {
                             labelId="category-label"
                             value={formData.category_id}
                             onChange={(e) => handleSetValue('category_id', e.target.value)}
-                            label="Category"
-                        >
+                            label="Category">
                             {categories.map((category) => (
                                 <MenuItem key={category.id} value={category.id}>
                                     {category.name}
@@ -128,18 +120,26 @@ const AddProduct: React.FC = () => {
                             ))}
                         </Select>
                     </FormControl>
-                    <Button variant="contained" color="primary" type="submit" fullWidth>
+                    <TextField
+                        label="Quantity Avaliable"
+                        variant="outlined"
+                        fullWidth
+                        value={formData.quantity}
+                        onChange={(e) => handleSetValue('quantity', e.target.value)}
+                        sx={{ mb: 2 }}
+                    />
+                    <ZelnakButton color="primary" type="submit" fullWidth>
                         Add Product
-                    </Button>
+                    </ZelnakButton>
                 </form>
                 {message && (
                     <Typography color="error" sx={{ mt: 2 }}>
                         {message}
                     </Typography>
                 )}
-            </Box>
-        </Box>
-    );
-};
+            </ZelnakBox>
+        </Layout>
+    )
+}
 
-export default AddProduct;
+export default AddProduct

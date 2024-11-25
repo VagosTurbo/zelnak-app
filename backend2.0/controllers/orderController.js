@@ -82,7 +82,7 @@ export const getAllOrders = async (req, res) => {
     const orders = await dbGetAllOrders();
     res.json(orders);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -92,7 +92,7 @@ export const getOrderById = async (req, res) => {
     const orderItems = await dbGetOrderItemsByOrderId(req.params.id);
     res.json({ order, orderItems });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -102,7 +102,7 @@ export const createOrder = async (req, res) => {
   if (!buyer_id || !products || products.length === 0) {
     return res
       .status(400)
-      .json({ error: "Buyer ID and products are required" });
+      .json({ message: "Buyer ID and products are required" });
   }
 
   const pool = await poolPromise;
@@ -143,7 +143,7 @@ export const createOrder = async (req, res) => {
         });
       } else {
         return res.status(500).json({
-          error: "Order created, but failed to update user role to Customer",
+          message: "Order created, but failed to update user role to Customer",
         });
       }
     }
@@ -167,7 +167,7 @@ export const updateOrder = async (req, res) => {
     await dbUpdateOrder(req.params.id, updatedOrder);
     res.json({ message: "Order updated successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -176,7 +176,7 @@ export const deleteOrder = async (req, res) => {
     await dbDeleteOrder(req.params.id);
     res.json({ message: "Order deleted successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -185,7 +185,7 @@ export const getOrdersByUserId = async (req, res) => {
     const orders = await dbGetOrdersByUserId(req.params.id);
     res.json(orders);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -195,7 +195,7 @@ export const createOrderItem = async (req, res) => {
 
   if (!order_id || !product_id || !seller_id || !quantity) {
     return res.status(400).json({
-      error: "Order ID, Product ID, Seller ID, and Quantity are required",
+      message: "Order ID, Product ID, Seller ID, and Quantity are required",
     });
   }
 
@@ -216,7 +216,7 @@ export const createOrderItem = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ error: "Failed to create order item: " + err.message });
+      .json({ message: "Failed to create order item: " + err.message });
   }
 };
 
@@ -229,7 +229,7 @@ export const updateOrderItem = async (req, res) => {
     await dbUpdateOrderItem(req.params.id, updatedOrderItem);
     res.json({ message: "Order item updated successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -238,7 +238,7 @@ export const deleteOrderItem = async (req, res) => {
     await dbDeleteOrderItem(req.params.id);
     res.json({ message: "Order item deleted successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -247,7 +247,7 @@ export const getOrderItemsByOrderId = async (req, res) => {
     const orderItems = await dbGetOrderItemsByOrderId(req.params.orderId);
     res.json(orderItems);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -256,6 +256,6 @@ export const getOrderItemsBySellerId = async (req, res) => {
     const orderItems = await dbGetOrderItemsBySellerId(req.params.sellerId);
     res.json(orderItems);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };

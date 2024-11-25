@@ -18,7 +18,7 @@ export const getAllEvents = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ error: "Failed to retrieve events: " + err.message });
+      .json({ message: "Failed to retrieve events: " + err.message });
   }
 };
 
@@ -27,18 +27,20 @@ export const getEventById = async (req, res) => {
     const eventId = req.params.id;
 
     if (!eventId) {
-      return res.status(400).json({ error: "Event ID is required" });
+      return res.status(400).json({ message: "Event ID is required" });
     }
 
     const event = await dbGetEventById(eventId);
 
     if (!event) {
-      return res.status(404).json({ error: "Event not found" });
+      return res.status(404).json({ message: "Event not found" });
     }
 
     res.json(event);
   } catch (err) {
-    res.status(500).json({ error: "Failed to retrieve event: " + err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to retrieve event: " + err.message });
   }
 };
 
@@ -47,7 +49,7 @@ export const getEventsByUserId = async (req, res) => {
     const userId = req.params.id;
 
     if (!userId) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ message: "User ID is required" });
     }
 
     const events = await dbGetEventsByUserId(userId);
@@ -56,7 +58,7 @@ export const getEventsByUserId = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ error: "Failed to retrieve events: " + err.message });
+      .json({ message: "Failed to retrieve events: " + err.message });
   }
 };
 
@@ -65,11 +67,11 @@ export const createEvent = async (req, res) => {
     const { name, description, date, location, user_id } = req.body;
 
     if (!user_id) {
-      return res.status(400).json({ error: "user_id is required" });
+      return res.status(400).json({ message: "user_id is required" });
     }
 
     if (!name || name.trim().length === 0) {
-      return res.status(400).json({ error: "Name of event is required" });
+      return res.status(400).json({ message: "Name of event is required" });
     }
 
     const eventCreated = await dbCreateEvent({

@@ -1,6 +1,7 @@
 import { Box, Card, CardActionArea, CardContent, Typography } from '@mui/material'
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { ZelnakButton } from '../../components/ZelnakButton'
 import { UrlParams } from '../../enums/UrlParams'
 import { Category } from '../../types/Category'
 
@@ -9,6 +10,12 @@ interface HomepageCategoriesProps {
 }
 
 export const HomepageCategories: React.FC<HomepageCategoriesProps> = ({ categories }) => {
+    const navigate = useNavigate()
+
+    const handleRemoveUrlParams = () => {
+        navigate({ pathname: '/', search: '' }) // Navigate to the base path
+    }
+
     return (
         <>
             <Typography variant="h1" component="h2" mb={3} textAlign="center">
@@ -37,6 +44,11 @@ export const HomepageCategories: React.FC<HomepageCategoriesProps> = ({ categori
                         </CardContent>
                     </Card>
                 ))}
+            </Box>
+            <Box textAlign="center" mb={3}>
+                <ZelnakButton color="primary" onClick={handleRemoveUrlParams}>
+                    Reset Filters
+                </ZelnakButton>
             </Box>
         </>
     )
