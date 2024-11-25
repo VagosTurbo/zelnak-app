@@ -176,6 +176,8 @@ export const updateProduct = async (req, res) => {
     if (req.body.price) updatedProduct.price = req.body.price;
     if (req.body.description) updatedProduct.description = req.body.description;
     if (req.body.image) updatedProduct.image = req.body.image;
+    if (req.body.category_id) updatedProduct.category_id = req.body.category_id;
+    if (req.body.quantity) updatedProduct.quantity = req.body.quantity;
 
     // Ensure that at least one valid field is provided for the update
     if (Object.keys(updatedProduct).length === 0) {
