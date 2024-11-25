@@ -9,6 +9,7 @@ import {
 import { dbGetUserById, dbUpdateUser } from "../models/user.js";
 import { dbGetCategoryById } from "../models/category.js";
 import { Roles } from "../enums/roles.js";
+import { dbDeleteOrderItemsByProductId } from "../models/orderItem.js";
 
 // Get all products
 export const getAllProducts = async (req, res) => {
@@ -182,7 +183,6 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-// Delete a product
 export const deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -196,6 +196,22 @@ export const deleteProduct = async (req, res) => {
     if (!existingProduct) {
       return res.status(404).json({ error: "Product not found" });
     }
+
+    // Check if the user is authorized to delete the event
+    const userId = req.user.id; // The logged-in user's ID from the token
+    const userRole = req.user.role; // The role from the token
+
+    // Only allow the deletion if the user is an admin or the user who created the event
+    if (userRole !== Roles.Admin && existingProduct.user_id !== userId) {
+      return res
+        .status(403)
+        .json({
+          error: "Forbidden: You are not authorized to delete this product",
+        });
+    }
+
+    // Delete related order items
+    await dbDeleteOrderItemsByProductId(productId);
 
     // Proceed with deleting the product
     await dbDeleteProduct(productId);
