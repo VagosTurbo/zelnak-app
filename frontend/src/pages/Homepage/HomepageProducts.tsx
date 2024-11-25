@@ -251,7 +251,7 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({
                             display: 'block',
                             margin: 'auto',
                         }}>
-                        Přidat produkt
+                        Add new product
                     </ZelnakButton>
                 </Link>
             )}

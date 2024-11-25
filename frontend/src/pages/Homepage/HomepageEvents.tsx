@@ -250,7 +250,7 @@ export const HomepageEvents: React.FC<HomepageEventsProps> = ({
                             display: 'block',
                             margin: 'auto',
                         }}>
-                        Vytvořit novou událost
+                        Create New Event
                     </ZelnakButton>
                 </Link>
             )}
