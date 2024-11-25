@@ -33,17 +33,3 @@ spusteni BE lokalne:
 
 1. cd backend2.0
 2. npm run dev
-
-/////
-
-edit product - susi
-add event - v discordu - susi
-router.tsx - vyresit prava - JP
-zkontrolovat prava na BE - NEVIM KDO
-na farmer page pridat ze pokud je to jeho page tak bude mit tlacitko na edit - nevim kdo
-edit event - susi
-delete event
-delete product
-pozadi na admin page modal
-
--- rozdelit body
