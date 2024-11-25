@@ -1,15 +1,15 @@
 import { Box, Paper, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { apiGet } from '../../api/apiGet'
 import { apiPut } from '../../api/apiPut'
 import { ZelnakButton } from '../../components/ZelnakButton'
 import { useAuth } from '../../context/AuthContext'
 import { useCurrentUser } from '../../context/CurrentUserContext'
+import { Order } from '../../types/Order'
 import { User } from '../../types/User'
+import { formatDateTime } from '../../utils/myUtils'
 import Layout from '../layouts/Layout'
 import ProfileOrders from './ProfileOrders'
-import { Order } from '../../types/Order'
-import { apiGet } from '../../api/apiGet'
-import { formatDateTime } from '../../utils/myUtils'
 
 const ProfilePage: React.FC = () => {
     const { currentUser, isCustomer } = useCurrentUser()
@@ -131,23 +131,22 @@ const ProfilePage: React.FC = () => {
                 </Paper>
 
                 {/* Customer orders */}
-                {isCustomer ||
-                    (true && (
-                        // TODO: remove true
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                p: 3,
-                                my: 5,
-                            }}>
-                            <Paper elevation={3} sx={{ p: 3, width: '760px' }}>
-                                <ProfileOrders orders={userOrders} loading={loading} />
-                            </Paper>
-                        </Box>
-                    ))}
+                {(isCustomer || true) && (
+                    // TODO: remove true
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            p: 3,
+                            my: 5,
+                        }}>
+                        <Paper elevation={3} sx={{ p: 3, width: '760px' }}>
+                            <ProfileOrders orders={userOrders} loading={loading} />
+                        </Paper>
+                    </Box>
+                )}
             </Box>
         </Layout>
     )
