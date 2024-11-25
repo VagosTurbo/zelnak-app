@@ -165,7 +165,7 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({
                             <Typography variant="body2" sx={{ color: colors.colorText }}>
                                 Quantity: {product.quantity}
                             </Typography>
-                            {!isFarmer && (
+                            {!allowDelete && (
                                 <Link to={`${Routes.Seller}/${product.user_id}`}>
                                     <Typography
                                         variant="body2"
