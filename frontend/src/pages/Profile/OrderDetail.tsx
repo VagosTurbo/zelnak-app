@@ -34,7 +34,7 @@ const OrderDetail = () => {
         setError(null)
 
         try {
-            const response = await apiGet<Order[]>(`/orders/${id}/items`, accessToken)
+            const response = await apiGet<Order[]>(`/orders/${id}/items2`, accessToken)
             setOrder(response)
         } catch (error: any) {
             setError(error.message)

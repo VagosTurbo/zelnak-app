@@ -45,3 +45,5 @@ edit event - susi
 delete event
 delete product
 pozadi na admin page modal
+
+-- rozdelit body

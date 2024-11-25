@@ -33,12 +33,12 @@ const ProfileFarmerOrders = (props: ProfileFarmerOrdersProps) => {
 
     const apiRef = useGridApiRef()
 
-    const handleApprove = (rowIndex: number) => {
+    const handleApprove = (orderId: number) => {
         if (!authenticated || !accessToken) return
 
         try {
             const body = { status: OrderStatusEnum.Approved }
-            const response = apiPut<any>(`/orders/items/${rowIndex}/approve`, body, accessToken)
+            const response = apiPut<any>(`/orders/items/${orderId}/approve`, body, accessToken)
             console.log(response)
         } catch (err: any) {
             console.error('Failed to approve order', err)

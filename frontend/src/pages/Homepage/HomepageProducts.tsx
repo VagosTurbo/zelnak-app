@@ -181,7 +181,7 @@ export const HomepageProducts: React.FC<HomepageProductsProps> = ({
                                         onClick={() => {
                                             addProduct(
                                                 product.id,
-                                                3,
+                                                1,
                                                 product.price,
                                                 product.user_id,
                                                 product.username
