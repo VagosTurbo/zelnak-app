@@ -7,6 +7,7 @@ import { apiGet } from '../api/apiGet'
 import { apiPost } from '../api/apiPost'
 import { ZelnakButton } from '../components/ZelnakButton'
 import { useAuth } from '../context/AuthContext'
+import { useCurrentUser } from '../context/CurrentUserContext'
 import { Routes } from '../enums'
 import { wait } from '../utils/myUtils'
 import Layout from './layouts/Layout'
@@ -38,6 +39,7 @@ const AddCategory: React.FC = () => {
     const [error, setError] = useState<string | null>(null)
 
     const { accessToken } = useAuth()
+    const { isModerator } = useCurrentUser()
 
     const navigate = useNavigate()
 
@@ -94,7 +96,11 @@ const AddCategory: React.FC = () => {
             setMessage(response.message || 'Category created successfully!')
             setLoading(false)
             setError(null)
-            await wait(1000).then(() => navigate(Routes.Categories))
+            if (isModerator) {
+                await wait(1000).then(() => navigate(Routes.Categories))
+            } else {
+                await wait(1000).then(() => navigate(Routes.Profile))
+            }
         } catch (error: any) {
             setError(error.message || 'Error occurred')
             setMessage('')
