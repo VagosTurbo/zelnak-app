@@ -10,6 +10,7 @@
 
 ## URL aplikace
 - [https://vagosturbo.github.io/zelnak-app/](https://vagosturbo.github.io/zelnak-app/)
+- ⚠️ Pri prvom spustení a vyhľadaní prvého dotazu je potrebné chvíľu počkať, kým sa backendový server "prebudí". Keďže je hostovaný zadarmo, môže to trvať až minútu, no po tejto dobe by už malo byť všetko v poriadku.
 
 ## Uživatelé systému pro testování
 
